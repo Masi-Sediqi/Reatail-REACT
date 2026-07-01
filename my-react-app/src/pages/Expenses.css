@@ -1,0 +1,126 @@
+.expenses-summary {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 24px;
+}
+
+.expenses-filter {
+  grid-template-columns: minmax(260px, 1fr) 150px 140px 140px;
+}
+
+.expense-panel h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.expense-empty {
+  min-height: 190px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.expense-empty strong {
+  color: var(--text);
+  font-size: 18px;
+}
+
+.expense-empty span {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.expense-modal {
+  width: clamp(340px, 42vw, 520px) !important;
+  max-width: calc(100vw - 24px) !important;
+  max-height: min(760px, calc(100dvh - 42px)) !important;
+  gap: 14px 16px;
+  padding: clamp(20px, 2vw, 26px);
+  padding-bottom: max(28px, env(safe-area-inset-bottom));
+  border-radius: 10px;
+  background: var(--panel-bg);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+  overscroll-behavior: contain;
+}
+
+.expense-modal h2 {
+  margin-bottom: 8px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.expense-modal span {
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.expense-modal input,
+.expense-modal select,
+.expense-modal textarea {
+  min-height: 40px;
+  border-radius: 7px;
+  font-weight: 400;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease, transform 150ms ease;
+}
+
+.expense-modal input:focus,
+.expense-modal select:focus,
+.expense-modal textarea:focus {
+  border-color: var(--accent);
+  background: var(--panel-bg);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.expense-modal textarea {
+  min-height: 80px;
+}
+
+.expense-modal .tiny-plus {
+  color: var(--text);
+  font-size: 12px;
+}
+
+.expense-modal .inline-field button,
+.expense-modal .primary-btn {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.expense-modal .inline-field button:last-child {
+  border-color: var(--border);
+  background: var(--panel-bg);
+  color: var(--text);
+}
+
+.expense-modal .primary-btn {
+  min-height: 42px;
+  margin-top: 4px;
+  font-weight: 700;
+}
+
+@media (max-width: 980px) {
+  .expenses-filter,
+  .expenses-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .expenses-filter,
+  .expenses-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .expense-modal {
+    width: calc(100vw - 16px) !important;
+    max-width: calc(100vw - 16px) !important;
+    max-height: calc(100dvh - 30px) !important;
+    grid-template-columns: 1fr !important;
+    padding: 18px 14px max(32px, env(safe-area-inset-bottom));
+  }
+}

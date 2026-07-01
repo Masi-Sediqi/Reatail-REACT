@@ -1,0 +1,27 @@
+.recycle-toolbar {
+  max-width: 520px;
+}
+
+.recycle-toolbar select {
+  font-weight: 400;
+}
+
+.recycle-toolbar span {
+  font-weight: 400;
+}
+
+.inline-actions button {
+  font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .recycle-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .recycle-toolbar select {
+    width: 100%;
+  }
+}

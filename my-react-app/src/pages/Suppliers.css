@@ -1,0 +1,102 @@
+.supplier-modal {
+  width: clamp(340px, 48vw, 660px) !important;
+  max-width: calc(100vw - 24px) !important;
+  max-height: min(860px, calc(100dvh - 42px)) !important;
+  gap: 14px 18px;
+  padding: clamp(18px, 2vw, 28px);
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  border-radius: 10px;
+  background: var(--panel-bg);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+  overscroll-behavior: contain;
+}
+
+.supplier-modal h2 {
+  margin-bottom: 8px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.supplier-modal label {
+  gap: 7px;
+}
+
+.supplier-modal span {
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.supplier-modal input,
+.supplier-modal select,
+.supplier-modal textarea {
+  min-height: 39px;
+  border-radius: 7px;
+  font-weight: 400;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+
+.supplier-modal input:focus,
+.supplier-modal select:focus,
+.supplier-modal textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.supplier-modal input::placeholder,
+.supplier-modal textarea::placeholder {
+  color: #718096;
+  font-weight: 400;
+}
+
+.supplier-modal textarea {
+  min-height: 64px;
+}
+
+.supplier-modal .modal-actions button {
+  font-weight: 600;
+}
+
+.supplier-modal .modal-actions .primary-btn,
+.supplier-modal .inline-field button {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.supplier-modal .item-chip-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: -2px;
+}
+
+.supplier-modal .item-chip-row button {
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--text);
+  padding: 0 10px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.supplier-modal .item-chip-row span {
+  font-size: 14px;
+  line-height: 1;
+}
+
+@media (max-width: 640px) {
+  .supplier-modal {
+    width: calc(100vw - 16px) !important;
+    max-width: calc(100vw - 16px) !important;
+    max-height: calc(100dvh - 28px) !important;
+    padding: 18px 14px max(36px, env(safe-area-inset-bottom));
+    grid-template-columns: 1fr !important;
+  }
+}
