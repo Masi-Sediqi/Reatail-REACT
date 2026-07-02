@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import PrintPreviewModal from '../components/PrintPreviewModal.jsx'
+import CustomSelect from '../components/CustomSelect.jsx'
+import FloatingActionMenu from '../components/FloatingActionMenu.jsx'
 import { currencies } from '../data/dashboardData.js'
 import './Suppliers.css'
 
@@ -26,19 +28,12 @@ const normalizeSupplier = (supplier) => {
 }
 
 function ActionMenu({ isOpen, onDelete, onEdit, onToggle, supplier, t }) {
-  return (
-    <div className="row-actions" onPointerDown={(event) => event.stopPropagation()}>
-      <button className="dots-btn" type="button" onClick={onToggle} aria-label={t.actions}>
-        ...
-      </button>
-      {isOpen && (
-        <div className="row-action-menu">
-          <button type="button" onClick={onEdit}>{t.edit}</button>
-          <button className="danger" type="button" onClick={() => onDelete(supplier)}>{t.delete}</button>
-        </div>
-      )}
-    </div>
-  )
+  void isOpen
+  void onToggle
+  return <FloatingActionMenu ariaLabel={t.actions} actions={[
+    { label: t.edit, onClick: onEdit },
+    { danger: true, label: t.delete, onClick: () => onDelete(supplier) },
+  ]} />
 }
 
 export function SupplierModal({ initialSupplier, onClose, onSave, t }) {
@@ -61,6 +56,7 @@ export function SupplierModal({ initialSupplier, onClose, onSave, t }) {
   const removeSupplyItem = (item) => {
     setForm((current) => ({ ...current, items: current.items.filter((value) => value !== item) }))
   }
+  const currencyOptions = currencies.map((currency) => ({ value: currency.code, label: `${currency.symbol} ${currency.name}` }))
 
   return (
     <div className={`modal-backdrop ${closing ? 'closing' : ''}`} onClick={(event) => { event.stopPropagation(); requestClose() }}>
@@ -80,7 +76,7 @@ export function SupplierModal({ initialSupplier, onClose, onSave, t }) {
         <label><span>{t.phoneNumber}</span><input value={form.phone} onChange={(e) => update('phone', e.target.value)} /></label>
         <label><span>{t.businessType}</span><input placeholder={t.businessTypePlaceholder} value={form.businessType} onChange={(e) => update('businessType', e.target.value)} /></label>
         <label className="wide"><span>{t.address}</span><input value={form.address} onChange={(e) => update('address', e.target.value)} /></label>
-        <label className="wide"><span>{t.currency}</span><select value={form.currency} onChange={(e) => update('currency', e.target.value)}>{currencies.map((c) => <option value={c.code} key={c.code}>{c.symbol} {c.name}</option>)}</select></label>
+        <label className="wide"><span>{t.currency}</span><CustomSelect ariaLabel={t.currency} options={currencyOptions} value={form.currency} onChange={(value) => update('currency', value)} /></label>
         <label className="wide">
           <span>{t.itemsTheySupply}</span>
           <div className="inline-field">
@@ -121,16 +117,15 @@ export function SupplierModal({ initialSupplier, onClose, onSave, t }) {
 function SuppliersPage({ companyInfo, onMoveToRecycle, onNotify, onSuppliersChange, printSettings, suppliers, t }) {
   const [modalOpen, setModalOpen] = useState(false)
   const [editingSupplier, setEditingSupplier] = useState(null)
-  const [openActionId, setOpenActionId] = useState('')
   const [printOpen, setPrintOpen] = useState(false)
+  const [balanceFilter, setBalanceFilter] = useState('all')
   const totalPayables = suppliers.reduce((sum, supplier) => sum + Number(supplier.balance || 0), 0)
-
-  useEffect(() => {
-    if (!openActionId) return undefined
-    const closeMenu = () => setOpenActionId('')
-    document.addEventListener('pointerdown', closeMenu)
-    return () => document.removeEventListener('pointerdown', closeMenu)
-  }, [openActionId])
+  const balanceOptions = [
+    { value: 'all', label: t.all },
+    { value: 'payable', label: t.payable },
+    { value: 'receivable', label: t.receivable },
+    { value: 'settled', label: t.settledPlain },
+  ]
 
   const saveSupplier = (supplier) => {
     onSuppliersChange((current) => {
@@ -144,13 +139,11 @@ function SuppliersPage({ companyInfo, onMoveToRecycle, onNotify, onSuppliersChan
 
   const deleteSupplier = (supplier) => {
     onMoveToRecycle('suppliers', supplier)
-    setOpenActionId('')
   }
 
   const editSupplier = (supplier) => {
     setEditingSupplier(supplier)
     setModalOpen(true)
-    setOpenActionId('')
   }
 
   return (
@@ -163,12 +156,15 @@ function SuppliersPage({ companyInfo, onMoveToRecycle, onNotify, onSuppliersChan
         </div>
       </div>
       <div className="summary-grid four">
-        <article><span>{t.totalSuppliers}</span><strong>{suppliers.length}</strong></article>
-        <article><span>{t.totalPayables}</span><strong className="danger-text">{totalPayables.toFixed(2)} ؋</strong></article>
-        <article><span>{t.totalReceivables}</span><strong className="success-text">0.00 ؋</strong></article>
-        <article><span>{t.netBalance}</span><strong>{totalPayables.toFixed(2)} ؋</strong><small>{t.settled}</small></article>
+        <article className="tone-blue"><span>{t.totalSuppliers}</span><strong>{suppliers.length}</strong></article>
+        <article className="tone-orange"><span>{t.totalPayables}</span><strong className="danger-text">{totalPayables.toFixed(2)} ؋</strong></article>
+        <article className="tone-green"><span>{t.totalReceivables}</span><strong className="success-text">0.00 ؋</strong></article>
+        <article className="tone-navy"><span>{t.netBalance}</span><strong>{totalPayables.toFixed(2)} ؋</strong><small>{t.settled}</small></article>
       </div>
-      <div className="filter-bar"><input placeholder={t.searchSuppliers} /><select><option>{t.all}</option><option>{t.payable}</option><option>{t.receivable}</option><option>{t.settledPlain}</option></select></div>
+      <div className="filter-bar">
+        <input placeholder={t.searchSuppliers} />
+        <CustomSelect ariaLabel={t.filter} options={balanceOptions} value={balanceFilter} onChange={setBalanceFilter} />
+      </div>
       <div className="chip-row"><span className="active">{t.all}</span><span>{t.payable}</span><span>{t.receivable}</span><span>{t.settledPlain}</span></div>
       <div className="data-panel">
         <table className="data-table">
@@ -179,10 +175,8 @@ function SuppliersPage({ companyInfo, onMoveToRecycle, onNotify, onSuppliersChan
                 <td>{supplier.name}</td><td>{supplier.phone}</td><td>{supplier.address}</td><td>{supplier.currency}</td><td>{supplier.balance || '0.00'}</td><td><span className="status-pill active">{t.active}</span></td>
                 <td>
                   <ActionMenu
-                    isOpen={openActionId === supplier.id}
                     onDelete={deleteSupplier}
                     onEdit={() => editSupplier(supplier)}
-                    onToggle={() => setOpenActionId((current) => current === supplier.id ? '' : supplier.id)}
                     supplier={supplier}
                     t={t}
                   />
@@ -199,3 +193,4 @@ function SuppliersPage({ companyInfo, onMoveToRecycle, onNotify, onSuppliersChan
 }
 
 export default SuppliersPage
+

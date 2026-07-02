@@ -1,0 +1,140 @@
+.staff-filter {
+  grid-template-columns: minmax(260px, 1fr) 140px 140px;
+}
+
+.staff-panel h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.staff-empty {
+  min-height: 190px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.staff-empty strong {
+  color: var(--text);
+  font-size: 18px;
+}
+
+.staff-empty span {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.staff-modal {
+  width: clamp(320px, 38vw, 500px) !important;
+  max-width: calc(100vw - 24px) !important;
+  max-height: min(760px, calc(100dvh - 42px)) !important;
+  gap: 12px 14px;
+  padding: clamp(16px, 1.7vw, 22px);
+  padding-bottom: max(28px, env(safe-area-inset-bottom));
+  border-radius: 12px;
+  background: var(--panel-bg);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+  overscroll-behavior: contain;
+}
+
+.staff-modal h2 {
+  margin-bottom: 8px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.staff-modal span {
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.staff-modal input,
+.staff-modal select,
+.staff-modal textarea {
+  min-height: 40px;
+  border-radius: 7px;
+  font-weight: 400;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease, transform 150ms ease;
+}
+
+.staff-modal input:focus,
+.staff-modal select:focus,
+.staff-modal textarea:focus {
+  border-color: var(--accent);
+  background: var(--panel-bg);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.staff-modal .primary-btn {
+  min-height: 42px;
+  margin-top: 4px;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 700;
+}
+
+@media (max-width: 980px) {
+  .staff-filter {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .staff-filter {
+    grid-template-columns: 1fr;
+  }
+
+  .staff-modal {
+    width: calc(100vw - 16px) !important;
+    max-width: calc(100vw - 16px) !important;
+    max-height: calc(100dvh - 30px) !important;
+    grid-template-columns: 1fr !important;
+    padding: 18px 14px max(36px, env(safe-area-inset-bottom));
+  }
+}
+.staff-content .entity-heading {
+  gap: 20px;
+  margin-bottom: 26px;
+}
+
+.staff-content .entity-actions {
+  gap: 10px;
+}
+
+.staff-content .entity-actions button {
+  min-height: 42px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.staff-content .entity-actions .primary-btn {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+}
+.payroll-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-bg);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.payroll-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}

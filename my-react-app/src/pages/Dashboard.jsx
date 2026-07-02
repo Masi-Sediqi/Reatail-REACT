@@ -10,7 +10,12 @@ import {
   supplierCards,
 } from '../data/dashboardData.js'
 
-function Dashboard({ t }) {
+function Dashboard({ dashboardMetrics, t }) {
+  const withValues = (cards) => cards.map((card) => ({
+    ...card,
+    value: dashboardMetrics?.[card.labelKey] ?? card.value,
+  }))
+
   return (
     <div className="content">
       <div className="page-heading">
@@ -30,10 +35,10 @@ function Dashboard({ t }) {
         </div>
       </div>
 
-      <Section title={t.financialOverview} cards={financialCards} variant="financial" t={t} />
-      <Section title={t.suppliersOverview} cards={supplierCards} variant="three" t={t} />
-      <Section title={t.stockOverview} cards={stockCards} variant="three" t={t} />
-      <Section title={t.staffOverview} cards={staffCards} variant="three" t={t} />
+      <Section title={t.financialOverview} cards={withValues(financialCards)} variant="financial" t={t} />
+      <Section title={t.suppliersOverview} cards={withValues(supplierCards)} variant="three" t={t} />
+      <Section title={t.stockOverview} cards={withValues(stockCards)} variant="three" t={t} />
+      <Section title={t.staffOverview} cards={withValues(staffCards)} variant="three" t={t} />
       <TrendChart t={t} />
 
       <div className="bottom-grid">

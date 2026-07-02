@@ -1,11 +1,11 @@
 .supplier-modal {
-  width: clamp(340px, 48vw, 660px) !important;
+  width: clamp(320px, 42vw, 580px) !important;
   max-width: calc(100vw - 24px) !important;
   max-height: min(860px, calc(100dvh - 42px)) !important;
-  gap: 14px 18px;
-  padding: clamp(18px, 2vw, 28px);
+  gap: 12px 14px;
+  padding: clamp(16px, 1.7vw, 22px);
   padding-bottom: max(24px, env(safe-area-inset-bottom));
-  border-radius: 10px;
+  border-radius: 12px;
   background: var(--panel-bg);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
   overscroll-behavior: contain;
@@ -50,7 +50,7 @@
 }
 
 .supplier-modal textarea {
-  min-height: 64px;
+  min-height: 58px;
 }
 
 .supplier-modal .modal-actions button {

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import CustomSelect from '../components/CustomSelect.jsx'
 import './RecycleBin.css'
 
 function RecycleBinPage({ deletedItems, onPermanentDelete, onRestore, t }) {
@@ -6,6 +7,12 @@ function RecycleBinPage({ deletedItems, onPermanentDelete, onRestore, t }) {
   const filteredItems = useMemo(() => (
     filter === 'all' ? deletedItems : deletedItems.filter((item) => item.module === filter)
   ), [deletedItems, filter])
+  const filterOptions = [
+    { value: 'all', label: t.all },
+    { value: 'products', label: t.products },
+    { value: 'suppliers', label: t.suppliers },
+    { value: 'customers', label: t.customers },
+  ]
 
   return (
     <div className="entity-content">
@@ -14,12 +21,7 @@ function RecycleBinPage({ deletedItems, onPermanentDelete, onRestore, t }) {
       </div>
 
       <div className="recycle-toolbar">
-        <select value={filter} onChange={(event) => setFilter(event.target.value)}>
-          <option value="all">{t.all}</option>
-          <option value="products">{t.products}</option>
-          <option value="suppliers">{t.suppliers}</option>
-          <option value="customers">{t.customers}</option>
-        </select>
+        <CustomSelect ariaLabel={t.filter} options={filterOptions} value={filter} onChange={setFilter} />
         <span>{filteredItems.length} {t.records}</span>
       </div>
 

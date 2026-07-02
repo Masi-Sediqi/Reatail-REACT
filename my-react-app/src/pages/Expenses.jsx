@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import PrintPreviewModal from '../components/PrintPreviewModal.jsx'
+import CustomSelect from '../components/CustomSelect.jsx'
+import FloatingActionMenu from '../components/FloatingActionMenu.jsx'
 import { currencies } from '../data/dashboardData.js'
-import { WalletCards } from '../components/Icons.jsx'
+import { Search, WalletCards } from '../components/Icons.jsx'
 import './Expenses.css'
 
 const defaultExpenseCategories = ['Miscellaneous', 'Rent', 'Utilities', 'Transport', 'Salary', 'Inventory', 'Maintenance', 'Marketing', 'Food', 'Office Supplies']
@@ -27,18 +29,15 @@ const readExpenseCategories = () => {
   }
 }
 
+const getCategoryLabel = (category, t) => t.expenseCategories?.[category] ?? category
+
 function ExpenseActionMenu({ expense, isOpen, onDelete, onEdit, onToggle, t }) {
-  return (
-    <div className="row-actions" onPointerDown={(event) => event.stopPropagation()}>
-      <button className="dots-btn" type="button" onClick={onToggle} aria-label={t.actions}>...</button>
-      {isOpen && (
-        <div className="row-action-menu">
-          <button type="button" onClick={onEdit}>{t.edit}</button>
-          <button className="danger" type="button" onClick={() => onDelete(expense)}>{t.delete}</button>
-        </div>
-      )}
-    </div>
-  )
+  void isOpen
+  void onToggle
+  return <FloatingActionMenu ariaLabel={t.actions} actions={[
+    { label: t.edit, onClick: onEdit },
+    { danger: true, label: t.delete, onClick: () => onDelete(expense) },
+  ]} />
 }
 
 function ExpenseModal({ categories, initialExpense, onCategoryAdd, onClose, onSave, t }) {
@@ -61,6 +60,9 @@ function ExpenseModal({ categories, initialExpense, onCategoryAdd, onClose, onSa
     setNewCategory('')
     setCategoryMode(false)
   }
+  const categoryOptions = categories.map((category) => ({ value: category, label: getCategoryLabel(category, t) }))
+  const currencyOptions = currencies.map((item) => ({ value: item.code, label: item.code }))
+  const methodOptions = paymentMethods.map((item) => ({ value: item, label: t.paymentMethods?.[item] ?? item }))
 
   return (
     <div className={`modal-backdrop ${closing ? 'closing' : ''}`} onClick={requestClose}>
@@ -84,16 +86,12 @@ function ExpenseModal({ categories, initialExpense, onCategoryAdd, onClose, onSa
               <button type="button" onClick={saveCategory}>{t.add}</button>
               <button type="button" onClick={() => setCategoryMode(false)}>{t.cancel}</button>
             </div>
-          ) : (
-            <select value={form.category} onChange={(event) => update('category', event.target.value)}>
-              {categories.map((category) => <option key={category}>{category}</option>)}
-            </select>
-          )}
+          ) : <CustomSelect ariaLabel={t.category} options={categoryOptions} value={form.category} onChange={(value) => update('category', value)} />}
         </label>
         <label className="wide"><span>{t.description} *</span><input className={submitted && !form.description.trim() ? 'field-invalid' : ''} placeholder={t.expenseDescriptionPlaceholder} value={form.description} onChange={(event) => update('description', event.target.value)} /></label>
         <label><span>{t.amount} *</span><input className={submitted && !String(form.amount).trim() ? 'field-invalid' : ''} inputMode="decimal" placeholder="0" value={form.amount} onChange={(event) => update('amount', event.target.value)} /></label>
-        <label><span>{t.currency}</span><select value={form.currency} onChange={(event) => update('currency', event.target.value)}>{currencies.map((item) => <option value={item.code} key={item.code}>{item.code}</option>)}</select></label>
-        <label className="wide"><span>{t.paymentMethod}</span><select value={form.method} onChange={(event) => update('method', event.target.value)}>{paymentMethods.map((item) => <option value={item} key={item}>{t.paymentMethods?.[item] ?? item}</option>)}</select></label>
+        <label><span>{t.currency}</span><CustomSelect ariaLabel={t.currency} options={currencyOptions} value={form.currency} onChange={(value) => update('currency', value)} /></label>
+        <label className="wide"><span>{t.paymentMethod}</span><CustomSelect ariaLabel={t.paymentMethod} options={methodOptions} value={form.method} onChange={(value) => update('method', value)} /></label>
         <label className="wide"><span>{t.notes}</span><textarea placeholder={t.additionalNotes} value={form.notes} onChange={(event) => update('notes', event.target.value)} /></label>
         <button className="primary-btn wide" type="submit">{initialExpense ? t.saveChanges : t.addExpense}</button>
       </form>
@@ -105,22 +103,15 @@ function ExpensesPage({ companyInfo, expenses, onExpensesChange, onMoveToRecycle
   const [categories, setCategories] = useState(readExpenseCategories)
   const [modalOpen, setModalOpen] = useState(false)
   const [editingExpense, setEditingExpense] = useState(null)
-  const [openActionId, setOpenActionId] = useState('')
   const [printOpen, setPrintOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [methodFilter, setMethodFilter] = useState('all')
+  const [dateFilter, setDateFilter] = useState('all')
 
   useEffect(() => {
     window.localStorage.setItem('retail-expense-categories', JSON.stringify(categories.filter((category) => !defaultExpenseCategories.includes(category))))
   }, [categories])
-
-  useEffect(() => {
-    if (!openActionId) return undefined
-    const closeMenu = () => setOpenActionId('')
-    document.addEventListener('pointerdown', closeMenu)
-    return () => document.removeEventListener('pointerdown', closeMenu)
-  }, [openActionId])
 
   const filteredExpenses = useMemo(() => expenses.filter((expense) => {
     const matchesSearch = `${expense.description} ${expense.category}`.toLowerCase().includes(search.toLowerCase())
@@ -135,6 +126,20 @@ function ExpensesPage({ companyInfo, expenses, onExpensesChange, onMoveToRecycle
     const now = new Date()
     return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear() ? sum + Number(expense.amount || 0) : sum
   }, 0)
+  const printableExpenses = useMemo(() => filteredExpenses.map((expense) => ({
+    ...expense,
+    category: getCategoryLabel(expense.category, t),
+    method: t.paymentMethods?.[expense.method] ?? expense.method,
+  })), [filteredExpenses, t])
+  const categoryOptions = useMemo(() => [
+    { value: 'all', label: t.allCategories },
+    ...categories.map((category) => ({ value: category, label: getCategoryLabel(category, t) })),
+  ], [categories, t])
+  const methodOptions = useMemo(() => [
+    { value: 'all', label: t.allMethods },
+    ...paymentMethods.map((item) => ({ value: item, label: t.paymentMethods?.[item] ?? item })),
+  ], [t])
+  const dateOptions = useMemo(() => [{ value: 'all', label: t.allTime }], [t.allTime])
 
   const addCategory = (category) => {
     setCategories((current) => current.some((item) => item.toLowerCase() === category.toLowerCase()) ? current : [...current, category])
@@ -152,7 +157,6 @@ function ExpensesPage({ companyInfo, expenses, onExpensesChange, onMoveToRecycle
 
   const deleteExpense = (expense) => {
     onMoveToRecycle('expenses', expense)
-    setOpenActionId('')
   }
 
   return (
@@ -172,16 +176,13 @@ function ExpensesPage({ companyInfo, expenses, onExpensesChange, onMoveToRecycle
       </div>
 
       <div className="filter-card expenses-filter">
-        <input placeholder={t.searchExpenses} value={search} onChange={(event) => setSearch(event.target.value)} />
-        <select value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
-          <option value="all">{t.allCategories}</option>
-          {categories.map((category) => <option value={category} key={category}>{category}</option>)}
-        </select>
-        <select value={methodFilter} onChange={(event) => setMethodFilter(event.target.value)}>
-          <option value="all">{t.allMethods}</option>
-          {paymentMethods.map((item) => <option value={item} key={item}>{t.paymentMethods?.[item] ?? item}</option>)}
-        </select>
-        <select><option>{t.allTime}</option></select>
+        <div className="filter-search">
+          <Search size={18} />
+          <input placeholder={t.searchExpenses} value={search} onChange={(event) => setSearch(event.target.value)} />
+        </div>
+        <CustomSelect ariaLabel={t.category} options={categoryOptions} value={categoryFilter} onChange={setCategoryFilter} />
+        <CustomSelect ariaLabel={t.paymentMethod} options={methodOptions} value={methodFilter} onChange={setMethodFilter} />
+        <CustomSelect ariaLabel={t.allTime} options={dateOptions} value={dateFilter} onChange={setDateFilter} />
       </div>
 
       <div className="data-panel expense-panel">
@@ -198,7 +199,7 @@ function ExpensesPage({ companyInfo, expenses, onExpensesChange, onMoveToRecycle
             <tbody>
               {filteredExpenses.map((expense) => (
                 <tr key={expense.id}>
-                  <td><span className="soft-pill">{expense.category}</span></td>
+                  <td><span className="soft-pill">{getCategoryLabel(expense.category, t)}</span></td>
                   <td>{expense.description}</td>
                   <td className="danger-text">{Number(expense.amount || 0).toFixed(2)} {expense.currency}</td>
                   <td>{t.paymentMethods?.[expense.method] ?? expense.method}</td>
@@ -206,10 +207,8 @@ function ExpensesPage({ companyInfo, expenses, onExpensesChange, onMoveToRecycle
                   <td>
                     <ExpenseActionMenu
                       expense={expense}
-                      isOpen={openActionId === expense.id}
                       onDelete={deleteExpense}
-                      onEdit={() => { setEditingExpense(expense); setModalOpen(true); setOpenActionId('') }}
-                      onToggle={() => setOpenActionId((current) => current === expense.id ? '' : expense.id)}
+                      onEdit={() => { setEditingExpense(expense); setModalOpen(true) }}
                       t={t}
                     />
                   </td>
@@ -221,7 +220,7 @@ function ExpensesPage({ companyInfo, expenses, onExpensesChange, onMoveToRecycle
       </div>
 
       {modalOpen && <ExpenseModal categories={categories} initialExpense={editingExpense} onCategoryAdd={addCategory} onClose={() => { setModalOpen(false); setEditingExpense(null) }} onSave={saveExpense} t={t} />}
-      {printOpen && <PrintPreviewModal companyInfo={companyInfo} onClose={() => setPrintOpen(false)} printSettings={printSettings} rows={filteredExpenses} title={t.expenseReport} columns={[{ key: 'category', label: t.category }, { key: 'description', label: t.description }, { key: 'amount', label: t.amount }, { key: 'currency', label: t.currency }, { key: 'method', label: t.paymentMethod }]} t={t} />}
+      {printOpen && <PrintPreviewModal companyInfo={companyInfo} onClose={() => setPrintOpen(false)} printSettings={printSettings} rows={printableExpenses} title={t.expenseReport} columns={[{ key: 'category', label: t.category }, { key: 'description', label: t.description }, { key: 'amount', label: t.amount }, { key: 'currency', label: t.currency }, { key: 'method', label: t.paymentMethod }]} t={t} />}
     </div>
   )
 }

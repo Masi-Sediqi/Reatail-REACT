@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import CustomSelect from '../components/CustomSelect.jsx'
 import { colorThemes, currencies, printTemplates, profileIcons, settingsTabs } from '../data/dashboardData.js'
 
 function SettingsPage({
@@ -20,6 +21,25 @@ function SettingsPage({
   const [activeTab, setActiveTab] = useState('general')
   const fileInputRef = useRef(null)
   const SaveIcon = profileIcons.save
+  const currencyOptions = currencies.map((currency) => ({ value: currency.code, label: `${currency.symbol} ${currency.name} (${currency.code})` }))
+  const companyCurrencyOptions = [
+    { value: '؋ Afghan Afghani (AFN)', label: '؋ Afghan Afghani (AFN)' },
+    { value: '$ US Dollar (USD)', label: '$ US Dollar (USD)' },
+    { value: '€ Euro (EUR)', label: '€ Euro (EUR)' },
+  ]
+  const languageOptions = [
+    { value: 'en', label: 'English (English)' },
+    { value: 'fa', label: 'دری' },
+    { value: 'ps', label: 'پښتو' },
+  ]
+  const alignmentOptions = [
+    { value: 'Left', label: t.left ?? 'Left' },
+    { value: 'Center', label: t.center ?? 'Center' },
+    { value: 'Right', label: t.right ?? 'Right' },
+  ]
+  const fontOptions = ['Arial', 'Tahoma', 'Verdana', 'Times New Roman'].map((item) => ({ value: item, label: item }))
+  const reportPaperOptions = ['A4', 'Letter', 'A5'].map((item) => ({ value: item, label: item }))
+  const billingPaperOptions = ['80mm (Thermal)', 'A4', 'Letter'].map((item) => ({ value: item, label: item }))
 
   const updateField = (field, value) => {
     onCompanyInfoChange((current) => ({ ...current, [field]: value }))
@@ -90,13 +110,7 @@ function SettingsPage({
 
           <label className="single-field">
             <span>{t.baseCurrency ?? 'Base Currency'}</span>
-            <select value={baseCurrency} onChange={(event) => onBaseCurrencyChange(event.target.value)}>
-              {currencies.map((currency) => (
-                <option value={currency.code} key={currency.code}>
-                  {currency.symbol} {currency.name} ({currency.code})
-                </option>
-              ))}
-            </select>
+            <CustomSelect ariaLabel={t.baseCurrency ?? 'Base Currency'} options={currencyOptions} value={baseCurrency} onChange={onBaseCurrencyChange} />
           </label>
 
           <h3 className="settings-subtitle">
@@ -213,44 +227,23 @@ function SettingsPage({
               ))}
               <label>
                 <span>{t.headerAlignment ?? 'Header Alignment'}</span>
-                <select value={printSettings.headerAlignment} onChange={(event) => updatePrintField('headerAlignment', event.target.value)}>
-                  <option>Left</option>
-                  <option>Center</option>
-                  <option>Right</option>
-                </select>
+                <CustomSelect ariaLabel={t.headerAlignment ?? 'Header Alignment'} options={alignmentOptions} value={printSettings.headerAlignment} onChange={(value) => updatePrintField('headerAlignment', value)} />
               </label>
               <label>
                 <span>{t.footerAlignment ?? 'Footer Alignment'}</span>
-                <select value={printSettings.footerAlignment} onChange={(event) => updatePrintField('footerAlignment', event.target.value)}>
-                  <option>Left</option>
-                  <option>Center</option>
-                  <option>Right</option>
-                </select>
+                <CustomSelect ariaLabel={t.footerAlignment ?? 'Footer Alignment'} options={alignmentOptions} value={printSettings.footerAlignment} onChange={(value) => updatePrintField('footerAlignment', value)} />
               </label>
               <label>
                 <span>{t.fontFamily ?? 'Font Family'}</span>
-                <select value={printSettings.fontFamily} onChange={(event) => updatePrintField('fontFamily', event.target.value)}>
-                  <option>Arial</option>
-                  <option>Tahoma</option>
-                  <option>Verdana</option>
-                  <option>Times New Roman</option>
-                </select>
+                <CustomSelect ariaLabel={t.fontFamily ?? 'Font Family'} options={fontOptions} value={printSettings.fontFamily} onChange={(value) => updatePrintField('fontFamily', value)} />
               </label>
               <label>
                 <span>{t.reportPaperSize ?? 'Paper Size (Reports)'}</span>
-                <select value={printSettings.reportPaperSize} onChange={(event) => updatePrintField('reportPaperSize', event.target.value)}>
-                  <option>A4</option>
-                  <option>Letter</option>
-                  <option>A5</option>
-                </select>
+                <CustomSelect ariaLabel={t.reportPaperSize ?? 'Paper Size (Reports)'} options={reportPaperOptions} value={printSettings.reportPaperSize} onChange={(value) => updatePrintField('reportPaperSize', value)} />
               </label>
               <label>
                 <span>{t.billingPaperSize ?? 'Billing Paper Size'}</span>
-                <select value={printSettings.billingPaperSize} onChange={(event) => updatePrintField('billingPaperSize', event.target.value)}>
-                  <option>80mm (Thermal)</option>
-                  <option>A4</option>
-                  <option>Letter</option>
-                </select>
+                <CustomSelect ariaLabel={t.billingPaperSize ?? 'Billing Paper Size'} options={billingPaperOptions} value={printSettings.billingPaperSize} onChange={(value) => updatePrintField('billingPaperSize', value)} />
               </label>
               <label className="wide">
                 <span>{t.footerText ?? 'Footer Text'}</span>
@@ -370,19 +363,11 @@ function SettingsPage({
             </label>
             <label>
               <span>{t.defaultCurrency}</span>
-              <select value={companyInfo.currency} onChange={(event) => updateField('currency', event.target.value)}>
-                <option>؋ Afghan Afghani (AFN)</option>
-                <option>$ US Dollar (USD)</option>
-                <option>€ Euro (EUR)</option>
-              </select>
+              <CustomSelect ariaLabel={t.defaultCurrency} options={companyCurrencyOptions} value={companyInfo.currency} onChange={(value) => updateField('currency', value)} />
             </label>
             <label>
               <span>{t.language}</span>
-              <select value={language} onChange={(event) => onLanguageChange(event.target.value)}>
-                <option value="en">English (English)</option>
-                <option value="fa">دری</option>
-                <option value="ps">پشتو</option>
-              </select>
+              <CustomSelect ariaLabel={t.language} options={languageOptions} value={language} onChange={onLanguageChange} />
             </label>
           </form>
         </section>
@@ -397,3 +382,4 @@ function SettingsPage({
 }
 
 export default SettingsPage
+

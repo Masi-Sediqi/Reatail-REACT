@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 import PrintPreviewModal from '../components/PrintPreviewModal.jsx'
+import CustomSelect from '../components/CustomSelect.jsx'
+import FloatingActionMenu from '../components/FloatingActionMenu.jsx'
 import { SupplierModal } from './Suppliers.jsx'
 import { currencies, productUnits } from '../data/dashboardData.js'
 import './Products.css'
@@ -21,21 +23,15 @@ const emptyProduct = {
 }
 
 const alertBeforeOptions = ['1 week', '2 weeks', '1 month', '3 months', '6 months', '1 year']
-
 function ProductActionMenu({ isOpen, onDelete, onEdit, onToggle, product, t }) {
-  return (
-    <div className="row-actions" onPointerDown={(event) => event.stopPropagation()}>
-      <button className="dots-btn" type="button" onClick={onToggle} aria-label={t.actions}>...</button>
-      {isOpen && (
-        <div className="row-action-menu">
-          <button type="button">{t.view}</button>
-          <button type="button" onClick={onEdit}>{t.edit}</button>
-          <button type="button">{t.viewBarcode}</button>
-          <button className="danger" type="button" onClick={() => onDelete(product)}>{t.delete}</button>
-        </div>
-      )}
-    </div>
-  )
+  void isOpen
+  void onToggle
+  return <FloatingActionMenu ariaLabel={t.actions} actions={[
+    { label: t.view },
+    { label: t.edit, onClick: onEdit },
+    { label: t.viewBarcode },
+    { danger: true, label: t.delete, onClick: () => onDelete(product) },
+  ]} />
 }
 
 function ProductModal({ categories, initialProduct, onCategoryAdd, onClose, onProductSave, onSupplierSave, suppliers, t }) {
@@ -60,6 +56,14 @@ function ProductModal({ categories, initialProduct, onCategoryAdd, onClose, onPr
     setNewCategory('')
     setCategoryMode(false)
   }
+  const categoryOptions = categories.map((item) => ({ value: item, label: item }))
+  const alertOptions = alertBeforeOptions.map((item) => ({ value: item, label: t.alertOptions?.[item] ?? item }))
+  const unitOptions = productUnits.map((item) => ({ value: item, label: item }))
+  const currencyOptions = currencies.map((item) => ({ value: item.code, label: item.code }))
+  const supplierOptions = [
+    { value: '', label: t.selectSupplier },
+    ...suppliers.map((supplier) => ({ value: supplier.id, label: supplier.name })),
+  ]
 
   return (
     <div className={`modal-backdrop ${closing ? 'closing' : ''}`} onClick={requestClose}>
@@ -86,9 +90,7 @@ function ProductModal({ categories, initialProduct, onCategoryAdd, onClose, onPr
               <button type="button" onClick={addCategory}>{t.add}</button>
               <button type="button" onClick={() => setCategoryMode(false)}>{t.cancel}</button>
             </div>
-          ) : (
-            <select value={form.category} onChange={(e) => update('category', e.target.value)}>{categories.map((item) => <option key={item}>{item}</option>)}</select>
-          )}
+          ) : <CustomSelect ariaLabel={t.category} options={categoryOptions} value={form.category} onChange={(value) => update('category', value)} />}
         </label>
         <label><span>{t.purchasePrice}</span><input placeholder="0.00" value={form.purchase} onChange={(e) => update('purchase', e.target.value)} /></label>
         <label><span>{t.sellingPrice}</span><input placeholder="0.00" value={form.selling} onChange={(e) => update('selling', e.target.value)} /></label>
@@ -96,15 +98,13 @@ function ProductModal({ categories, initialProduct, onCategoryAdd, onClose, onPr
         <label><span>{t.expiryDate} <small>({t.optional})</small></span><input type="date" value={form.expiry} onChange={(e) => update('expiry', e.target.value)} /></label>
         <label>
           <span>{t.alertMeBefore}</span>
-          <select value={form.alertBefore} onChange={(e) => update('alertBefore', e.target.value)}>
-            {alertBeforeOptions.map((item) => <option value={item} key={item}>{t.alertOptions?.[item] ?? item}</option>)}
-          </select>
+          <CustomSelect ariaLabel={t.alertMeBefore} options={alertOptions} value={form.alertBefore} onChange={(value) => update('alertBefore', value)} />
         </label>
         <label className="wide"><span>{t.lowStockThreshold} <small>({t.optional})</small></span><input placeholder="e.g. 10 pcs" value={form.lowStock} onChange={(e) => update('lowStock', e.target.value)} /></label>
         <label><span>{t.quantity}</span><input placeholder="0" value={form.quantity} onChange={(e) => update('quantity', e.target.value)} /></label>
-        <label><span>{t.unit}</span><select value={form.unit} onChange={(e) => update('unit', e.target.value)}>{productUnits.map((item) => <option key={item}>{item}</option>)}</select></label>
-        <label><span>{t.currency}</span><select value={form.currency} onChange={(e) => update('currency', e.target.value)}>{currencies.map((item) => <option value={item.code} key={item.code}>{item.code}</option>)}</select></label>
-        <label className="wide supplier-select-box"><span>{t.suppliers} <small>({t.optional})</small></span><div className="inline-field"><select value={form.supplierId} onChange={(e) => update('supplierId', e.target.value)}><option value="">{t.selectSupplier}</option>{suppliers.map((supplier) => <option value={supplier.id} key={supplier.id}>{supplier.name}</option>)}</select><button type="button" onClick={(event) => { event.stopPropagation(); setSupplierModalOpen(true) }}>+</button></div></label>
+        <label><span>{t.unit}</span><CustomSelect ariaLabel={t.unit} options={unitOptions} value={form.unit} onChange={(value) => update('unit', value)} /></label>
+        <label><span>{t.currency}</span><CustomSelect ariaLabel={t.currency} options={currencyOptions} value={form.currency} onChange={(value) => update('currency', value)} /></label>
+        <label className="wide supplier-select-box"><span>{t.suppliers} <small>({t.optional})</small></span><div className="inline-field"><CustomSelect ariaLabel={t.suppliers} options={supplierOptions} value={form.supplierId} onChange={(value) => update('supplierId', value)} /><button type="button" onClick={(event) => { event.stopPropagation(); setSupplierModalOpen(true) }}>+</button></div></label>
         <button className="primary-btn wide" type="submit">{initialProduct ? t.saveChanges : t.addProduct}</button>
       </form>
       {supplierModalOpen && (
@@ -125,15 +125,50 @@ function ProductModal({ categories, initialProduct, onCategoryAdd, onClose, onPr
 function ProductsPage({ categories, companyInfo, onCategoryAdd, onMoveToRecycle, onNotify, onProductsChange, onSuppliersChange, printSettings, products, suppliers, t }) {
   const [modalOpen, setModalOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState(null)
-  const [openActionId, setOpenActionId] = useState('')
   const [printOpen, setPrintOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('all')
+  const [stockFilter, setStockFilter] = useState('all')
+  const [dateFilter, setDateFilter] = useState('all')
 
-  useEffect(() => {
-    if (!openActionId) return undefined
-    const closeMenu = () => setOpenActionId('')
-    document.addEventListener('pointerdown', closeMenu)
-    return () => document.removeEventListener('pointerdown', closeMenu)
-  }, [openActionId])
+  const categoryOptions = useMemo(() => [
+    { value: 'all', label: t.allCategories },
+    ...categories.map((item) => ({ value: item, label: item })),
+  ], [categories, t.allCategories])
+
+  const stockOptions = useMemo(() => [
+    { value: 'all', label: t.stockStatusAll },
+    { value: 'in', label: t.inStock },
+    { value: 'low', label: t.lowStock },
+    { value: 'out', label: t.outOfStock },
+    { value: 'expiring', label: t.expiringSoon },
+    { value: 'expired', label: t.expired },
+  ], [t.expired, t.expiringSoon, t.inStock, t.lowStock, t.outOfStock, t.stockStatusAll])
+
+  const dateOptions = useMemo(() => [
+    { value: 'all', label: t.allTime },
+  ], [t.allTime])
+
+  const filteredProducts = useMemo(() => {
+    const needle = search.trim().toLowerCase()
+    const today = new Date()
+    const soon = new Date()
+    soon.setDate(today.getDate() + 30)
+    return products.filter((product) => {
+      const quantity = Number(product.quantity || 0)
+      const lowStock = Number(product.lowStock || 0)
+      const expiryDate = product.expiry ? new Date(`${product.expiry}T12:00:00`) : null
+      const matchesSearch = !needle || `${product.name} ${product.code} ${product.barcode}`.toLowerCase().includes(needle)
+      const matchesCategory = categoryFilter === 'all' || product.category === categoryFilter
+      const matchesStock = stockFilter === 'all'
+        || (stockFilter === 'in' && quantity > 0)
+        || (stockFilter === 'out' && quantity <= 0)
+        || (stockFilter === 'low' && quantity > 0 && lowStock > 0 && quantity <= lowStock)
+        || (stockFilter === 'expired' && expiryDate && expiryDate < today)
+        || (stockFilter === 'expiring' && expiryDate && expiryDate >= today && expiryDate <= soon)
+      return matchesSearch && matchesCategory && matchesStock
+    })
+  }, [categoryFilter, products, search, stockFilter])
 
   const saveProduct = (product) => {
     onProductsChange((current) => {
@@ -151,13 +186,11 @@ function ProductsPage({ categories, companyInfo, onCategoryAdd, onMoveToRecycle,
 
   const deleteProduct = (product) => {
     onMoveToRecycle('products', product)
-    setOpenActionId('')
   }
 
   const editProduct = (product) => {
     setEditingProduct(product)
     setModalOpen(true)
-    setOpenActionId('')
   }
 
   return (
@@ -166,23 +199,26 @@ function ProductsPage({ categories, companyInfo, onCategoryAdd, onMoveToRecycle,
         <div><h1>{t.products}</h1><p>{t.manageProductInventory}</p></div>
         <div className="entity-actions"><button type="button" onClick={() => setPrintOpen(true)}>{t.printReport}</button><button className="primary-btn" type="button" onClick={() => setModalOpen(true)}>+ {t.addProduct}</button></div>
       </div>
-      <div className="filter-card"><input placeholder={t.searchProducts} /><select><option>{t.allCategories}</option>{categories.map((item) => <option key={item}>{item}</option>)}</select><select><option>{t.stockStatusAll}</option><option>{t.inStock}</option><option>{t.outOfStock}</option></select><select><option>{t.allTime}</option></select></div>
+      <div className="filter-card">
+        <input placeholder={t.searchProducts} value={search} onChange={(event) => setSearch(event.target.value)} />
+        <CustomSelect ariaLabel={t.category} options={categoryOptions} value={categoryFilter} onChange={setCategoryFilter} />
+        <CustomSelect ariaLabel={t.stock} className="stock-select" options={stockOptions} value={stockFilter} onChange={setStockFilter} />
+        <CustomSelect ariaLabel={t.allTime} options={dateOptions} value={dateFilter} onChange={setDateFilter} />
+      </div>
       <div className="data-panel">
-        <h2>{t.products} ({products.length})</h2>
+        <h2>{t.products} ({filteredProducts.length})</h2>
         <table className="data-table">
           <thead><tr><th>{t.name}</th><th>{t.code}</th><th>{t.category}</th><th>{t.purchase}</th><th>{t.selling}</th><th>{t.profit}</th><th>{t.stock}</th><th>{t.status}</th><th>{t.actions}</th></tr></thead>
           <tbody>
-            {products.length === 0 ? <tr><td colSpan="9" className="empty-cell">{t.noProductsFound}</td></tr> : products.map((product) => {
+            {filteredProducts.length === 0 ? <tr><td colSpan="9" className="empty-cell">{t.noProductsFound}</td></tr> : filteredProducts.map((product) => {
               const profit = Number(product.selling || 0) - Number(product.purchase || 0)
               return (
                 <tr key={product.id}>
                   <td>{product.name}</td><td>{product.code}</td><td><span className="soft-pill">{product.category}</span></td><td>{product.purchase || '0.00'} ؋</td><td>{product.selling || '0.00'} ؋</td><td className="success-text">{profit.toFixed(2)} ؋</td><td>{product.quantity || 0} {product.unit}</td><td><span className={product.status === 'Out of Stock' ? 'status-pill danger' : 'status-pill active'}>{product.status === 'Out of Stock' ? t.outOfStock : t.inStock}</span></td>
                   <td>
                     <ProductActionMenu
-                      isOpen={openActionId === product.id}
                       onDelete={deleteProduct}
                       onEdit={() => editProduct(product)}
-                      onToggle={() => setOpenActionId((current) => current === product.id ? '' : product.id)}
                       product={product}
                       t={t}
                     />
@@ -194,7 +230,7 @@ function ProductsPage({ categories, companyInfo, onCategoryAdd, onMoveToRecycle,
         </table>
       </div>
       {modalOpen && <ProductModal categories={categories} initialProduct={editingProduct} onCategoryAdd={onCategoryAdd} onClose={() => { setModalOpen(false); setEditingProduct(null) }} onProductSave={saveProduct} onSupplierSave={saveSupplier} suppliers={suppliers} t={t} />}
-      {printOpen && <PrintPreviewModal companyInfo={companyInfo} onClose={() => setPrintOpen(false)} printSettings={printSettings} rows={products} title={t.productInventoryReport} columns={[{ key: 'name', label: t.name }, { key: 'code', label: t.code }, { key: 'category', label: t.category }, { key: 'purchase', label: t.purchase }, { key: 'selling', label: t.selling }, { key: 'quantity', label: t.stock }, { key: 'status', label: t.status }]} t={t} />}
+      {printOpen && <PrintPreviewModal companyInfo={companyInfo} onClose={() => setPrintOpen(false)} printSettings={printSettings} rows={filteredProducts} title={t.productInventoryReport} columns={[{ key: 'name', label: t.name }, { key: 'code', label: t.code }, { key: 'category', label: t.category }, { key: 'purchase', label: t.purchase }, { key: 'selling', label: t.selling }, { key: 'quantity', label: t.stock }, { key: 'status', label: t.status }]} t={t} />}
     </div>
   )
 }

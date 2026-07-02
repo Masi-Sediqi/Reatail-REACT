@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import PrintPreviewModal from '../components/PrintPreviewModal.jsx'
+import CustomSelect from '../components/CustomSelect.jsx'
+import FloatingActionMenu from '../components/FloatingActionMenu.jsx'
 import './Customers.css'
 
 const emptyCustomer = {
@@ -14,18 +16,13 @@ const emptyCustomer = {
 }
 
 function CustomerActionMenu({ customer, isOpen, onDelete, onEdit, onToggle, t }) {
-  return (
-    <div className="row-actions" onPointerDown={(event) => event.stopPropagation()}>
-      <button className="dots-btn" type="button" onClick={onToggle} aria-label={t.actions}>...</button>
-      {isOpen && (
-        <div className="row-action-menu">
-          <button type="button">{t.view}</button>
-          <button type="button" onClick={onEdit}>{t.edit}</button>
-          <button className="danger" type="button" onClick={() => onDelete(customer)}>{t.delete}</button>
-        </div>
-      )}
-    </div>
-  )
+  void isOpen
+  void onToggle
+  return <FloatingActionMenu ariaLabel={t.actions} actions={[
+    { label: t.view },
+    { label: t.edit, onClick: onEdit },
+    { danger: true, label: t.delete, onClick: () => onDelete(customer) },
+  ]} />
 }
 
 function CustomerModal({ initialCustomer, onClose, onSave, t }) {
@@ -71,17 +68,23 @@ function CustomerModal({ initialCustomer, onClose, onSave, t }) {
 function CustomersPage({ companyInfo, customers, onCustomersChange, onMoveToRecycle, onNotify, printSettings, t }) {
   const [modalOpen, setModalOpen] = useState(false)
   const [editingCustomer, setEditingCustomer] = useState(null)
-  const [openActionId, setOpenActionId] = useState('')
   const [printOpen, setPrintOpen] = useState(false)
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [paymentFilter, setPaymentFilter] = useState('all')
+  const [dateFilter, setDateFilter] = useState('all')
   const totalPurchases = customers.reduce((sum, customer) => sum + Number(customer.purchases || 0), 0)
   const totalPending = customers.reduce((sum, customer) => sum + Number(customer.pending || 0), 0)
-
-  useEffect(() => {
-    if (!openActionId) return undefined
-    const closeMenu = () => setOpenActionId('')
-    document.addEventListener('pointerdown', closeMenu)
-    return () => document.removeEventListener('pointerdown', closeMenu)
-  }, [openActionId])
+  const statusOptions = [
+    { value: 'all', label: t.allStatuses },
+    { value: 'active', label: t.active },
+    { value: 'vip', label: t.vipCustomers },
+  ]
+  const paymentOptions = [
+    { value: 'all', label: t.paymentStatus },
+    { value: 'pending', label: t.pendingPayments },
+    { value: 'settled', label: t.settledPlain },
+  ]
+  const dateOptions = [{ value: 'all', label: t.allTime }]
 
   const saveCustomer = (customer) => {
     onCustomersChange((current) => {
@@ -95,7 +98,6 @@ function CustomersPage({ companyInfo, customers, onCustomersChange, onMoveToRecy
 
   const deleteCustomer = (customer) => {
     onMoveToRecycle('customers', customer)
-    setOpenActionId('')
   }
 
   return (
@@ -117,9 +119,9 @@ function CustomersPage({ companyInfo, customers, onCustomersChange, onMoveToRecy
 
       <div className="filter-card">
         <input placeholder={t.searchCustomers} />
-        <select><option>{t.allStatuses}</option><option>{t.active}</option><option>{t.vipCustomers}</option></select>
-        <select><option>{t.paymentStatus}</option><option>{t.pendingPayments}</option><option>{t.settledPlain}</option></select>
-        <select><option>{t.allTime}</option></select>
+        <CustomSelect ariaLabel={t.status} options={statusOptions} value={statusFilter} onChange={setStatusFilter} />
+        <CustomSelect ariaLabel={t.paymentStatus} options={paymentOptions} value={paymentFilter} onChange={setPaymentFilter} />
+        <CustomSelect ariaLabel={t.allTime} options={dateOptions} value={dateFilter} onChange={setDateFilter} />
       </div>
 
       <div className="data-panel">
@@ -137,10 +139,8 @@ function CustomersPage({ companyInfo, customers, onCustomersChange, onMoveToRecy
                 <td>
                   <CustomerActionMenu
                     customer={customer}
-                    isOpen={openActionId === customer.id}
                     onDelete={deleteCustomer}
-                    onEdit={() => { setEditingCustomer(customer); setModalOpen(true); setOpenActionId('') }}
-                    onToggle={() => setOpenActionId((current) => current === customer.id ? '' : customer.id)}
+                    onEdit={() => { setEditingCustomer(customer); setModalOpen(true) }}
                     t={t}
                   />
                 </td>

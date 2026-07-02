@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import CustomSelect from './CustomSelect.jsx'
 import { printTemplates } from '../data/dashboardData.js'
 
 function PrintPreviewModal({ companyInfo, onClose, printSettings, rows, title, columns, t }) {
@@ -19,6 +20,13 @@ function PrintPreviewModal({ companyInfo, onClose, printSettings, rows, title, c
   const templateGradient = `linear-gradient(90deg, ${template.colors[0]}, ${template.colors[1]})`
   const encodedSubject = encodeURIComponent(title)
   const encodedBody = encodeURIComponent(`${title}\n${rows.length} ${t.totalRecords}`)
+  const paperOptions = ['A4 (210x297mm)', 'Letter', 'A5'].map((item) => ({ value: item, label: item }))
+  const borderOptions = ['Solid', 'Dashed', 'None'].map((item) => ({ value: item, label: t[item.toLowerCase()] ?? item }))
+  const watermarkPositionOptions = [
+    { value: 'center', label: t.center ?? 'Center' },
+    { value: 'top', label: t.top ?? 'Top' },
+    { value: 'bottom', label: t.bottom ?? 'Bottom' },
+  ]
   const requestClose = () => {
     if (closing) return
     setClosing(true)
@@ -97,11 +105,7 @@ function PrintPreviewModal({ companyInfo, onClose, printSettings, rows, title, c
           <aside className="print-controls">
             <label>
               <span>{t.paperSize}</span>
-              <select value={paperSize} onChange={(event) => setPaperSize(event.target.value)}>
-                <option>A4 (210x297mm)</option>
-                <option>Letter</option>
-                <option>A5</option>
-              </select>
+              <CustomSelect ariaLabel={t.paperSize} options={paperOptions} value={paperSize} onChange={setPaperSize} />
             </label>
             <div className="print-toggle-row">
               <span>{t.showHeader}</span>
@@ -117,11 +121,7 @@ function PrintPreviewModal({ companyInfo, onClose, printSettings, rows, title, c
             </label>
             <label>
               <span>{t.borderStyle}</span>
-              <select value={borderStyle} onChange={(event) => setBorderStyle(event.target.value)}>
-                <option>Solid</option>
-                <option>Dashed</option>
-                <option>None</option>
-              </select>
+              <CustomSelect ariaLabel={t.borderStyle} options={borderOptions} value={borderStyle} onChange={setBorderStyle} />
             </label>
             <div>
               <span className="control-caption">{t.printTemplates}</span>
@@ -145,11 +145,7 @@ function PrintPreviewModal({ companyInfo, onClose, printSettings, rows, title, c
                     <span>{t.opacity ?? 'Opacity'}: {watermarkOpacity}%</span>
                     <input type="range" min="5" max="60" value={watermarkOpacity} onChange={(event) => setWatermarkOpacity(event.target.value)} />
                   </label>
-                  <select value={watermarkPosition} onChange={(event) => setWatermarkPosition(event.target.value)}>
-                    <option value="center">{t.center ?? 'Center'}</option>
-                    <option value="top">{t.top ?? 'Top'}</option>
-                    <option value="bottom">{t.bottom ?? 'Bottom'}</option>
-                  </select>
+                  <CustomSelect ariaLabel={t.position ?? 'Position'} options={watermarkPositionOptions} value={watermarkPosition} onChange={setWatermarkPosition} />
                 </>
               )}
             </div>
