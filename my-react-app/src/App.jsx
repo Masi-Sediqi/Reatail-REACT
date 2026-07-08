@@ -1,5 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+﻿import { useEffect, useMemo, useRef, useState } from 'react'
 import Dashboard from './pages/Dashboard.jsx'
+import DashboardMetricDetail from './pages/DashboardMetricDetail.jsx'
+import CashWalletPage from './pages/CashWalletPage.jsx'
 import Profile from './pages/Profile.jsx'
 import SettingsPage from './pages/Settings.jsx'
 import ProductsPage from './pages/Products.jsx'
@@ -12,15 +14,28 @@ import BillingPage from './pages/Billing.jsx'
 import SalesBillsPage from './pages/SalesBills.jsx'
 import GodownPage from './pages/Godown.jsx'
 import LoansPage from './pages/Loans.jsx'
+import FinancialsPage from './pages/Financials.jsx'
+import ReportsPage from './pages/Reports.jsx'
+import TermsPrivacy from './pages/TermsPrivacy.jsx'
+import AgentPage from './pages/Agent.jsx'
 import Header from './components/Header.jsx'
 import Sidebar from './components/Sidebar.jsx'
+import UserGuide from './pages/UserGuide.jsx'
+import HelpCenter from './pages/HelpCenter.jsx'
 import { colorThemes, productCategories } from './data/dashboardData.js'
 import { translations } from './data/translations.js'
+import { clearLegacyJsonStorage, hasLegacyJsonStorage, loadJsonStorage, readLegacyJson, saveJsonStorage } from './utils/jsonStorage.js'
+import { playNotificationSound } from './utils/notificationSounds.js'
 import './App.css'
 
 const getPageFromPath = () => {
+  if (window.location.pathname.startsWith('/dashboard/')) return `dashboardMetric:${window.location.pathname.split('/').pop() || 'totalRevenue'}`
+  if (window.location.pathname.startsWith('/customers/')) return `customerProfile:${window.location.pathname.split('/').pop() || ''}`
+  if (window.location.pathname === '/user-guide') return 'userGuide'
+  if (window.location.pathname === '/help-center') return 'helpCenter'
   if (window.location.pathname === '/profile') return 'profile'
   if (window.location.pathname === '/settings') return 'settings'
+  if (window.location.pathname === '/terms') return 'terms'
   if (window.location.pathname === '/products') return 'products'
   if (window.location.pathname === '/suppliers') return 'suppliers'
   if (window.location.pathname === '/customers') return 'customers'
@@ -29,22 +44,72 @@ const getPageFromPath = () => {
   if (window.location.pathname === '/billing') return 'billing'
   if (window.location.pathname === '/godown') return 'godown'
   if (window.location.pathname === '/loans') return 'loans'
+  if (window.location.pathname === '/financials') return 'financials'
+  if (window.location.pathname === '/reports') return 'reports'
+  if (window.location.pathname === '/agent') return 'agent'
   if (window.location.pathname === '/sales-bills') return 'salesBills'
   if (window.location.pathname === '/recycle-bin') return 'recycleBin'
   return 'dashboard'
 }
 
-const readStorage = (key, fallback) => {
-  try {
-    const value = window.localStorage.getItem(key)
-    return value ? JSON.parse(value) : fallback
-  } catch {
-    return fallback
-  }
+const readStorage = readLegacyJson
+
+const defaultExpenseCategories = ['Miscellaneous', 'Rent', 'Utilities', 'Transport', 'Salary', 'Inventory', 'Maintenance', 'Marketing', 'Food', 'Office Supplies']
+
+const defaultPrintSettings = {
+  flexibleMode: false,
+  proMode: false,
+  template: 'default',
+  logoWidth: 100,
+  headerColor: '#172137',
+  footerColor: '#6b7280',
+  headerAlignment: 'Left',
+  footerAlignment: 'Center',
+  fontFamily: 'Arial',
+  titleFontSize: 18,
+  subtitleFontSize: 14,
+  bodyFontSize: 12,
+  footerText: 'Thank you for your business!',
+  reportPaperSize: 'A4',
+  billingPaperSize: '80mm (Thermal)',
+  paddingTop: 10,
+  paddingBottom: 10,
+  paddingLeft: 10,
+  paddingRight: 10,
+  recordsPerPage: 10,
+  headerHeight: 12,
+  footerHeight: 8,
+  brandLanguage: 'en',
+  printTitle: 'NEXORA',
+  printSubtitle: '',
 }
 
-const parseNumber = (value) => Number.parseFloat(value || 0) || 0
-const formatAfn = (value) => `${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ؋`
+const defaultCompanyInfo = {
+  name: 'RetailPro',
+  tagline: 'Retail Management System',
+  address: '',
+  phone: '',
+  email: '',
+  website: '',
+  currency: 'AFN',
+  logo: '',
+}
+
+const alertBeforeDays = {
+  '1 week': 7,
+  '2 weeks': 14,
+  '1 month': 30,
+  '3 months': 90,
+  '6 months': 180,
+  '1 year': 365,
+}
+
+const dateOnly = (value) => (value ? new Date(`${String(value).slice(0, 10)}T12:00:00`) : null)
+const daysUntil = (date) => {
+  const today = new Date()
+  today.setHours(12, 0, 0, 0)
+  return Math.ceil((date - today) / 86400000)
+}
 
 const mergeCategories = (storedCategories) => {
   const merged = [...productCategories, ...(Array.isArray(storedCategories) ? storedCategories : [])]
@@ -60,7 +125,23 @@ const getContrastColor = (hexColor) => {
   return brightness > 150 ? '#07111f' : '#ffffff'
 }
 
+function ConfirmActionModal({ confirmText, message, onCancel, onConfirm, title, t }) {
+  return (
+    <div className="modal-backdrop app-confirm-backdrop" onClick={onCancel}>
+      <div className="app-confirm-modal" onClick={(event) => event.stopPropagation()}>
+        <h2>{title}</h2>
+        <p>{message}</p>
+        <footer className="modal-actions">
+          <button type="button" onClick={onCancel}>{t.cancel}</button>
+          <button className="danger-btn" type="button" onClick={onConfirm}>{confirmText}</button>
+        </footer>
+      </div>
+    </div>
+  )
+}
+
 function App() {
+  const [storageLoaded, setStorageLoaded] = useState(false)
   const [theme, setTheme] = useState(() => readStorage('retail-theme-mode', 'light'))
   const [language, setLanguage] = useState(() => readStorage('retail-language', 'en'))
   const [page, setPage] = useState(getPageFromPath)
@@ -73,50 +154,23 @@ function App() {
   const [salesBills, setSalesBills] = useState(() => readStorage('retail-sales-bills', []))
   const [godownEntries, setGodownEntries] = useState(() => readStorage('retail-godown-entries', []))
   const [cashWallet, setCashWallet] = useState(() => readStorage('retail-cash-wallet', 120))
+  const [cashWalletEntries, setCashWalletEntries] = useState(() => readStorage('retail-cash-wallet-entries', []))
   const [editingSale, setEditingSale] = useState(null)
   const [deletedItems, setDeletedItems] = useState(() => readStorage('retail-recycle-bin', []))
+  const [pendingConfirmation, setPendingConfirmation] = useState(null)
   const [categories, setCategories] = useState(() => mergeCategories(readStorage('retail-product-categories', [])))
+  const [expenseCategories, setExpenseCategories] = useState(() => {
+    const stored = readStorage('retail-expense-categories', [])
+    const merged = [...defaultExpenseCategories, ...(Array.isArray(stored) ? stored : [])]
+    return merged.filter((category, index) => merged.findIndex((item) => item.toLowerCase() === category.toLowerCase()) === index)
+  })
   const [baseCurrency, setBaseCurrency] = useState(() => readStorage('retail-base-currency', 'AFN'))
   const [exchangeRates, setExchangeRates] = useState(() => readStorage('retail-exchange-rates', {}))
   const [toast, setToast] = useState('')
   const toastTimerRef = useRef(null)
-  const [printSettings, setPrintSettings] = useState(() => readStorage('retail-print-settings', {
-    flexibleMode: false,
-    proMode: false,
-    template: 'default',
-    logoWidth: 100,
-    headerColor: '#172137',
-    footerColor: '#6b7280',
-    headerAlignment: 'Left',
-    footerAlignment: 'Center',
-    fontFamily: 'Arial',
-    titleFontSize: 18,
-    subtitleFontSize: 14,
-    bodyFontSize: 12,
-    footerText: 'Thank you for your business!',
-    reportPaperSize: 'A4',
-    billingPaperSize: '80mm (Thermal)',
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingLeft: 10,
-    paddingRight: 10,
-    recordsPerPage: 10,
-    headerHeight: 12,
-    footerHeight: 8,
-    brandLanguage: 'en',
-    printTitle: 'NEXORA',
-    printSubtitle: '',
-  }))
-  const [companyInfo, setCompanyInfo] = useState(() => readStorage('retail-company-info', {
-    name: 'RetailPro',
-    tagline: 'Retail Management System',
-    address: '',
-    phone: '',
-    email: '',
-    website: '',
-    currency: '؋ Afghan Afghani (AFN)',
-    logo: '',
-  }))
+  const alertSoundTimerRef = useRef(null)
+  const [printSettings, setPrintSettings] = useState(() => readStorage('retail-print-settings', defaultPrintSettings))
+  const [companyInfo, setCompanyInfo] = useState(() => readStorage('retail-company-info', defaultCompanyInfo))
   const t = useMemo(() => translations[language], [language])
   const isRtl = language === 'fa' || language === 'ps'
   const selectedColorTheme = colorThemes.find((item) => item.id === activeColorTheme) ?? colorThemes[0]
@@ -125,43 +179,22 @@ function App() {
     '--accent-contrast': getContrastColor(selectedColorTheme.accent),
     '--accent-soft': `${selectedColorTheme.accent}22`,
   }
-  const dashboardMetrics = useMemo(() => {
-    const totalRevenue = salesBills.reduce((sum, sale) => sum + parseNumber(sale.total), 0)
-    const totalExpenses = expenses.reduce((sum, expense) => sum + parseNumber(expense.amount), 0)
-    const pendingPayments = salesBills.reduce((sum, sale) => sum + parseNumber(sale.balance), 0)
-    const totalPayables = suppliers.reduce((sum, supplier) => sum + Math.max(0, parseNumber(supplier.balance)), 0)
-    const totalReceivables = customers.reduce((sum, customer) => sum + parseNumber(customer.pending), 0)
-    const stockQuantity = products.reduce((sum, product) => sum + parseNumber(product.quantity), 0)
-    const globalStockValue = products.reduce((sum, product) => sum + parseNumber(product.quantity) * parseNumber(product.purchase), 0)
-    const netProfit = totalRevenue - totalExpenses
-
-    return {
-      activeProducts: String(products.length),
-      currentCashWallet: formatAfn(cashWallet),
-      globalStockValue: formatAfn(globalStockValue),
-      netBalance: formatAfn(totalPayables - totalReceivables),
-      netProfit: formatAfn(netProfit),
-      pendingPayments: formatAfn(pendingPayments),
-      pureProfit: formatAfn(netProfit),
-      staffPaid: formatAfn(0),
-      staffPayable: formatAfn(staffMembers.reduce((sum, staff) => sum + parseNumber(staff.salary), 0)),
-      stockQuantity: String(stockQuantity),
-      totalCustomers: String(customers.length),
-      totalExpenses: formatAfn(totalExpenses),
-      totalPayables: formatAfn(totalPayables),
-      totalReceivables: formatAfn(totalReceivables),
-      totalRefunds: formatAfn(0),
-      totalRevenue: formatAfn(totalRevenue),
-      totalSales: String(salesBills.length),
-      totalStaff: String(staffMembers.length),
-    }
-  }, [cashWallet, customers, expenses, products, salesBills, staffMembers, suppliers])
   const navigate = (nextPage) => {
     const nextPath =
-      nextPage === 'profile'
+      nextPage.startsWith?.('dashboardMetric:')
+        ? `/dashboard/${nextPage.split(':')[1] || 'totalRevenue'}`
+        : nextPage.startsWith?.('customerProfile:')
+          ? `/customers/${nextPage.split(':')[1] || ''}`
+        : nextPage === 'profile'
         ? '/profile'
         : nextPage === 'settings'
           ? '/settings'
+          : nextPage === 'terms'
+            ? '/terms'
+            : nextPage === 'helpCenter'
+              ? '/help-center'
+              : nextPage === 'userGuide'
+                ? '/user-guide'
           : nextPage === 'products'
             ? '/products'
             : nextPage === 'suppliers'
@@ -178,11 +211,18 @@ function App() {
                     ? '/godown'
                     : nextPage === 'loans'
                       ? '/loans'
-                      : nextPage === 'salesBills'
-                        ? '/sales-bills'
-                        : nextPage === 'recycleBin'
-                          ? '/recycle-bin'
-                          : '/'
+                      : nextPage === 'financials'
+                        ? '/financials'
+                        : nextPage === 'reports'
+                          ? '/reports'
+                          : nextPage === 'agent'
+                            ? '/agent'
+                            : nextPage === 'salesBills'
+                              ? '/sales-bills'
+                              : nextPage === 'recycleBin'
+                                ? '/recycle-bin'
+                                : '/'
+                               
     setPage(nextPage)
     window.history.pushState({ page: nextPage }, '', nextPath)
   }
@@ -191,6 +231,72 @@ function App() {
     window.clearTimeout(toastTimerRef.current)
     setToast(message)
     toastTimerRef.current = window.setTimeout(() => setToast(''), 2400)
+  }
+
+  const appBackupData = useMemo(() => ({
+    version: '6.5.0',
+    exportedAt: new Date().toISOString(),
+    data: {
+      theme,
+      language,
+      activeColorTheme,
+      suppliers,
+      products,
+      customers,
+      expenses,
+      staffMembers,
+      salesBills,
+      godownEntries,
+      cashWallet,
+      cashWalletEntries,
+      deletedItems,
+      categories,
+      expenseCategories,
+      baseCurrency,
+      exchangeRates,
+      printSettings,
+      companyInfo,
+    },
+  }), [activeColorTheme, baseCurrency, cashWallet, cashWalletEntries, categories, companyInfo, customers, deletedItems, exchangeRates, expenseCategories, expenses, godownEntries, language, printSettings, products, salesBills, staffMembers, suppliers, theme])
+
+  const importBackupData = (backup) => {
+    const data = backup?.data ?? backup
+    if (!data || typeof data !== 'object') return false
+    setTheme(data.theme ?? 'light')
+    setLanguage(data.language ?? 'en')
+    setActiveColorTheme(data.activeColorTheme ?? 'default')
+    setSuppliers(Array.isArray(data.suppliers) ? data.suppliers : [])
+    setProducts(Array.isArray(data.products) ? data.products : [])
+    setCustomers(Array.isArray(data.customers) ? data.customers : [])
+    setExpenses(Array.isArray(data.expenses) ? data.expenses : [])
+    setStaffMembers(Array.isArray(data.staffMembers) ? data.staffMembers : [])
+    setSalesBills(Array.isArray(data.salesBills) ? data.salesBills : [])
+    setGodownEntries(Array.isArray(data.godownEntries) ? data.godownEntries : [])
+    setCashWallet(Number(data.cashWallet ?? 120))
+    setCashWalletEntries(Array.isArray(data.cashWalletEntries) ? data.cashWalletEntries : [])
+    setDeletedItems(Array.isArray(data.deletedItems) ? data.deletedItems : [])
+    setCategories(mergeCategories(data.categories))
+    setExpenseCategories(Array.isArray(data.expenseCategories) && data.expenseCategories.length ? data.expenseCategories : defaultExpenseCategories)
+    setBaseCurrency(data.baseCurrency ?? 'AFN')
+    setExchangeRates(data.exchangeRates ?? {})
+    setPrintSettings({ ...defaultPrintSettings, ...(data.printSettings ?? {}) })
+    setCompanyInfo({ ...defaultCompanyInfo, ...(data.companyInfo ?? {}) })
+    showToast(t.importCompleted ?? 'Backup imported successfully')
+    return true
+  }
+
+  const clearBusinessData = () => {
+    setSuppliers([])
+    setProducts([])
+    setCustomers([])
+    setExpenses([])
+    setStaffMembers([])
+    setSalesBills([])
+    setGodownEntries([])
+    setCashWallet(120)
+    setCashWalletEntries([])
+    setDeletedItems([])
+    showToast(t.dataCleared ?? 'Data cleared')
   }
 
   const startEditBill = (sale) => {
@@ -213,24 +319,147 @@ function App() {
   }, [])
 
   useEffect(() => {
-    window.localStorage.setItem('retail-theme-mode', JSON.stringify(theme))
-    window.localStorage.setItem('retail-language', JSON.stringify(language))
-    window.localStorage.setItem('retail-color-theme', JSON.stringify(activeColorTheme))
-    window.localStorage.setItem('retail-suppliers', JSON.stringify(suppliers))
-    window.localStorage.setItem('retail-products', JSON.stringify(products))
-    window.localStorage.setItem('retail-customers', JSON.stringify(customers))
-    window.localStorage.setItem('retail-expenses', JSON.stringify(expenses))
-    window.localStorage.setItem('retail-staff-members', JSON.stringify(staffMembers))
-    window.localStorage.setItem('retail-sales-bills', JSON.stringify(salesBills))
-    window.localStorage.setItem('retail-godown-entries', JSON.stringify(godownEntries))
-    window.localStorage.setItem('retail-cash-wallet', JSON.stringify(cashWallet))
-    window.localStorage.setItem('retail-recycle-bin', JSON.stringify(deletedItems))
-    window.localStorage.setItem('retail-product-categories', JSON.stringify(categories))
-    window.localStorage.setItem('retail-base-currency', JSON.stringify(baseCurrency))
-    window.localStorage.setItem('retail-exchange-rates', JSON.stringify(exchangeRates))
-    window.localStorage.setItem('retail-print-settings', JSON.stringify(printSettings))
-    window.localStorage.setItem('retail-company-info', JSON.stringify(companyInfo))
-  }, [activeColorTheme, baseCurrency, cashWallet, categories, companyInfo, customers, deletedItems, exchangeRates, expenses, godownEntries, language, printSettings, products, salesBills, staffMembers, suppliers, theme])
+    let isActive = true
+    const applyState = (data) => {
+      setTheme(data.theme ?? 'light')
+      setLanguage(data.language ?? 'en')
+      setActiveColorTheme(data.activeColorTheme ?? 'default')
+      setSuppliers(Array.isArray(data.suppliers) ? data.suppliers : [])
+      setProducts(Array.isArray(data.products) ? data.products : [])
+      setCustomers(Array.isArray(data.customers) ? data.customers : [])
+      setExpenses(Array.isArray(data.expenses) ? data.expenses : [])
+      setStaffMembers(Array.isArray(data.staffMembers) ? data.staffMembers : [])
+      setSalesBills(Array.isArray(data.salesBills) ? data.salesBills : [])
+      setGodownEntries(Array.isArray(data.godownEntries) ? data.godownEntries : [])
+      setCashWallet(Number(data.cashWallet ?? 120))
+      setCashWalletEntries(Array.isArray(data.cashWalletEntries) ? data.cashWalletEntries : [])
+      setDeletedItems(Array.isArray(data.deletedItems) ? data.deletedItems : [])
+      setCategories(mergeCategories(data.categories))
+      setExpenseCategories(Array.isArray(data.expenseCategories) && data.expenseCategories.length ? data.expenseCategories : defaultExpenseCategories)
+      setBaseCurrency(data.baseCurrency ?? 'AFN')
+      setExchangeRates(data.exchangeRates ?? {})
+      setPrintSettings({ ...defaultPrintSettings, ...(data.printSettings ?? {}) })
+      setCompanyInfo({ ...defaultCompanyInfo, ...(data.companyInfo ?? {}) })
+    }
+    const legacySnapshot = () => {
+      const storedExpenseCategories = readStorage('retail-expense-categories', [])
+      const mergedExpenseCategories = [...defaultExpenseCategories, ...(Array.isArray(storedExpenseCategories) ? storedExpenseCategories : [])]
+      return {
+        theme: readStorage('retail-theme-mode', 'light'),
+        language: readStorage('retail-language', 'en'),
+        activeColorTheme: readStorage('retail-color-theme', 'default'),
+        suppliers: readStorage('retail-suppliers', []),
+        products: readStorage('retail-products', []),
+        customers: readStorage('retail-customers', []),
+        expenses: readStorage('retail-expenses', []),
+        staffMembers: readStorage('retail-staff-members', []),
+        salesBills: readStorage('retail-sales-bills', []),
+        godownEntries: readStorage('retail-godown-entries', []),
+        cashWallet: readStorage('retail-cash-wallet', 120),
+        cashWalletEntries: readStorage('retail-cash-wallet-entries', []),
+        deletedItems: readStorage('retail-recycle-bin', []),
+        categories: mergeCategories(readStorage('retail-product-categories', [])),
+        expenseCategories: mergedExpenseCategories.filter((category, index) => mergedExpenseCategories.findIndex((item) => item.toLowerCase() === category.toLowerCase()) === index),
+        baseCurrency: readStorage('retail-base-currency', 'AFN'),
+        exchangeRates: readStorage('retail-exchange-rates', {}),
+        printSettings: { ...defaultPrintSettings, ...readStorage('retail-print-settings', {}) },
+        companyInfo: { ...defaultCompanyInfo, ...readStorage('retail-company-info', {}) },
+      }
+    }
+
+    ;(async () => {
+      try {
+        const stored = await loadJsonStorage()
+        const shouldMigrateLegacy = !stored.hasData && hasLegacyJsonStorage()
+        const nextState = shouldMigrateLegacy ? legacySnapshot() : stored
+        if (!isActive) return
+        applyState(nextState)
+        if (shouldMigrateLegacy) {
+          await saveJsonStorage(nextState)
+          clearLegacyJsonStorage()
+        }
+      } catch {
+        // If the local JSON server is not running, the app stays usable in memory.
+      } finally {
+        if (isActive) setStorageLoaded(true)
+      }
+    })()
+
+    return () => {
+      isActive = false
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!storageLoaded) return
+    saveJsonStorage({
+      theme,
+      language,
+      activeColorTheme,
+      suppliers,
+      products,
+      customers,
+      expenses,
+      staffMembers,
+      salesBills,
+      godownEntries,
+      cashWallet,
+      cashWalletEntries,
+      deletedItems,
+      categories,
+      expenseCategories,
+      baseCurrency,
+      exchangeRates,
+      printSettings,
+      companyInfo,
+    }).catch(() => {})
+  }, [activeColorTheme, baseCurrency, cashWallet, cashWalletEntries, categories, companyInfo, customers, deletedItems, exchangeRates, expenseCategories, expenses, godownEntries, language, printSettings, products, salesBills, staffMembers, storageLoaded, suppliers, theme])
+
+  useEffect(() => {
+    if (!storageLoaded) return
+
+    const dueAlerts = []
+    products.forEach((product) => {
+      const quantity = Number(product.quantity || 0)
+      const lowStock = Number(product.lowStock || product.lowStockThreshold || 0)
+      if (lowStock > 0 && quantity > 0 && quantity <= lowStock) {
+        dueAlerts.push(`product-low-${product.id}`)
+      }
+
+      const expiryDate = dateOnly(product.expiry || product.expiryDate)
+      const alertDays = alertBeforeDays[product.alertBefore] ?? Number(product.alertDaysBefore || 0)
+      if (expiryDate && alertDays >= 0) {
+        const remainingDays = daysUntil(expiryDate)
+        if (remainingDays >= 0 && remainingDays <= alertDays) dueAlerts.push(`product-expiry-${product.id}`)
+      }
+    })
+
+    godownEntries.forEach((entry) => {
+      ;(entry.rows || []).forEach((row) => {
+        const expiryDate = dateOnly(row.expiryDate)
+        const alertDays = Number(row.alertDaysBefore || 0)
+        if (expiryDate && alertDays >= 0) {
+          const remainingDays = daysUntil(expiryDate)
+          if (remainingDays >= 0 && remainingDays <= alertDays) dueAlerts.push(`godown-expiry-${row.id}`)
+        }
+      })
+    })
+
+    if (!dueAlerts.length) return
+    const todayKey = new Date().toISOString().slice(0, 10)
+    const storageKey = `retail-alert-sounds-${todayKey}`
+    const played = new Set(readStorage(storageKey, []))
+    const newAlerts = dueAlerts.filter((key) => !played.has(key))
+    if (!newAlerts.length) return
+
+    alertSoundTimerRef.current = window.setTimeout(() => {
+      playNotificationSound(companyInfo.notificationSettings?.sound || 'chime')
+      showToast(t.alertsOptional ?? 'Alerts')
+      window.localStorage.setItem(storageKey, JSON.stringify([...played, ...newAlerts]))
+    }, 700)
+
+    return () => window.clearTimeout(alertSoundTimerRef.current)
+  }, [companyInfo.notificationSettings?.sound, godownEntries, products, storageLoaded, t.alertsOptional])
 
   useEffect(() => () => window.clearTimeout(toastTimerRef.current), [])
 
@@ -238,7 +467,7 @@ function App() {
     setCategories((current) => current.some((item) => item.toLowerCase() === category.toLowerCase()) ? current : [...current, category])
   }
 
-  const moveToRecycle = (module, item) => {
+  const performMoveToRecycle = (module, item) => {
     const recycleItem = {
       recycleId: crypto.randomUUID(),
       id: item.id,
@@ -257,6 +486,15 @@ function App() {
     showToast(t.movedToRecycle)
   }
 
+  const moveToRecycle = (module, item) => {
+    setPendingConfirmation({
+      title: t.confirmDeletion ?? 'Confirm Deletion',
+      message: (t.confirmDeleteItem ?? 'Are you sure you want to delete {name}?').replace('{name}', item.name || item.code || module),
+      confirmText: t.delete,
+      onConfirm: () => performMoveToRecycle(module, item),
+    })
+  }
+
   const restoreItem = (item) => {
     if (item.module === 'products') setProducts((current) => current.some((product) => product.id === item.id) ? current : [...current, item.data])
     if (item.module === 'suppliers') setSuppliers((current) => current.some((supplier) => supplier.id === item.id) ? current : [...current, item.data])
@@ -268,19 +506,40 @@ function App() {
   }
 
   const permanentDelete = (recycleId) => {
-    setDeletedItems((current) => current.filter((item) => item.recycleId !== recycleId))
-    showToast(t.deletedForever)
+    const item = deletedItems.find((deleted) => deleted.recycleId === recycleId)
+    setPendingConfirmation({
+      title: t.confirmDeletion ?? 'Confirm Deletion',
+      message: (t.confirmPermanentDelete ?? 'This will permanently delete {name}. This cannot be undone.').replace('{name}', item?.name || t.item || ''),
+      confirmText: t.delete,
+      onConfirm: () => {
+        setDeletedItems((current) => current.filter((deleted) => deleted.recycleId !== recycleId))
+        showToast(t.deletedForever)
+      },
+    })
+  }
+
+  const emptyRecycleBin = () => {
+    setPendingConfirmation({
+      title: t.emptyRecycleBin ?? 'Empty Recycle Bin?',
+      message: t.emptyRecycleBinWarning ?? 'This will permanently delete all items. This cannot be undone.',
+      confirmText: t.confirm ?? 'Confirm',
+      onConfirm: () => {
+        setDeletedItems([])
+        showToast(t.recycleBinEmptied ?? t.deletedForever)
+      },
+    })
   }
 
   return (
     <div className={`retail-shell theme-${theme}`} dir={isRtl ? 'rtl' : 'ltr'} style={themeStyle}>
       <div className="workspace">
-        <Sidebar activePage={page} companyInfo={companyInfo} onNavigate={navigate} t={t} />
+        <Sidebar activePage={page.startsWith('dashboardMetric:') ? 'dashboard' : page.startsWith('customerProfile:') ? 'customers' : page} companyInfo={companyInfo} onNavigate={navigate} t={t} />
         <main className="main-area">
           <Header
             cashWallet={cashWallet}
             language={language}
             onCashWalletChange={setCashWallet}
+            onWalletEntriesChange={setCashWalletEntries}
             onLanguageChange={setLanguage}
             onNavigate={navigate}
             onThemeToggle={() => setTheme((current) => (current === 'dark' ? 'light' : 'dark'))}
@@ -288,9 +547,17 @@ function App() {
             theme={theme}
           />
 
-          {page === 'settings' ? (
+          {page === 'terms' ? (
+  <TermsPrivacy companyInfo={companyInfo} t={t} />
+) : page === 'userGuide' ? (
+  <UserGuide t={t} />
+  ) : page === 'helpCenter' ? (
+  <HelpCenter t={t} onNavigate={navigate} />
+) : page === 'settings' ? (
+  
             <SettingsPage
               activeColorTheme={activeColorTheme}
+              appBackupData={appBackupData}
               baseCurrency={baseCurrency}
               companyInfo={companyInfo}
               exchangeRates={exchangeRates}
@@ -299,6 +566,8 @@ function App() {
               onCompanyInfoChange={setCompanyInfo}
               onBaseCurrencyChange={setBaseCurrency}
               onExchangeRatesChange={setExchangeRates}
+              onClearBusinessData={clearBusinessData}
+              onImportBackupData={importBackupData}
               onLanguageChange={setLanguage}
               onNotify={showToast}
               onPrintSettingsChange={setPrintSettings}
@@ -324,21 +593,27 @@ function App() {
           ) : page === 'suppliers' ? (
             <SuppliersPage
               companyInfo={companyInfo}
+              godownEntries={godownEntries}
+              onGodownChange={setGodownEntries}
               onMoveToRecycle={moveToRecycle}
               onNotify={showToast}
               onSuppliersChange={setSuppliers}
               printSettings={printSettings}
+              products={products}
               suppliers={suppliers}
               t={t}
             />
-          ) : page === 'customers' ? (
+          ) : page === 'customers' || page.startsWith('customerProfile:') ? (
             <CustomersPage
               companyInfo={companyInfo}
               customers={customers}
+              initialProfileCustomerId={page.startsWith('customerProfile:') ? page.split(':')[1] || '' : ''}
               onCustomersChange={setCustomers}
               onMoveToRecycle={moveToRecycle}
               onNotify={showToast}
               printSettings={printSettings}
+              products={products}
+              sales={salesBills}
               t={t}
             />
           ) : page === 'staff' ? (
@@ -355,6 +630,8 @@ function App() {
             <ExpensesPage
               companyInfo={companyInfo}
               expenses={expenses}
+              expenseCategories={expenseCategories}
+              onExpenseCategoriesChange={setExpenseCategories}
               onExpensesChange={setExpenses}
               onMoveToRecycle={moveToRecycle}
               onNotify={showToast}
@@ -400,26 +677,132 @@ function App() {
               products={products}
               suppliers={suppliers}
               t={t}
+              onNavigate={navigate}
             />
           ) : page === 'loans' ? (
             <LoansPage
               companyInfo={companyInfo}
+              onCustomersChange={setCustomers}
+              onEditBill={startEditBill}
+              onNotify={showToast}
+              onSalesChange={setSalesBills}
               printSettings={printSettings}
               sales={salesBills}
               t={t}
             />
+          ) : page === 'financials' ? (
+            <FinancialsPage
+              cashWallet={cashWallet}
+              companyInfo={companyInfo}
+              expenses={expenses}
+              printSettings={printSettings}
+              products={products}
+              sales={salesBills}
+              staffMembers={staffMembers}
+              t={t}
+            />
+          ) : page === 'reports' ? (
+            <ReportsPage
+              cashWallet={cashWallet}
+              companyInfo={companyInfo}
+              expenses={expenses}
+              printSettings={printSettings}
+              products={products}
+              sales={salesBills}
+              staffMembers={staffMembers}
+              t={t}
+            />
+          ) : page === 'agent' ? (
+            <AgentPage
+              cashWallet={cashWallet}
+              cashWalletEntries={cashWalletEntries}
+              companyInfo={companyInfo}
+              customers={customers}
+              expenses={expenses}
+              godownEntries={godownEntries}
+              products={products}
+              sales={salesBills}
+              staffMembers={staffMembers}
+              suppliers={suppliers}
+              t={t}
+            />
+          ) : page.startsWith('dashboardMetric:') ? (
+            (page.split(':')[1] || 'totalRevenue') === 'currentCashWallet' ? (
+              <CashWalletPage
+                cashWallet={cashWallet}
+                companyInfo={companyInfo}
+                expenses={expenses}
+                onBack={() => navigate('dashboard')}
+                onCashWalletChange={setCashWallet}
+                onWalletEntriesChange={setCashWalletEntries}
+                products={products}
+                sales={salesBills}
+                staffMembers={staffMembers}
+                suppliers={suppliers}
+                t={t}
+                walletEntries={cashWalletEntries}
+              />
+            ) : (
+              <DashboardMetricDetail
+                cashWallet={cashWallet}
+                companyInfo={companyInfo}
+                customers={customers}
+                expenses={expenses}
+                metricKey={page.split(':')[1] || 'totalRevenue'}
+                onBack={() => navigate('dashboard')}
+                onNavigate={navigate}
+                printSettings={printSettings}
+                products={products}
+                sales={salesBills}
+                staffMembers={staffMembers}
+                suppliers={suppliers}
+                t={t}
+              />
+            )
           ) : page === 'recycleBin' ? (
             <RecycleBinPage
               deletedItems={deletedItems}
+              onEmptyBin={emptyRecycleBin}
               onPermanentDelete={permanentDelete}
               onRestore={restoreItem}
               t={t}
             />
           ) : (
-            <Dashboard dashboardMetrics={dashboardMetrics} t={t} />
+            <Dashboard
+              cashWallet={cashWallet}
+              customers={customers}
+              expenses={expenses}
+              onNavigate={navigate}
+              products={products}
+              sales={salesBills}
+              staffMembers={staffMembers}
+              suppliers={suppliers}
+              t={t}
+            />
           )}
         </main>
       </div>
+      {pendingConfirmation && (
+        <ConfirmActionModal
+          confirmText={pendingConfirmation.confirmText}
+          message={pendingConfirmation.message}
+          onCancel={() => setPendingConfirmation(null)}
+          onConfirm={() => {
+            pendingConfirmation.onConfirm()
+            setPendingConfirmation(null)
+          }}
+          title={pendingConfirmation.title}
+          t={t}
+        />
+      )}
+      {!storageLoaded && (
+        <div className="app-loader" role="status" aria-live="polite">
+          <div className="app-loader-card">
+            <span />
+            <strong>{t.loadingData ?? 'Loading data...'}</strong>
+          </div>
+        </div>
+      )}
       {toast && <div className="app-toast" role="status">{toast}</div>}
     </div>
   )

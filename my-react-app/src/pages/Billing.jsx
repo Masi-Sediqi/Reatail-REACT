@@ -3,12 +3,17 @@ import {
   CalendarDays,
   Camera,
   CreditCard,
+  Download,
   Mail,
+  MessageCircle,
+  Printer,
   ReceiptText,
   Search,
+  Share2,
   ShoppingCart,
   Trash2,
   UserPlus,
+  X,
 } from '../components/Icons.jsx'
 import CustomSelect from '../components/CustomSelect.jsx'
 import './Billing.css'
@@ -73,7 +78,7 @@ const getShamsiShortLabel = (isoDate) => {
   }
 }
 
-function CurrencySelect({ label, onChange, t, value }) {
+function CurrencySelect({ label, onChange, value }) {
   const options = currencyOptions.map((currency) => ({
     label: `${currency.symbol} ${currency.name}`,
     value: currency.code,
@@ -83,7 +88,6 @@ function CurrencySelect({ label, onChange, t, value }) {
     <div className="billing-field currency-field">
       <span>{label}</span>
       <CustomSelect ariaLabel={label} className="currency-select" options={options} value={value} onChange={onChange} />
-      <small>{t.currencyHint}</small>
     </div>
   )
 }
@@ -153,7 +157,6 @@ function ScannerModal({ onClose, onScan, t }) {
   return (
     <div className={`modal-backdrop ${closing ? 'closing' : ''}`} onClick={requestClose}>
       <div className="scanner-modal" onClick={(event) => event.stopPropagation()}>
-        <button className="modal-close" type="button" onClick={requestClose}>×</button>
         <h2><Camera size={18} /> {t.barcodeScanner}</h2>
         <div className="scanner-view">
           <video ref={videoRef} muted playsInline />
@@ -241,13 +244,13 @@ function InvoicePreviewModal({ companyInfo, invoice, onClose, t }) {
       <div className="invoice-preview-modal" onClick={(event) => event.stopPropagation()}>
         <div className="invoice-preview-top">
           <strong>{t.invoicePreview} — {invoice.invoiceNumber}</strong>
-          <div>
-            <button type="button" onClick={() => navigator.share?.({ title: invoice.invoiceNumber, text: encodedBody })}>{t.share}</button>
-            <a className="print-top-link" href={`https://wa.me/?text=${encodedSubject}%20${encodedBody}`} target="_blank" rel="noreferrer">WhatsApp</a>
+          <div className="print-action-bar">
+            <button type="button" onClick={requestClose}><X size={14} /> {t.cancel}</button>
+            <button type="button" onClick={() => navigator.share?.({ title: invoice.invoiceNumber, text: encodedBody })}><Share2 size={15} /> {t.share}</button>
+            <a className="print-top-link" href={`https://wa.me/?text=${encodedSubject}%20${encodedBody}`} target="_blank" rel="noreferrer"><MessageCircle size={15} /> WhatsApp</a>
             <a className="print-top-link" href={`mailto:?subject=${encodedSubject}&body=${encodedBody}`}><Mail size={15} /> Email</a>
-            <button type="button" onClick={openPrint}>PDF</button>
-            <button className="primary-btn" type="button" onClick={openPrint}>{t.print}</button>
-            <button type="button" onClick={requestClose}>×</button>
+            <button type="button" onClick={openPrint}><Download size={15} /> PDF</button>
+            <button className="primary-btn print-confirm-btn" type="button" onClick={openPrint}><Printer size={15} /> {t.print}</button>
           </div>
         </div>
         <div className="invoice-scroll">
@@ -304,6 +307,72 @@ function InvoicePreviewModal({ companyInfo, invoice, onClose, t }) {
   )
 }
 
+function CustomerSearchSelect({ customers, onChange, t, value }) {
+  const rootRef = useRef(null)
+  const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState('')
+  const selectedCustomer = customers.find((customer) => customer.id === value)
+  const filteredCustomers = customers
+    .filter((customer) => `${customer.name} ${customer.phone || ''} ${customer.email || ''}`.toLowerCase().includes(query.trim().toLowerCase()))
+    .slice(0, 8)
+
+  useEffect(() => {
+    const close = (event) => {
+      if (!rootRef.current?.contains(event.target)) setOpen(false)
+    }
+    document.addEventListener('mousedown', close)
+    return () => document.removeEventListener('mousedown', close)
+  }, [])
+
+  return (
+    <div className="customer-search-select" ref={rootRef}>
+      <button className="customer-search-btn" type="button" onClick={() => setOpen((current) => !current)}>
+        <span>{selectedCustomer?.name || t.selectCustomer}</span>
+        <span aria-hidden="true">⌄</span>
+      </button>
+      {open && (
+        <div className="customer-search-menu">
+          <div className="customer-search-input">
+            <Search size={15} />
+            <input
+              autoFocus
+              placeholder={t.searchCustomer ?? t.searchCustomers ?? 'Search customer...'}
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+            />
+          </div>
+          <button
+            className={!value ? 'selected' : ''}
+            type="button"
+            onClick={() => {
+              onChange('')
+              setOpen(false)
+              setQuery('')
+            }}
+          >
+            {t.selectCustomer}
+          </button>
+          {filteredCustomers.map((customer) => (
+            <button
+              className={customer.id === value ? 'selected' : ''}
+              key={customer.id}
+              type="button"
+              onClick={() => {
+                onChange(customer.id)
+                setOpen(false)
+                setQuery('')
+              }}
+            >
+              <span>{customer.name}</span>
+              {(customer.phone || customer.email) && <small>{customer.phone || customer.email}</small>}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function BillingPage({
   companyInfo,
   customers,
@@ -333,10 +402,6 @@ function BillingPage({
   const [scannerOpen, setScannerOpen] = useState(false)
   const [previewInvoice, setPreviewInvoice] = useState(null)
   const isEditing = Boolean(editingSale)
-  const customerOptions = useMemo(() => [
-    { value: '', label: t.selectCustomer },
-    ...customers.map((customer) => ({ value: customer.id, label: customer.name })),
-  ], [customers, t.selectCustomer])
   const paymentMethodOptions = useMemo(() => defaultPaymentMethods.map((method) => ({ value: method, label: t[method] })), [t])
 
   useEffect(() => {
@@ -402,6 +467,14 @@ function BillingPage({
     })
     setSearchTerm('')
   }
+
+  const searchResults = useMemo(() => {
+    const needle = searchTerm.trim().toLowerCase()
+    if (!needle) return []
+    return products
+      .filter((product) => [product.barcode, product.code, product.name].some((value) => String(value || '').toLowerCase().includes(needle)))
+      .slice(0, 6)
+  }, [products, searchTerm])
 
   const updateItem = (productId, patch) => {
     setItems((current) => current.map((item) => item.productId === productId ? { ...item, ...patch } : item))
@@ -520,7 +593,17 @@ function BillingPage({
               onKeyDown={(event) => event.key === 'Enter' && addProductToBill(searchTerm)}
               placeholder={t.searchProductsByBarcode}
             />
-            <button type="button" onClick={() => addProductToBill(searchTerm)}>{t.search}</button>
+            {searchResults.length > 0 && (
+              <div className="billing-search-results">
+                {searchResults.map((product) => (
+                  <button key={product.id} type="button" onClick={() => addProductToBill(product.barcode || product.code || product.name)}>
+                    <strong>{product.name || t.product}</strong>
+                    <span>{product.code || '-'} · {product.barcode || '-'} · {formatMoney(product.selling, currency)}</span>
+                    <small>{product.quantity || 0} {product.unit || 'pcs'} {t.available ?? 'available'}</small>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="billing-panel bill-items-panel">
@@ -554,13 +637,13 @@ function BillingPage({
         <aside className="billing-right">
           <div className="billing-panel side-card">
             <h2><UserPlus size={18} /> {t.customer}</h2>
-            <CustomSelect ariaLabel={t.selectCustomer} options={customerOptions} value={customerId} onChange={setCustomerId} />
+            <CustomerSearchSelect customers={customers} onChange={setCustomerId} t={t} value={customerId} />
             <div className="or-divider">{t.or}</div>
             <input value={walkInName} onChange={(event) => setWalkInName(event.target.value)} placeholder={t.enterCustomerName} />
           </div>
 
           <div className="billing-panel side-card">
-            <CurrencySelect label={t.currency} onChange={setCurrency} t={t} value={currency} />
+            <CurrencySelect label={t.currency} onChange={setCurrency} value={currency} />
             <label className="billing-field">
               <span>{t.discount}</span>
               <div className="segmented-row">

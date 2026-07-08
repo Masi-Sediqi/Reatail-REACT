@@ -91,6 +91,186 @@
   line-height: 1;
 }
 
+.suppliers-content {
+  gap: 24px;
+}
+
+.supplier-summary-grid {
+  gap: 14px;
+}
+
+.supplier-summary-card {
+  position: relative;
+  min-height: 112px;
+  padding: 24px 58px 22px 26px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel-bg);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.07);
+}
+
+.supplier-summary-card > svg {
+  position: absolute;
+  top: 28px;
+  right: 24px;
+  color: var(--muted-text);
+}
+
+[dir="rtl"] .supplier-summary-card {
+  padding-right: 26px;
+  padding-left: 58px;
+}
+
+[dir="rtl"] .supplier-summary-card > svg {
+  right: auto;
+  left: 24px;
+}
+
+.supplier-summary-card span {
+  color: var(--muted-text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.supplier-summary-card strong {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 18px;
+  color: var(--text);
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.supplier-summary-card small {
+  margin-inline-start: 6px;
+  color: var(--danger);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.supplier-filter-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 18px;
+  overflow: visible;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.supplier-filter-row {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(150px, 190px) minmax(200px, 260px);
+  align-items: center;
+  gap: 12px;
+  max-width: 930px;
+  overflow: visible;
+}
+
+.supplier-filter-row .search-field {
+  min-height: 40px;
+}
+
+.supplier-filter-row .custom-select-trigger,
+.supplier-filter-row .date-range-btn {
+  min-height: 40px;
+  border-radius: 8px;
+}
+
+.supplier-status-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.supplier-status-tabs button {
+  min-height: 24px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--panel-bg);
+  color: var(--text);
+  padding: 0 12px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.supplier-status-tabs button:hover,
+.supplier-status-tabs button.active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.supplier-status-tabs button:hover {
+  transform: translateY(-1px);
+}
+
+.supplier-table-card {
+  padding: 0;
+  overflow: visible;
+  border-radius: 8px;
+}
+
+.supplier-table {
+  min-width: 1080px;
+}
+
+.supplier-table thead th {
+  padding: 18px 16px;
+  color: var(--muted-text);
+  font-weight: 800;
+}
+
+.supplier-table tbody td {
+  padding: 20px 16px;
+}
+
+.supplier-status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  border-radius: 999px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.supplier-status-pill.payable {
+  background: rgba(239, 68, 68, 0.13);
+  color: var(--danger);
+}
+
+.supplier-status-pill.receivable {
+  background: rgba(34, 197, 94, 0.14);
+  color: var(--success);
+}
+
+.supplier-status-pill.settled {
+  background: var(--panel-soft);
+  color: var(--muted-text);
+}
+
+.supplier-portal-controls {
+  max-width: 720px;
+}
+
+.supplier-portal-controls .custom-select,
+.supplier-portal-controls .date-range-picker {
+  min-width: 160px;
+}
+
+.supplier-portal-controls .date-range-calendar,
+.supplier-filter-row .date-range-calendar {
+  z-index: 3000;
+}
+
 @media (max-width: 640px) {
   .supplier-modal {
     width: calc(100vw - 16px) !important;
@@ -98,5 +278,564 @@
     max-height: calc(100dvh - 28px) !important;
     padding: 18px 14px max(36px, env(safe-area-inset-bottom));
     grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 1100px) {
+  .supplier-filter-row {
+    grid-template-columns: 1fr 180px 220px;
+    max-width: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .supplier-filter-row {
+    grid-template-columns: 1fr;
+  }
+
+  .supplier-summary-card {
+    min-height: 96px;
+    padding-block: 18px;
+  }
+
+  .supplier-controls,
+  .supplier-portal-controls {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+  }
+
+  .supplier-controls > *,
+  .supplier-portal-controls > *,
+  .supplier-controls .smooth-select,
+  .supplier-portal-controls .smooth-select,
+  .supplier-controls .date-range-picker,
+  .supplier-portal-controls .date-range-picker,
+  .supplier-date-range {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .supplier-tabs,
+  .godown-tabs.supplier-tabs {
+    width: 100% !important;
+    overflow-x: auto;
+  }
+
+  .supplier-section-card {
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    padding: 14px;
+  }
+
+  .supplier-section-card .data-table {
+    min-width: 720px;
+  }
+
+  .supplier-controls .date-range-calendar,
+  .supplier-portal-controls .date-range-calendar,
+  .supplier-date-range .date-range-calendar {
+    position: fixed !important;
+    inset-inline: 12px !important;
+    top: auto !important;
+    bottom: max(12px, env(safe-area-inset-bottom)) !important;
+    width: auto !important;
+    max-height: min(430px, calc(100dvh - 30px));
+    overflow-y: auto;
+    z-index: 10050 !important;
+  }
+}
+.supplier-summary-grid .supplier-summary-card {
+  position: relative !important;
+  min-height: 90px !important;
+  display: grid !important;
+  align-content: center !important;
+  gap: 10px !important;
+  padding: 14px 72px 14px 20px !important;
+  border-radius: 12px !important;
+  background: var(--panel-bg) !important;
+  border: 1px solid var(--border) !important;
+  border-inline-start-width: 4px !important;
+  box-shadow: var(--shadow) !important;
+}
+
+.supplier-summary-grid .supplier-summary-card > svg {
+  position: absolute !important;
+  top: 50% !important;
+  inset-inline-end: 22px !important;
+  transform: translateY(-50%) !important;
+  width: 40px !important;
+  height: 40px !important;
+  padding: 10px !important;
+  border-radius: 10px !important;
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
+}
+
+.supplier-summary-grid .supplier-summary-card span {
+  display: block !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  color: var(--muted) !important;
+}
+
+.supplier-summary-grid .supplier-summary-card strong {
+  display: block !important;
+  margin-top: 0 !important;
+  font-size: clamp(18px, 1.25vw, 22px) !important;
+  font-weight: 900 !important;
+  line-height: 1.15 !important;
+  white-space: nowrap !important;
+}
+
+.supplier-summary-grid .supplier-summary-card small {
+  display: inline-block !important;
+  margin-inline-start: 6px !important;
+  font-size: 12px !important;
+  line-height: 1.1 !important;
+  white-space: nowrap !important;
+}
+
+[dir="rtl"] .supplier-summary-grid .supplier-summary-card {
+  padding: 14px 20px 14px 72px !important;
+}
+
+[dir="rtl"] .supplier-summary-grid .supplier-summary-card > svg {
+  inset-inline-end: auto !important;
+  inset-inline-start: 22px !important;
+}/* Supplier filter layout fix */
+.supplier-filter-card {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 14px !important;
+  padding: 18px !important;
+}
+
+/* Supplier filter: search full width, filters at the end */
+
+.supplier-filter-card {
+  width: 100% !important;
+  padding: 18px !important;
+}
+
+.supplier-filter-row {
+  display: grid !important;
+  grid-template-columns: minmax(420px, 1fr) 170px 250px !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.supplier-filter-row .search-field {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+
+
+.supplier-filter-row .date-range-btn {
+  width: 100% !important;
+  min-height: 40px !important;
+}
+
+@media (max-width: 900px) {
+  .supplier-filter-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .supplier-filter-row .smooth-select,
+  .supplier-filter-row .custom-select,
+  .supplier-filter-row .inline-date-range,
+  .supplier-filter-row .date-range-picker {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+}
+.supplier-filter-row .date-range-btn,
+.supplier-filter-row .custom-select-trigger{
+    width:100% !important;
+    height:40px !important;
+}
+.supplier-filter-row .search-field{
+    flex:1 1 auto !important;
+    width:auto !important;
+    max-width:none !important;
+    min-width:300px;
+}
+
+
+.supplier-status-tabs {
+  display: flex !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: auto !important;
+  margin: 0 !important;
+}
+
+.supplier-status-tabs button {
+  min-height: 26px !important;
+  padding: 0 12px !important;
+  border-radius: 999px !important;
+  font-size: 12px !important;
+}/* ================================
+   SUPPLIER PORTAL FIX
+================================ */
+
+.supplier-portal-page .supplier-portal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+
+.supplier-portal-page .supplier-portal-head > button {
+  height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-bg);
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.supplier-portal-page .supplier-portal-head > button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.supplier-account-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 28px;
+  padding: 22px 26px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--panel-bg);
+  box-shadow: var(--shadow);
+  margin-bottom: 18px;
+}
+
+.supplier-account-card h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.supplier-account-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.supplier-balance-box {
+  text-align: center;
+  min-width: 150px;
+}
+
+.supplier-balance-box span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.supplier-balance-box strong {
+  display: block;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.supplier-balance-box small {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* Controls: Add Adjustment + All Time + Date Range */
+.supplier-controls,
+.supplier-portal-controls {
+  max-width: none !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin-bottom: 18px !important;
+  position: relative;
+  z-index: 20;
+}
+
+.supplier-controls > button,
+.supplier-portal-controls > button {
+  height: 38px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--panel-bg);
+  color: var(--text);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.supplier-controls .smooth-select,
+.supplier-portal-controls .smooth-select {
+  width: 170px !important;
+  min-width: 170px !important;
+}
+
+.supplier-controls .date-range-picker,
+.supplier-portal-controls .date-range-picker,
+.supplier-date-range {
+  width: 240px !important;
+  min-width: 240px !important;
+  position: relative !important;
+}
+
+.supplier-controls .date-range-calendar,
+.supplier-portal-controls .date-range-calendar,
+.supplier-date-range .date-range-calendar {
+  position: absolute !important;
+  top: calc(100% + 8px) !important;
+  left: 0 !important;
+  z-index: 9999 !important;
+  width: 300px !important;
+  background: var(--panel-bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.22) !important;
+}
+
+/* Tabs */
+.supplier-tabs,
+.godown-tabs.supplier-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  padding: 5px;
+  border-radius: 12px;
+  background: var(--panel-soft);
+  margin-bottom: 18px;
+}
+
+.supplier-tabs button {
+  min-height: 34px;
+  padding: 0 13px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.supplier-tabs button.active {
+  background: var(--panel-bg);
+  color: var(--text);
+  border-color: var(--border);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+/* Table card */
+.supplier-section-card {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--panel-bg);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  overflow: visible;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.print-pdf-btn {
+  min-height: 38px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-bg);
+  color: var(--text);
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+}
+
+.print-pdf-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.supplier-section-card .data-table thead th {
+  background: transparent !important;
+  color: var(--muted) !important;
+  border-bottom: 1px solid var(--border);
+}
+
+.supplier-section-card .data-table tbody td {
+  border-bottom: 1px solid var(--border);
+}
+
+/* Print Preview Modal */
+.supplier-statement-modal {
+  width: min(860px, calc(100vw - 28px)) !important;
+  max-height: calc(100dvh - 40px) !important;
+  overflow-y: auto !important;
+  background: var(--panel-bg);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.38);
+}
+
+.supplier-statement-modal > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.supplier-statement-modal > header h2 {
+  font-size: 17px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.supplier-statement-modal > header > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.supplier-statement-modal > header button {
+  height: 36px;
+  padding: 0 13px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-bg);
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.supplier-statement-modal > header .primary-btn {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.supplier-statement-paper {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 26px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel-bg);
+}
+
+.supplier-statement-paper table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+.supplier-statement-paper th,
+.supplier-statement-paper td {
+  padding: 10px 12px;
+  font-size: 12px;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Responsive */
+@media (max-width: 800px) {
+  .supplier-account-card {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .supplier-balance-box {
+    text-align: start;
+  }
+
+  .supplier-controls,
+  .supplier-portal-controls {
+    flex-wrap: wrap;
+  }
+
+  .supplier-controls .smooth-select,
+  .supplier-portal-controls .smooth-select,
+  .supplier-controls .date-range-picker,
+  .supplier-portal-controls .date-range-picker {
+    width: 100% !important;
+    min-width: 100% !important;
+  }
+}
+/* FINAL FIX: Supplier filter equal controls */
+
+.supplier-filter-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 170px 170px !important;
+  gap: 12px !important;
+  align-items: center !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.supplier-filter-row .search-field {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.supplier-filter-row .smooth-select,
+.supplier-filter-row .custom-select,
+.supplier-filter-row .date-range-picker,
+.supplier-filter-row .inline-date-range {
+  width: 170px !important;
+  min-width: 170px !important;
+  max-width: 170px !important;
+}
+
+.supplier-filter-row .smooth-select-btn,
+.supplier-filter-row .date-range-btn {
+  width: 100% !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  border-radius: 10px !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 900px) {
+  .supplier-filter-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .supplier-filter-row .smooth-select,
+  .supplier-filter-row .custom-select,
+  .supplier-filter-row .date-range-picker,
+  .supplier-filter-row .inline-date-range {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
   }
 }

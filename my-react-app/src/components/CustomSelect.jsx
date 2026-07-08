@@ -66,18 +66,19 @@ function CustomSelect({ ariaLabel, className = '', onChange, options, value }) {
     >
       {options.map((option) => (
         <button
-  aria-selected={option.value === value}
-  className={option.value === value ? 'selected' : ''}
-  key={option.value}
-  onClick={() => {
-    onChange(option.value)
-    setOpen(false)
-  }}
-  role="option"
-  type="button"
->
-  <span>{option.label}</span>
-</button>
+          aria-selected={option.value === value}
+          className={option.value === value ? 'selected' : ''}
+          key={option.value}
+          onClick={() => {
+            onChange(option.value)
+            setOpen(false)
+          }}
+          role="option"
+          type="button"
+        >
+          <span>{option.label}</span>
+          <span className="smooth-select-check" aria-hidden="true" />
+        </button>
       ))}
     </div>
   )

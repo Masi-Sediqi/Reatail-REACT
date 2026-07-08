@@ -94,19 +94,39 @@
   content: "$";
 }
 
-.expenses-summary strong,
-.expenses-summary span {
-  color: var(--text);
+/* Expenses summary cards text bold fix */
+.expenses-summary article span {
+  display: block;
+  color: var(--muted) !important;
+  font-size: 13px;
+  font-weight: 800 !important;
 }
 
+.expenses-summary article strong {
+  display: block;
+  margin-top: 10px;
+  color: var(--text) !important;
+  font-size: 24px;
+  font-weight: 900 !important;
+  line-height: 1.2;
+}
+
+/* keep amount bold and same style */
+.expenses-summary article.tone-red strong,
+.expenses-summary article.tone-orange strong,
+.expenses-summary article.tone-blue strong {
+  color: var(--text) !important;
+  font-weight: 900 !important;
+}
 .expenses-summary span {
   color: var(--muted);
 }
 
 .expenses-filter {
-  grid-template-columns: minmax(260px, 1fr) 150px 140px 140px;
-  align-items: center;
+  grid-template-columns: minmax(260px, 1fr) 170px 170px 190px;
+  align-items: start;
   padding: 24px;
+  overflow: visible !important;
 }
 
 .filter-search {
@@ -124,11 +144,16 @@
 }
 
 .filter-search input {
-  padding-inline-start: 38px;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+  padding: 0 !important;
 }
 
 [dir="rtl"] .filter-search input {
-  padding-inline: 12px 38px;
+  padding: 0 !important;
 }
 
 .expense-panel h2 {
@@ -247,4 +272,125 @@
     grid-template-columns: 1fr !important;
     padding: 18px 14px max(32px, env(safe-area-inset-bottom));
   }
+}
+/* Category inline row */
+
+.expense-modal .inline-field{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    width:100%;
+}
+
+.expense-modal .inline-field input{
+    flex:1;
+    min-width:0;
+}
+
+.expense-modal .inline-field button{
+    flex:0 0 auto;
+    height:38px;
+    padding:0 16px;
+    white-space:nowrap;
+    border-radius:8px;
+}
+
+.expense-modal .inline-field button:first-of-type{
+    background:#2563eb;
+    border:1px solid #2563eb;
+    color:#fff;
+}
+
+.expense-modal .inline-field button:last-of-type{
+    background:var(--panel-bg);
+    border:1px solid var(--border);
+    color:var(--text);
+}
+
+/* Mobile */
+@media (max-width:520px){
+    .expense-modal .inline-field{
+        flex-wrap:wrap;
+    }
+
+    .expense-modal .inline-field input{
+        width:100%;
+        flex:0 0 100%;
+    }
+
+    .expense-modal .inline-field button{
+        flex:1;
+    }
+}
+.expenses-filter {
+  grid-template-columns: minmax(260px, 1fr) 170px 170px 190px;
+  align-items: start;
+  padding: 24px;
+  overflow: visible !important;
+}
+
+/* Expense filter date side by side fix */
+
+.expenses-filter {
+  grid-template-columns: minmax(260px, 1fr) 170px 170px 390px !important;
+  align-items: center !important;
+  padding: 24px;
+  overflow: visible !important;
+}
+
+.expense-date-filter {
+  position: relative;
+  display: grid !important;
+  grid-template-columns: 190px 190px !important;
+  gap: 10px !important;
+  min-width: 390px !important;
+  align-items: center !important;
+}
+
+.expense-date-filter:not(:has(.expense-date-range)) {
+  grid-template-columns: 190px !important;
+  min-width: 190px !important;
+}
+
+.expense-date-filter .smooth-select,
+.expense-date-filter .expense-date-range {
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+.expense-date-filter .smooth-select-btn,
+.expense-date-filter .date-range-btn {
+  height: 40px !important;
+  min-height: 40px !important;
+  border-radius: 10px !important;
+}
+
+.expense-date-filter .date-range-calendar {
+  position: absolute !important;
+  top: calc(100% + 8px) !important;
+  inset-inline-end: 0 !important;
+  z-index: 9999 !important;
+
+}.expenses-filter .filter-search {
+  position: relative;
+}
+
+.expenses-filter .filter-search svg {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: 14px;
+  transform: translateY(-50%);
+  width: 17px;
+  height: 17px;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.expenses-filter .filter-search input {
+  width: 100%;
+  padding: 0 !important;
+}
+
+[dir="rtl"] .expenses-filter .filter-search input {
+  padding: 0 !important;
 }

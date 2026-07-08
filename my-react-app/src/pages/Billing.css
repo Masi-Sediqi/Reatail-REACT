@@ -30,8 +30,8 @@
   min-height: 36px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--accent);
-  color: var(--accent-contrast);
+  background: #2563eb;
+  color: #ffffff;
   padding: 0 14px;
   cursor: pointer;
   font-weight: 800;
@@ -74,7 +74,7 @@
 .search-panel {
   min-height: 88px;
   display: grid;
-  grid-template-columns: 22px minmax(0, 1fr) auto;
+  grid-template-columns: 22px minmax(0, 1fr);
   align-items: center;
   gap: 12px;
   padding: 20px;
@@ -98,8 +98,8 @@
 .billing-panel input:focus,
 .billing-panel select:focus,
 .currency-trigger:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  border-color: var(--border);
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.16);
 }
 
 .search-panel button,
@@ -114,6 +114,43 @@
   padding: 0 14px;
   cursor: pointer;
   font-weight: 800;
+}
+
+.billing-search-results {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.billing-search-results button {
+  min-height: 92px;
+  display: grid;
+  align-content: center;
+  gap: 5px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-soft);
+  color: var(--text);
+  padding: 12px;
+  text-align: start;
+  cursor: pointer;
+}
+
+.billing-search-results button:hover {
+  border-color: var(--border);
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.16);
+}
+
+.billing-search-results strong {
+  font-weight: 900;
+}
+
+.billing-search-results span,
+.billing-search-results small {
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .bill-items-panel {
@@ -243,6 +280,93 @@
 .side-card {
   display: grid;
   gap: 14px;
+  overflow: visible;
+}
+
+.customer-search-select {
+  position: relative;
+  z-index: 20;
+}
+
+.customer-search-btn {
+  width: 100%;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-soft);
+  color: var(--text);
+  padding: 0 12px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: start;
+}
+
+.customer-search-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  inset-inline: 0;
+  z-index: 10010;
+  display: grid;
+  gap: 6px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-bg);
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.22);
+  animation: dropdownSoftIn 190ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  transform-origin: top center;
+}
+
+.customer-search-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-soft);
+  padding: 0 10px;
+}
+
+.customer-search-input input {
+  min-height: 36px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.customer-search-menu > button {
+  min-height: 38px;
+  display: grid;
+  gap: 3px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  padding: 8px 10px;
+  text-align: start;
+  cursor: pointer;
+}
+
+.customer-search-menu > button small {
+  color: var(--muted);
+}
+
+.customer-search-menu > button.selected,
+.customer-search-menu > button:hover {
+  background: var(--panel-soft);
+  color: var(--text);
+}
+
+.customer-search-menu > button.selected small,
+.customer-search-menu > button:hover small {
+  color: var(--muted);
 }
 
 .or-divider {
@@ -295,6 +419,8 @@
   border-radius: 8px;
   background: var(--panel-bg);
   box-shadow: 0 18px 44px rgba(15, 23, 42, 0.22);
+  animation: dropdownSoftIn 190ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  transform-origin: top center;
 }
 
 .currency-menu button {
@@ -314,8 +440,8 @@
 
 .currency-menu button.selected,
 .currency-menu button:hover {
-  background: var(--accent);
-  color: var(--accent-contrast);
+  background: var(--panel-soft);
+  color: var(--text);
 }
 
 .segmented-row {
@@ -340,24 +466,63 @@
 }
 
 .segmented-row button.active {
-  background: var(--accent);
-  color: var(--accent-contrast);
+  background: #111827;
+  color: #ffffff;
 }
 
 .date-field {
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: grid;
+  gap: 6px !important;
 }
 
-.date-field > span,
-.date-field > .date-input-shell {
+.date-field > span {
   grid-column: 1 / -1;
 }
 
 .date-field .segmented-row {
-  grid-column: 2;
-  grid-row: 1;
+  justify-self: end;
+  margin-top: -34px;
+  margin-bottom: 6px;
+  min-height: 28px;
+  border-radius: 8px;
 }
 
+.date-field .date-input-shell {
+  min-height: 40px !important;
+  height: 40px !important;
+  padding: 0 12px !important;
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.date-field .date-input-shell svg {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.date-field .date-input-shell input {
+  flex: 1;
+  min-height: 38px !important;
+  border: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+  font-size: 13px;
+}
+
+.date-field .date-input-shell strong {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.date-field .date-input-shell small {
+  display: none !important; /* حذف آیتم دوم */
+}
 .date-input-shell {
   position: relative;
   display: grid;
@@ -432,9 +597,9 @@
 .billing-actions .primary-btn,
 .manual-scan button,
 .scanner-placeholder button {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--accent-contrast);
+  border-color: #2563eb;
+  background: #2563eb;
+  color: #ffffff;
 }
 
 .scanner-modal {
@@ -497,6 +662,22 @@
   gap: 8px;
 }
 
+.manual-scan input {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-soft);
+  color: var(--text);
+  padding: 0 12px;
+  outline: none;
+}
+
+.manual-scan input:focus {
+  border-color: var(--border);
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.16);
+}
+
 .manual-scan button {
   display: inline-flex;
   align-items: center;
@@ -553,9 +734,9 @@
 }
 
 .invoice-preview-top .primary-btn {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--accent-contrast);
+  border-color: #2563eb;
+  background: #2563eb;
+  color: #ffffff;
 }
 
 .invoice-scroll {
@@ -791,4 +972,106 @@
   .invoice-paper {
     min-width: 560px;
   }
+}
+.billing-right .side-card {
+  padding: 16px 18px !important;
+  gap: 12px !important;
+  border-radius: 12px;
+}
+
+.billing-right .billing-field {
+  gap: 6px !important;
+}
+
+.billing-right .billing-field > span {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.billing-right .smooth-select-btn,
+.billing-right input {
+  min-height: 40px !important;
+  height: 40px !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+}
+
+.billing-right .segmented-row button {
+  min-height: 28px !important;
+  padding: 0 10px !important;
+  font-size: 12px !important;
+}
+
+.billing-right .date-input-shell {
+  min-height: 40px !important;
+  height: 40px !important;
+  padding: 0 10px !important;
+  grid-template-columns: 22px minmax(0, 1fr) auto !important;
+}
+
+.billing-right .date-input-shell input {
+  min-height: 38px !important;
+  font-size: 13px !important;
+}
+
+.billing-right .date-input-shell strong {
+  grid-column: 3 !important;
+  grid-row: 1 !important;
+  font-size: 12px !important;
+}
+
+.billing-right .date-input-shell small {
+  display: none !important;
+}.billing-right .billing-field > small,
+.currency-field > small {
+  display: none !important;
+}
+
+.billing-right .billing-field {
+  position: relative;
+  display: grid !important;
+  gap: 8px !important;
+}
+
+.billing-right .billing-field > span {
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  color: var(--text) !important;
+}
+
+.billing-right .segmented-row {
+  justify-self: end !important;
+  margin-top: -34px !important;
+  margin-bottom: 6px !important;
+}
+
+.billing-right .date-field .segmented-row {
+  margin-top: -34px !important;
+}
+
+.billing-right .date-input-shell {
+  height: 42px !important;
+  min-height: 42px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 0 12px !important;
+}
+
+.billing-right .date-input-shell svg:last-of-type {
+  display: none !important;
+}
+
+.billing-right .date-input-shell small {
+  display: none !important;
+}
+
+.billing-right .date-input-shell input {
+  flex: 1;
+}
+
+.billing-right .date-input-shell strong {
+  font-size: 12px !important;
+  color: var(--muted) !important;
+  white-space: nowrap;
 }

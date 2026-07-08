@@ -1,6 +1,6 @@
 import { quickActions } from '../data/dashboardData.js'
 
-function QuickActions({ t }) {
+function QuickActions({ onNavigate, t }) {
   return (
     <section className="panel quick-panel">
       <h2>{t.quickActions}</h2>
@@ -9,7 +9,7 @@ function QuickActions({ t }) {
           const ActionIcon = action.icon
 
           return (
-            <button className={action.featured ? 'quick-action featured' : 'quick-action'} type="button" key={action.labelKey}>
+            <button className={action.featured ? 'quick-action featured' : 'quick-action'} type="button" key={action.labelKey} onClick={() => action.page && onNavigate?.(action.page)}>
               <ActionIcon size={22} />
               <span>{t[action.labelKey]}</span>
             </button>

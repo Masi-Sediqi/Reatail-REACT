@@ -18,6 +18,7 @@ import {
   LayoutDashboard,
   Lock,
   Mail,
+  MessageCircle,
   Moon,
   Package,
   Phone,
@@ -49,9 +50,10 @@ export const sidebarItems = [
   { key: 'suppliers', icon: Truck, page: 'suppliers' },
   { key: 'expenses', icon: WalletCards, page: 'expenses' },
   { key: 'loans', icon: CreditCard, page: 'loans' },
-  { key: 'financials', icon: DollarSign },
-  { key: 'reports', icon: BarChart3 },
+  { key: 'financials', icon: DollarSign, page: 'financials' },
+  { key: 'reports', icon: BarChart3, page: 'reports' },
   { key: 'recycleBin', icon: Trash2, page: 'recycleBin' },
+  { key: 'agent', icon: MessageCircle, page: 'agent' },
   { key: 'settings', icon: Settings, page: 'settings' },
 ]
 
@@ -103,10 +105,10 @@ export const staffCards = [
 ]
 
 export const quickActions = [
-  { labelKey: 'newBill', icon: ReceiptText, featured: true },
-  { labelKey: 'addProduct', icon: Plus },
-  { labelKey: 'addCustomer', icon: UserPlus },
-  { labelKey: 'recordPayment', icon: CreditCard },
+  { labelKey: 'newBill', icon: ReceiptText, featured: true, page: 'billing' },
+  { labelKey: 'addProduct', icon: Plus, page: 'products' },
+  { labelKey: 'addCustomer', icon: UserPlus, page: 'customers' },
+  { labelKey: 'recordPayment', icon: CreditCard, page: 'loans' },
 ]
 
 export const activities = [

@@ -1,0 +1,369 @@
+.metric-detail-content {
+  display: grid;
+  gap: 24px;
+}
+
+.metric-detail-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.metric-detail-title .back-icon-btn {
+  flex: 0 0 auto;
+}
+
+.summary-grid.three.metric-detail-summary {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.detail-summary-card {
+  position: relative;
+  min-height: 96px;
+  display: grid;
+  align-content: center;
+  padding: 20px 72px 20px 20px;
+  border: 1px solid var(--border);
+  border-inline-start: 4px solid #0ea5e9;
+  border-radius: 10px;
+  background: var(--panel-bg);
+  box-shadow: var(--shadow);
+}
+
+.detail-summary-card.tone-red {
+  border-inline-start-color: #ef4444;
+  background: color-mix(in srgb, #ef4444 7%, var(--panel-bg));
+}
+
+.detail-summary-card.tone-green {
+  border-inline-start-color: #22c55e;
+  background: color-mix(in srgb, #22c55e 6%, var(--panel-bg));
+}
+
+.detail-summary-card.tone-navy {
+  border-inline-start-color: var(--navy);
+}
+
+.detail-summary-card span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.detail-summary-card strong {
+  display: block;
+  margin-top: 10px;
+  color: var(--text);
+  font-size: clamp(20px, 2vw, 25px);
+  font-weight: 950;
+  line-height: 1.15;
+  word-break: break-word;
+}
+
+.detail-summary-card > svg {
+  position: absolute;
+  top: 20px;
+  inset-inline-end: 20px;
+  width: 40px;
+  height: 40px;
+  padding: 10px;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.metric-detail-filter {
+  grid-template-columns: minmax(260px, 1fr) minmax(150px, 190px) minmax(220px, 280px);
+  margin-bottom: 0;
+  overflow: visible;
+}
+
+.metric-detail-filter:not(:has(.metric-detail-date-range)) {
+  grid-template-columns: minmax(260px, 1fr) minmax(150px, 190px);
+}
+
+.customer-view-filter {
+  grid-template-columns: minmax(260px, 1fr) minmax(150px, 190px) minmax(150px, 190px);
+}
+
+.customer-view-filter:not(:has(.metric-detail-date-range)) {
+  grid-template-columns: minmax(260px, 1fr) minmax(150px, 190px) minmax(150px, 190px);
+}
+
+.expenses-view-filter {
+  grid-template-columns: minmax(260px, 1fr) minmax(150px, 190px) minmax(150px, 190px) minmax(150px, 190px);
+}
+
+.expenses-view-filter:has(.metric-detail-date-range) {
+  grid-template-columns: minmax(260px, 1fr) minmax(150px, 190px) minmax(150px, 190px) minmax(150px, 190px) minmax(220px, 280px);
+}
+
+.metric-detail-date-range,
+.metric-detail-date-range .date-range-btn {
+  width: 100%;
+}
+
+.metric-detail-filter .search-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--input-bg, var(--panel-soft));
+}
+
+.metric-detail-filter .search-field svg {
+  flex: 0 0 auto;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.metric-detail-filter .search-field input {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--text);
+}
+
+.metric-detail-filter .search-field input::placeholder {
+  color: var(--muted);
+}
+
+.metric-detail-filter .smooth-select,
+.metric-detail-filter .date-range-picker,
+.metric-detail-filter .date-range-btn {
+  min-width: 0;
+}
+
+.metric-detail-panel {
+  overflow: visible;
+}
+
+.metric-detail-panel h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.metric-detail-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 22px;
+  padding: 4px;
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.metric-detail-tabs button {
+  min-height: 34px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.metric-detail-tabs button.active {
+  background: var(--panel-bg);
+  color: var(--text);
+  box-shadow: var(--shadow-soft);
+}
+
+.metric-detail-table-wrap {
+  overflow-x: auto;
+}
+
+.metric-detail-table {
+  min-width: 760px;
+}
+
+.customer-view-table,
+.expenses-view-table {
+  min-width: 860px;
+}
+
+.table-link-btn {
+  min-width: auto;
+  height: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.table-link-btn:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+.net-profit-date-filter {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.net-profit-date-filter .smooth-select,
+.net-profit-date-filter .date-range-picker {
+  width: min(220px, 100%);
+}
+
+.net-profit-breakdown h2,
+.net-profit-source h2 {
+  margin-bottom: 22px;
+  font-size: 17px;
+}
+
+.net-profit-rows {
+  display: grid;
+  gap: 9px;
+}
+
+.net-profit-rows > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 36px;
+  padding: 9px 10px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--panel-soft) 76%, transparent);
+}
+
+.net-profit-rows > div:nth-child(1) {
+  background: rgba(34, 197, 94, 0.08);
+}
+
+.net-profit-rows > div:nth-child(2),
+.net-profit-rows > div:nth-child(4),
+.net-profit-rows > div:nth-child(5),
+.net-profit-rows > div:nth-child(6) {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.net-profit-rows > div.strong {
+  border: 1px dashed var(--border);
+  background: var(--panel-bg);
+}
+
+.net-profit-rows > div.success {
+  border: 1px solid #22c55e;
+  background: rgba(34, 197, 94, 0.08);
+}
+
+.net-profit-rows > div.muted {
+  background: var(--panel-soft);
+  color: var(--muted);
+}
+
+.net-profit-rows strong {
+  white-space: nowrap;
+  font-size: 15px;
+}
+
+.net-profit-rows > div:nth-child(1) strong,
+.net-profit-rows > div.success strong {
+  color: #16a34a;
+}
+
+.net-profit-rows > div:nth-child(2) strong,
+.net-profit-rows > div:nth-child(4) strong,
+.net-profit-rows > div:nth-child(5) strong,
+.net-profit-rows > div:nth-child(6) strong {
+  color: #ef4444;
+}
+
+.net-source-tabs {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  width: min(760px, 100%);
+}
+
+.net-profit-search {
+  margin-bottom: 12px;
+}
+
+.net-profit-search input {
+  width: min(320px, 100%);
+  min-height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--text);
+  padding: 0 12px;
+}
+
+.net-source-table {
+  min-width: 980px;
+}
+
+@media (max-width: 900px) {
+  .summary-grid.three.metric-detail-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .metric-detail-heading {
+    gap: 14px;
+  }
+
+  .metric-detail-filter,
+  .metric-detail-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .metric-detail-filter:not(:has(.metric-detail-date-range)),
+  .customer-view-filter,
+  .customer-view-filter:not(:has(.metric-detail-date-range)),
+  .expenses-view-filter,
+  .expenses-view-filter:has(.metric-detail-date-range) {
+    grid-template-columns: 1fr;
+  }
+
+  .metric-detail-filter .smooth-select,
+  .metric-detail-filter .date-range-picker,
+  .metric-detail-filter .date-range-btn,
+  .net-profit-date-filter .smooth-select,
+  .net-profit-date-filter .date-range-picker,
+  .net-profit-date-filter .date-range-btn {
+    width: 100%;
+  }
+
+  .net-profit-date-filter {
+    flex-direction: column;
+  }
+
+  .detail-summary-card {
+    min-height: 88px;
+    padding: 16px 64px 16px 16px;
+  }
+
+  .metric-detail-table {
+    min-width: 640px;
+  }
+
+  .net-source-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .net-source-table {
+    min-width: 860px;
+  }
+
+  .net-profit-rows > div {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

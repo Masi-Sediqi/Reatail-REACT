@@ -50,6 +50,24 @@ export function Bell(props) {
   )
 }
 
+export function Play(props) {
+  return (
+    <Icon {...props}>
+      <path d="M6 4v16l14-8-14-8Z" />
+    </Icon>
+  )
+}
+
+export function Volume2(props) {
+  return (
+    <Icon {...props}>
+      <path d="M11 5 6 9H3v6h3l5 4V5Z" />
+      <path d="M15 9.4a5 5 0 0 1 0 5.2" />
+      <path d="M18.5 6a9 9 0 0 1 0 12" />
+    </Icon>
+  )
+}
+
 export function Box(props) {
   return (
     <Icon {...props}>
@@ -222,6 +240,14 @@ export function Mail(props) {
   )
 }
 
+export function MessageCircle(props) {
+  return (
+    <Icon {...props}>
+      <path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.8 8.8 0 0 1-3.8-.9L3 21l1.8-5a8.4 8.4 0 1 1 16.2-4.5Z" />
+    </Icon>
+  )
+}
+
 export function Moon(props) {
   return (
     <Icon {...props}>
@@ -257,6 +283,16 @@ export function Plus(props) {
   )
 }
 
+export function Printer(props) {
+  return (
+    <Icon {...props}>
+      <path d="M6 9V3h12v6" />
+      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+      <path d="M6 14h12v7H6z" />
+    </Icon>
+  )
+}
+
 export function ReceiptText(props) {
   return (
     <Icon {...props}>
@@ -264,6 +300,18 @@ export function ReceiptText(props) {
       <path d="M9 8h6" />
       <path d="M9 12h6" />
       <path d="M9 16h4" />
+    </Icon>
+  )
+}
+
+export function Share2(props) {
+  return (
+    <Icon {...props}>
+      <circle cx="18" cy="5" r="3" />
+      <circle cx="6" cy="12" r="3" />
+      <circle cx="18" cy="19" r="3" />
+      <path d="m8.6 10.5 6.8-4" />
+      <path d="m8.6 13.5 6.8 4" />
     </Icon>
   )
 }
@@ -279,11 +327,29 @@ export function RefreshCcw(props) {
   )
 }
 
+export function X(props) {
+  return (
+    <Icon {...props}>
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </Icon>
+  )
+}
+
 export function Search(props) {
   return (
     <Icon {...props}>
       <circle cx="11" cy="11" r="7" />
       <path d="m20 20-3.5-3.5" />
+    </Icon>
+  )
+}
+
+export function Send(props) {
+  return (
+    <Icon {...props}>
+      <path d="M22 2 11 13" />
+      <path d="m22 2-7 20-4-9-9-4 20-7Z" />
     </Icon>
   )
 }

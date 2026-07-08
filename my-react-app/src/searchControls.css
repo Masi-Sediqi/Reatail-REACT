@@ -1,0 +1,211 @@
+.retail-shell {
+  --search-control-height: 42px;
+  --search-control-radius: 10px;
+  --search-control-padding: 13px;
+}
+
+.retail-shell .main-area :is(
+  .search-field,
+  .products-search-field,
+  .sales-search,
+  .filter-search,
+  .global-search-input,
+  .customer-search-input,
+  .cash-wallet-filters .search-field,
+  .metric-detail-filter .search-field,
+  .godown-filter-bar .search-field,
+  .loans-filter-bar .search-field
+) {
+  position: relative !important;
+  min-height: var(--search-control-height) !important;
+  height: var(--search-control-height) !important;
+  display: grid !important;
+  grid-template-columns: 18px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 9px !important;
+  padding: 0 var(--search-control-padding) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--search-control-radius) !important;
+  background: var(--panel-bg) !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+.retail-shell .main-area :is(
+  .search-field,
+  .products-search-field,
+  .sales-search,
+  .filter-search,
+  .global-search-input,
+  .customer-search-input,
+  .cash-wallet-filters .search-field,
+  .metric-detail-filter .search-field,
+  .godown-filter-bar .search-field,
+  .loans-filter-bar .search-field
+) > svg {
+  position: static !important;
+  width: 17px !important;
+  height: 17px !important;
+  margin: 0 !important;
+  transform: none !important;
+  color: var(--muted) !important;
+  pointer-events: none !important;
+}
+
+.retail-shell .main-area :is(
+  .search-field,
+  .products-search-field,
+  .sales-search,
+  .filter-search,
+  .global-search-input,
+  .customer-search-input,
+  .cash-wallet-filters .search-field,
+  .metric-detail-filter .search-field,
+  .godown-filter-bar .search-field,
+  .loans-filter-bar .search-field
+) > input,
+.retail-shell .main-area :is(
+  .search-field,
+  .products-search-field,
+  .sales-search,
+  .filter-search,
+  .global-search-input,
+  .customer-search-input,
+  .cash-wallet-filters .search-field,
+  .metric-detail-filter .search-field,
+  .godown-filter-bar .search-field,
+  .loans-filter-bar .search-field
+) input {
+  min-width: 0 !important;
+  width: 100% !important;
+  min-height: calc(var(--search-control-height) - 2px) !important;
+  height: calc(var(--search-control-height) - 2px) !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+  padding: 0 !important;
+}
+
+.retail-shell .main-area :is(
+  .search-field,
+  .products-search-field,
+  .sales-search,
+  .filter-search,
+  .global-search-input,
+  .customer-search-input,
+  .cash-wallet-filters .search-field,
+  .metric-detail-filter .search-field,
+  .godown-filter-bar .search-field,
+  .loans-filter-bar .search-field
+):focus-within {
+  border-color: #93b4e8 !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.13) !important;
+}
+
+.retail-shell .main-area :is(
+  .search-field,
+  .products-search-field,
+  .sales-search,
+  .filter-search,
+  .global-search-input,
+  .customer-search-input,
+  .cash-wallet-filters .search-field,
+  .metric-detail-filter .search-field,
+  .godown-filter-bar .search-field,
+  .loans-filter-bar .search-field
+) input:focus {
+  border: 0 !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+}
+
+.retail-shell .main-area .search-field.search-field > input,
+.retail-shell .main-area .search-field.search-field input,
+.retail-shell .main-area .products-search-field.products-search-field > input,
+.retail-shell .main-area .products-search-field.products-search-field input,
+.retail-shell .main-area .sales-search.sales-search > input,
+.retail-shell .main-area .sales-search.sales-search input,
+.retail-shell .main-area .filter-search.filter-search > input,
+.retail-shell .main-area .filter-search.filter-search input,
+.retail-shell .main-area .global-search-input.global-search-input > input,
+.retail-shell .main-area .global-search-input.global-search-input input,
+.retail-shell .main-area .customer-search-input.customer-search-input > input,
+.retail-shell .main-area .customer-search-input.customer-search-input input {
+  min-width: 0 !important;
+  width: 100% !important;
+  min-height: calc(var(--search-control-height) - 2px) !important;
+  height: calc(var(--search-control-height) - 2px) !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+  padding: 0 !important;
+}
+
+.retail-shell .main-area .search-field.search-field > input:focus,
+.retail-shell .main-area .search-field.search-field input:focus,
+.retail-shell .main-area .products-search-field.products-search-field > input:focus,
+.retail-shell .main-area .products-search-field.products-search-field input:focus,
+.retail-shell .main-area .sales-search.sales-search > input:focus,
+.retail-shell .main-area .sales-search.sales-search input:focus,
+.retail-shell .main-area .filter-search.filter-search > input:focus,
+.retail-shell .main-area .filter-search.filter-search input:focus,
+.retail-shell .main-area .global-search-input.global-search-input > input:focus,
+.retail-shell .main-area .global-search-input.global-search-input input:focus,
+.retail-shell .main-area .customer-search-input.customer-search-input > input:focus,
+.retail-shell .main-area .customer-search-input.customer-search-input input:focus {
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+}
+
+.retail-shell.retail-shell .main-area.main-area .search-field.search-field input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+.retail-shell.retail-shell .main-area.main-area .products-search-field.products-search-field input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+.retail-shell.retail-shell .main-area.main-area .sales-search.sales-search input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+.retail-shell.retail-shell .main-area.main-area .filter-search.filter-search input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+.retail-shell.retail-shell .main-area.main-area .global-search-input.global-search-input input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+.retail-shell.retail-shell .main-area.main-area .customer-search-input.customer-search-input input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]) {
+  min-width: 0 !important;
+  width: 100% !important;
+  min-height: calc(var(--search-control-height) - 2px) !important;
+  height: calc(var(--search-control-height) - 2px) !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+  padding: 0 !important;
+}
+
+.retail-shell.retail-shell .main-area.main-area .search-field.search-field input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):focus,
+.retail-shell.retail-shell .main-area.main-area .products-search-field.products-search-field input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):focus,
+.retail-shell.retail-shell .main-area.main-area .sales-search.sales-search input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):focus,
+.retail-shell.retail-shell .main-area.main-area .filter-search.filter-search input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):focus,
+.retail-shell.retail-shell .main-area.main-area .global-search-input.global-search-input input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):focus,
+.retail-shell.retail-shell .main-area.main-area .customer-search-input.customer-search-input input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):focus {
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+}

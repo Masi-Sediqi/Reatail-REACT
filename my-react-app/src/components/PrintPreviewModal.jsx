@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import CustomSelect from './CustomSelect.jsx'
+import { Download, Mail, MessageCircle, Printer, Share2, X } from './Icons.jsx'
 import { printTemplates } from '../data/dashboardData.js'
 
 function PrintPreviewModal({ companyInfo, onClose, printSettings, rows, title, columns, t }) {
@@ -92,14 +93,37 @@ function PrintPreviewModal({ companyInfo, onClose, printSettings, rows, title, c
       <div className="print-preview-modal" onClick={(event) => event.stopPropagation()}>
         <div className="print-preview-top">
           <strong>{title} - {t.printPreview}</strong>
-          <div>
-            <button type="button" onClick={requestClose}>{t.cancel}</button>
-            <button type="button" onClick={() => navigator.share?.({ title, text: `${rows.length} ${t.totalRecords}` })}>{t.share}</button>
-            <a className="print-top-link" href={`https://wa.me/?text=${encodedSubject}%20-%20${rows.length}%20${encodeURIComponent(t.totalRecords)}`} target="_blank" rel="noreferrer">WhatsApp</a>
-            <a className="print-top-link" href={`mailto:?subject=${encodedSubject}&body=${encodedBody}`}>{t.email ?? 'Email'}</a>
-            <button type="button" onClick={() => openPrintableDocument('pdf')}>PDF</button>
-            <button className="primary-btn" type="button" onClick={() => openPrintableDocument('print')}>{t.print}</button>
-          </div>
+         <div className="print-action-bar">
+  <button className="print-top-link" type="button" onClick={requestClose}>
+    <X size={14} />
+    <span>Cancel</span>
+  </button>
+
+  <button className="print-top-link" type="button" onClick={() => navigator.share?.({ title, text: `${rows.length} ${t.totalRecords}` })}>
+    <Share2 size={15} />
+    <span>Share</span>
+  </button>
+
+  <a className="print-top-link" href={`https://wa.me/?text=${encodedSubject}%20-%20${rows.length}%20${encodeURIComponent(t.totalRecords)}`} target="_blank" rel="noreferrer">
+    <MessageCircle size={15} />
+    <span>WhatsApp</span>
+  </a>
+
+  <a className="print-top-link" href={`mailto:?subject=${encodedSubject}&body=${encodedBody}`}>
+    <Mail size={15} />
+    <span>Email</span>
+  </a>
+
+  <button className="print-top-link" type="button" onClick={() => openPrintableDocument('pdf')}>
+    <Download size={15} />
+    <span>PDF</span>
+  </button>
+
+  <button className="print-top-link" type="button" onClick={() => openPrintableDocument('print')}>
+    <Printer size={15} />
+    <span>Print</span>
+  </button>
+</div>
         </div>
         <div className="print-preview-body">
           <aside className="print-controls">

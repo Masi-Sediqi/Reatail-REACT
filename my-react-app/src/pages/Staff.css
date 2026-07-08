@@ -1,5 +1,5 @@
 .staff-filter {
-  grid-template-columns: minmax(260px, 1fr) 140px 140px;
+  grid-template-columns: minmax(260px, 1fr) minmax(140px, 170px) minmax(140px, 170px) minmax(220px, 260px);
 }
 
 .staff-panel h2 {
@@ -137,4 +137,251 @@
 .payroll-btn:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+
+.payroll-modal {
+  width: min(480px, calc(100vw - 28px));
+  max-height: min(820px, calc(100dvh - 42px));
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px 12px;
+  position: relative;
+  overflow: visible;
+  padding: 24px;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel-bg);
+  color: var(--text);
+  box-shadow: 0 26px 80px rgba(0, 0, 0, 0.34);
+  animation: modalIn 180ms ease both;
+}
+
+.payroll-modal h2 {
+  grid-column: 1 / -1;
+  margin: 0 28px 4px 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.payroll-modal label {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.payroll-modal label.wide,
+.payroll-modal .modal-actions.wide {
+  grid-column: 1 / -1;
+}
+
+.payroll-modal span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.payroll-modal small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.payroll-modal input,
+.payroll-modal textarea,
+.payroll-modal .smooth-select-btn {
+  min-height: 40px;
+  border-radius: 8px;
+  border-color: var(--border);
+  background: var(--panel-soft);
+  color: var(--text);
+}
+
+.payroll-modal input,
+.payroll-modal textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  padding: 0 12px;
+  outline: none;
+  font: inherit;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+
+.payroll-modal textarea {
+  min-height: 82px;
+  resize: vertical;
+  padding-block: 12px;
+}
+
+.payroll-modal input:focus,
+.payroll-modal textarea:focus {
+  border-color: var(--accent);
+  background: var(--panel-bg);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.payroll-modal .smooth-select-menu {
+  z-index: 5000;
+}
+
+.payroll-modal .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.payroll-modal .modal-actions button {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-bg);
+  color: var(--text);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.payroll-modal .modal-actions .primary-btn {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.payroll-modal .modal-actions .primary-btn:disabled {
+  border-color: var(--muted);
+  background: var(--muted);
+  color: var(--panel-bg);
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+.success-text {
+  color: var(--success) !important;
+}
+
+.staff-profile-heading {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.staff-profile-heading > button:first-child {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-bg);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.staff-profile-heading h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.staff-profile-heading p {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+
+.staff-profile-heading .primary-btn {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.payroll-history-table {
+  min-width: 920px;
+}
+
+.payroll-delete-btn {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--danger);
+  cursor: pointer;
+}
+
+.payroll-delete-btn:hover {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+}
+
+@media (max-width: 760px) {
+  .payroll-modal {
+    grid-template-columns: 1fr;
+    width: calc(100vw - 18px);
+    padding: 20px 14px max(24px, env(safe-area-inset-bottom));
+  }
+
+  .staff-profile-heading {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .staff-profile-heading .primary-btn {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}
+.staff-summary-grid article {
+  position: relative;
+  min-height: 96px;
+  padding: 20px 72px 20px 20px !important;
+}
+
+.staff-summary-grid article > svg {
+  position: absolute;
+  top: 50%;
+  inset-inline-end: 22px;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  padding: 10px;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.staff-summary-grid article span {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.staff-summary-grid article strong {
+  font-size: 22px;
+  font-weight: 900;
+}
+
+[dir="rtl"] .staff-summary-grid article {
+  padding: 20px 20px 20px 72px !important;
+}
+
+[dir="rtl"] .staff-summary-grid article > svg {
+  inset-inline-end: auto;
+  inset-inline-start: 22px;
 }

@@ -68,9 +68,67 @@
 .sales-summary-grid .tone-orange { border-inline-start-color: #f59e0b; }
 .sales-summary-grid .tone-red { border-inline-start-color: #ef4444; }
 
+
+
+
+.sales-summary-grid article {
+  position: relative;
+  min-height: 96px;
+  padding: 20px 72px 20px 20px !important;
+}
+
+.sales-summary-grid article > svg {
+  position: absolute;
+  top: 50%;
+  inset-inline-end: 22px;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  padding: 10px;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.sales-summary-grid article span {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.sales-summary-grid article strong {
+  font-size: 22px;
+  font-weight: 900;
+}
+
+[dir="rtl"] .sales-summary-grid article {
+  padding: 20px 20px 20px 72px !important;
+}
+
+[dir="rtl"] .sales-summary-grid article > svg {
+  inset-inline-end: auto;
+  inset-inline-start: 22px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .sales-filter-card {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 160px 140px;
+  position: relative;
+  z-index: 70;
+  grid-template-columns: minmax(0, 1fr) minmax(150px, 170px) minmax(150px, 170px) minmax(150px, 170px);
   gap: 16px;
   margin-bottom: 24px;
   padding: 24px;
@@ -79,6 +137,7 @@
   background: var(--panel-bg);
   box-shadow: var(--shadow);
   animation: fadeLiftIn 220ms ease both;
+  overflow: visible;
 }
 
 .sales-search {
@@ -112,6 +171,116 @@
 
 .sales-filter-card select {
   padding: 0 12px;
+}
+
+.sales-date-range-picker {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.sales-date-range-btn {
+  width: 100%;
+  min-height: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-bg);
+  color: var(--text);
+  padding-block: 0;
+  padding-inline: 12px;
+  cursor: pointer;
+  font: inherit;
+  text-align: start;
+}
+
+.sales-date-range-btn span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 400;
+}
+
+.sales-date-calendar {
+  position: absolute;
+  top: calc(100% + 8px);
+  inset-inline-end: 0;
+  z-index: 10010;
+  width: min(278px, calc(100vw - 32px));
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-bg);
+  color: var(--text);
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.22);
+  animation: dropdownIn 140ms ease both;
+}
+
+.calendar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.calendar-head button,
+.calendar-days button {
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.calendar-head button {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+}
+
+.calendar-head strong {
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.calendar-weekdays,
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  text-align: center;
+}
+
+.calendar-weekdays span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.calendar-days button {
+  min-height: 32px;
+  font-size: 13px;
+}
+
+.calendar-days button.muted {
+  color: var(--muted);
+  opacity: 0.65;
+}
+
+.calendar-days button.in-range {
+  background: var(--accent-soft);
+}
+
+.calendar-days button.selected,
+.calendar-days button:hover {
+  background: var(--accent);
+  color: var(--accent-contrast);
 }
 
 .sales-table-panel h2 {
@@ -427,19 +596,33 @@
   gap: 4px;
 }
 
-.payment-nested-backdrop {
-  z-index: 70;
-  background: rgba(0, 0, 0, 0.72);
-}
-
 .add-payment-modal {
   width: min(448px, calc(100vw - 24px));
+  gap: 18px;
+  padding: 26px 24px;
+  overflow: visible;
+}
+
+.add-payment-modal h2 {
+  margin: 0;
+  padding-inline-end: 28px;
+  font-size: 20px;
+  font-weight: 900;
 }
 
 .payment-facts {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 10px 16px;
+  gap: 12px 18px;
+  padding: 12px 0 4px;
+}
+
+.payment-facts span {
+  font-weight: 700;
+}
+
+.payment-facts strong {
+  text-align: end;
 }
 
 .sales-form-field {
@@ -453,7 +636,7 @@
   width: 100%;
   min-height: 46px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--panel-soft);
   color: var(--text);
   padding: 0 12px;
@@ -489,6 +672,14 @@
   cursor: pointer;
   font: inherit;
   font-weight: 800;
+}
+
+.add-payment-modal .modal-actions {
+  margin-top: 2px;
+}
+
+.add-payment-modal .modal-actions button {
+  min-width: 94px;
 }
 
 .modal-actions .danger-btn {

@@ -1,0 +1,366 @@
+/* Dashboard filter controls */
+.dashboard-date-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.dashboard-date-control {
+  width: 150px;
+  flex: 0 0 150px;
+}
+
+.dashboard-filter-select,
+.dashboard-filter-select .smooth-select {
+  width: 100%;
+}
+
+.dashboard-filter-select .smooth-select-btn {
+  height: 42px;
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-bg);
+  color: var(--text);
+  box-shadow: var(--shadow-soft);
+}
+
+.dashboard-filter-select .smooth-select-label {
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.dashboard-filter-select .smooth-select-btn svg {
+  width: 15px;
+  height: 15px;
+  color: var(--muted);
+}
+
+.dashboard-range-shell {
+  position: relative;
+  width: 150px;
+  flex: 0 0 150px;
+}
+
+.dashboard-range-shell .date-range-picker {
+  width: 100%;
+  min-width: 0;
+}
+
+.dashboard-range-shell .date-range-btn {
+  width: 100%;
+  height: 42px;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  padding-block: 0;
+  padding-inline: 12px 34px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-bg);
+  color: var(--text);
+  box-shadow: var(--shadow-soft);
+}
+
+.dashboard-range-shell .date-range-btn svg {
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+  flex: 0 0 auto;
+}
+
+.dashboard-range-shell .date-range-btn span {
+  font-size: 13px;
+  font-weight: 400;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-filter-reset {
+  position: absolute;
+  top: 50%;
+  inset-inline-end: 10px;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  z-index: 5;
+}
+
+.dashboard-filter-reset:hover {
+  background: var(--panel-soft);
+  color: var(--accent);
+}
+
+/* Quick Actions */
+.quick-panel {
+  padding: 28px 24px;
+}
+
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.retail-shell .quick-panel .quick-action,
+.retail-shell .quick-panel .quick-action.featured {
+  width: 100%;
+  min-height: 54px !important;
+  height: auto !important;
+  padding: 12px 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  text-align: start;
+  white-space: normal !important;
+}
+
+.retail-shell .quick-panel .quick-action svg,
+.retail-shell .quick-panel .quick-action.featured svg {
+  width: 19px;
+  height: 19px;
+  flex: 0 0 auto;
+  color: var(--muted) !important;
+}
+
+.retail-shell .quick-panel .quick-action span {
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.retail-shell .quick-panel .quick-action:hover,
+.retail-shell .quick-panel .quick-action.featured:hover {
+  transform: translateY(-1px) !important;
+  border-color: var(--accent) !important;
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08) !important;
+}
+
+/* Trend chart design */
+.trend-panel {
+  margin-top: 6px;
+  margin-bottom: 32px;
+  padding: 24px 24px 18px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-bg);
+  box-shadow: var(--shadow);
+}
+
+.trend-panel h2 {
+  margin: 0 0 4px;
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.trend-chart-wrap {
+  width: 100%;
+  overflow: hidden;
+}
+
+.trend-chart-wrap svg {
+  display: block;
+  width: 100%;
+  height: 300px;
+  min-height: 300px;
+}
+
+.trend-line {
+  fill: none !important;
+  stroke-width: 2 !important;
+  vector-effect: non-scaling-stroke;
+}
+
+.trend-line.navy {
+  stroke: #16264e !important;
+}
+
+.trend-line.red {
+  stroke: #ff3333 !important;
+}
+
+.trend-line.orange {
+  stroke: #ffa500 !important;
+}
+
+.trend-line.purple {
+  stroke: #8b5cf6 !important;
+}
+
+.trend-line.green {
+  stroke: #10b981 !important;
+}
+
+.trend-dot {
+  r: 2.6;
+  stroke-width: 1.5;
+}
+
+.trend-dot.navy {
+  fill: #16264e;
+  stroke: #16264e;
+}
+
+.trend-dot.red {
+  fill: #ff3333;
+  stroke: #ff3333;
+}
+
+.trend-dot.orange {
+  fill: #ffa500;
+  stroke: #ffa500;
+}
+
+.trend-dot.purple {
+  fill: #8b5cf6;
+  stroke: #8b5cf6;
+}
+
+.trend-dot.green {
+  fill: #10b981;
+  stroke: #10b981;
+}
+
+.axis-label {
+  fill: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.trend-tooltip {
+  display: none;
+}
+
+.trend-legend {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  margin-top: 4px;
+  color: var(--text);
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+}
+
+.legend-item::before {
+  content: "";
+  width: 14px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.legend-item.navy {
+  color: #16264e;
+}
+
+.legend-item.red {
+  color: #ff3333;
+}
+
+.legend-item.orange {
+  color: #ffa500;
+}
+
+.legend-item.purple {
+  color: #8b5cf6;
+}
+
+.legend-item.green {
+  color: #10b981;
+}
+
+.retail-shell .date-range-calendar .calendar-days button.in-range {
+  background: color-mix(in srgb, #2563eb 12%, var(--panel-bg)) !important;
+  color: var(--text) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .date-range-calendar .calendar-days button.selected {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25) !important;
+}
+
+.retail-shell .date-range-calendar .calendar-days button.in-range:not(.selected) {
+  border-radius: 6px !important;
+}
+
+.retail-shell .date-range-calendar .calendar-days button:hover:not(.selected):not(.in-range) {
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+}
+
+.retail-shell .date-range-calendar .calendar-days button.selected:hover {
+  background: #1d4ed8 !important;
+  color: #ffffff !important;
+}
+
+@media (max-width: 760px) {
+  .dashboard-date-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .dashboard-date-control,
+  .dashboard-range-shell {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .quick-panel {
+    padding: 20px 16px;
+  }
+
+  .quick-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .trend-panel {
+    padding: 20px 14px 16px;
+  }
+
+  .trend-chart-wrap {
+    overflow-x: auto;
+  }
+
+  .trend-chart-wrap svg {
+    min-width: 850px;
+  }
+}

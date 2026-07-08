@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import PrintPreviewModal from '../components/PrintPreviewModal.jsx'
 import CustomSelect from '../components/CustomSelect.jsx'
 import FloatingActionMenu from '../components/FloatingActionMenu.jsx'
+import DateRangePicker from '../components/DateRangePicker.jsx'
 import { currencies } from '../data/dashboardData.js'
 import { Search, WalletCards } from '../components/Icons.jsx'
 import './Expenses.css'
@@ -19,17 +20,31 @@ const emptyExpense = {
   date: '',
 }
 
-const readExpenseCategories = () => {
-  try {
-    const stored = JSON.parse(window.localStorage.getItem('retail-expense-categories') || '[]')
-    const merged = [...defaultExpenseCategories, ...(Array.isArray(stored) ? stored : [])]
-    return merged.filter((category, index) => merged.findIndex((item) => item.toLowerCase() === category.toLowerCase()) === index)
-  } catch {
-    return defaultExpenseCategories
-  }
+const getCategoryLabel = (category, t) => t.expenseCategories?.[category] ?? category
+
+const parseExpenseDate = (value) => {
+  if (!value) return null
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? null : date
 }
 
-const getCategoryLabel = (category, t) => t.expenseCategories?.[category] ?? category
+const getDateMatches = (dateValue, filter, customStartDate, customEndDate) => {
+  if (filter === 'all') return true
+  const date = parseExpenseDate(dateValue)
+  if (!date) return true
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const dateOnly = new Date(date)
+  dateOnly.setHours(0, 0, 0, 0)
+  const daysOld = Math.floor((today - dateOnly) / 86400000)
+  const rangeStart = customStartDate ? new Date(`${customStartDate}T00:00:00`) : null
+  const rangeEnd = customEndDate ? new Date(`${customEndDate}T23:59:59`) : null
+  return (filter === 'today' && daysOld === 0)
+    || (filter === 'weekly' && daysOld >= 0 && daysOld <= 7)
+    || (filter === 'monthly' && daysOld >= 0 && daysOld <= 31)
+    || (filter === 'annual' && daysOld >= 0 && daysOld <= 366)
+    || (filter === 'custom' && (!rangeStart || date >= rangeStart) && (!rangeEnd || date <= rangeEnd))
+}
 
 function ExpenseActionMenu({ expense, isOpen, onDelete, onEdit, onToggle, t }) {
   void isOpen
@@ -99,8 +114,7 @@ function ExpenseModal({ categories, initialExpense, onCategoryAdd, onClose, onSa
   )
 }
 
-function ExpensesPage({ companyInfo, expenses, onExpensesChange, onMoveToRecycle, onNotify, printSettings, t }) {
-  const [categories, setCategories] = useState(readExpenseCategories)
+function ExpensesPage({ companyInfo, expenseCategories = defaultExpenseCategories, expenses, onExpenseCategoriesChange, onExpensesChange, onMoveToRecycle, onNotify, printSettings, t }) {
   const [modalOpen, setModalOpen] = useState(false)
   const [editingExpense, setEditingExpense] = useState(null)
   const [printOpen, setPrintOpen] = useState(false)
@@ -108,17 +122,24 @@ function ExpensesPage({ companyInfo, expenses, onExpensesChange, onMoveToRecycle
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [methodFilter, setMethodFilter] = useState('all')
   const [dateFilter, setDateFilter] = useState('all')
+  const [customStartDate, setCustomStartDate] = useState('')
+  const [customEndDate, setCustomEndDate] = useState('')
+
+  const usedExpenseCategories = useMemo(() => (
+    [...new Set(expenses.map((expense) => expense.category).filter(Boolean))]
+  ), [expenses])
 
   useEffect(() => {
-    window.localStorage.setItem('retail-expense-categories', JSON.stringify(categories.filter((category) => !defaultExpenseCategories.includes(category))))
-  }, [categories])
+    if (categoryFilter !== 'all' && !usedExpenseCategories.includes(categoryFilter)) setCategoryFilter('all')
+  }, [categoryFilter, usedExpenseCategories])
 
   const filteredExpenses = useMemo(() => expenses.filter((expense) => {
     const matchesSearch = `${expense.description} ${expense.category}`.toLowerCase().includes(search.toLowerCase())
     const matchesCategory = categoryFilter === 'all' || expense.category === categoryFilter
     const matchesMethod = methodFilter === 'all' || expense.method === methodFilter
-    return matchesSearch && matchesCategory && matchesMethod
-  }), [categoryFilter, expenses, methodFilter, search])
+    const matchesDate = getDateMatches(expense.date, dateFilter, customStartDate, customEndDate)
+    return matchesSearch && matchesCategory && matchesMethod && matchesDate
+  }), [categoryFilter, customEndDate, customStartDate, dateFilter, expenses, methodFilter, search])
 
   const filteredTotal = filteredExpenses.reduce((sum, expense) => sum + Number(expense.amount || 0), 0)
   const thisMonthTotal = expenses.reduce((sum, expense) => {
@@ -133,16 +154,23 @@ function ExpensesPage({ companyInfo, expenses, onExpensesChange, onMoveToRecycle
   })), [filteredExpenses, t])
   const categoryOptions = useMemo(() => [
     { value: 'all', label: t.allCategories },
-    ...categories.map((category) => ({ value: category, label: getCategoryLabel(category, t) })),
-  ], [categories, t])
+    ...usedExpenseCategories.map((category) => ({ value: category, label: getCategoryLabel(category, t) })),
+  ], [usedExpenseCategories, t])
   const methodOptions = useMemo(() => [
     { value: 'all', label: t.allMethods },
     ...paymentMethods.map((item) => ({ value: item, label: t.paymentMethods?.[item] ?? item })),
   ], [t])
-  const dateOptions = useMemo(() => [{ value: 'all', label: t.allTime }], [t.allTime])
+  const dateOptions = useMemo(() => [
+    { value: 'all', label: t.allTime },
+    { value: 'today', label: t.today ?? 'Today' },
+    { value: 'weekly', label: t.weekly ?? 'Weekly' },
+    { value: 'monthly', label: t.monthly ?? 'Monthly' },
+    { value: 'annual', label: t.annual ?? 'Annual' },
+    { value: 'custom', label: t.custom ?? 'Custom' },
+  ], [t.allTime, t.annual, t.custom, t.monthly, t.today, t.weekly])
 
   const addCategory = (category) => {
-    setCategories((current) => current.some((item) => item.toLowerCase() === category.toLowerCase()) ? current : [...current, category])
+    onExpenseCategoriesChange?.((current) => current.some((item) => item.toLowerCase() === category.toLowerCase()) ? current : [...current, category])
   }
 
   const saveExpense = (expense) => {
@@ -182,7 +210,21 @@ function ExpensesPage({ companyInfo, expenses, onExpensesChange, onMoveToRecycle
         </div>
         <CustomSelect ariaLabel={t.category} options={categoryOptions} value={categoryFilter} onChange={setCategoryFilter} />
         <CustomSelect ariaLabel={t.paymentMethod} options={methodOptions} value={methodFilter} onChange={setMethodFilter} />
-        <CustomSelect ariaLabel={t.allTime} options={dateOptions} value={dateFilter} onChange={setDateFilter} />
+        <div className="expense-date-filter">
+          <CustomSelect ariaLabel={t.allTime} options={dateOptions} value={dateFilter} onChange={setDateFilter} />
+          {dateFilter === 'custom' && (
+            <DateRangePicker
+              className="expense-date-range"
+              end={customEndDate}
+              onChange={({ end: nextEnd, start: nextStart }) => {
+                setCustomStartDate(nextStart)
+                setCustomEndDate(nextEnd)
+              }}
+              start={customStartDate}
+              t={t}
+            />
+          )}
+        </div>
       </div>
 
       <div className="data-panel expense-panel">
@@ -219,7 +261,7 @@ function ExpensesPage({ companyInfo, expenses, onExpensesChange, onMoveToRecycle
         )}
       </div>
 
-      {modalOpen && <ExpenseModal categories={categories} initialExpense={editingExpense} onCategoryAdd={addCategory} onClose={() => { setModalOpen(false); setEditingExpense(null) }} onSave={saveExpense} t={t} />}
+      {modalOpen && <ExpenseModal categories={expenseCategories} initialExpense={editingExpense} onCategoryAdd={addCategory} onClose={() => { setModalOpen(false); setEditingExpense(null) }} onSave={saveExpense} t={t} />}
       {printOpen && <PrintPreviewModal companyInfo={companyInfo} onClose={() => setPrintOpen(false)} printSettings={printSettings} rows={printableExpenses} title={t.expenseReport} columns={[{ key: 'category', label: t.category }, { key: 'description', label: t.description }, { key: 'amount', label: t.amount }, { key: 'currency', label: t.currency }, { key: 'method', label: t.paymentMethod }]} t={t} />}
     </div>
   )

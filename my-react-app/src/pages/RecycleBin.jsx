@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react'
 import CustomSelect from '../components/CustomSelect.jsx'
+import { Trash2 } from '../components/Icons.jsx'
 import './RecycleBin.css'
 
-function RecycleBinPage({ deletedItems, onPermanentDelete, onRestore, t }) {
+function RecycleBinPage({ deletedItems, onEmptyBin, onPermanentDelete, onRestore, t }) {
   const [filter, setFilter] = useState('all')
   const filteredItems = useMemo(() => (
     filter === 'all' ? deletedItems : deletedItems.filter((item) => item.module === filter)
@@ -18,6 +19,10 @@ function RecycleBinPage({ deletedItems, onPermanentDelete, onRestore, t }) {
     <div className="entity-content">
       <div className="entity-heading">
         <div><h1>{t.recycleBin}</h1><p>{t.recycleBinHint}</p></div>
+        <button className="empty-bin-btn" type="button" disabled={deletedItems.length === 0} onClick={onEmptyBin}>
+          <Trash2 size={16} />
+          {t.emptyBin ?? 'Empty Bin'}
+        </button>
       </div>
 
       <div className="recycle-toolbar">

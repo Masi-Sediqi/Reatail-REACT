@@ -1,20 +1,27 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import CustomSelect from '../components/CustomSelect.jsx'
 import FloatingActionMenu from '../components/FloatingActionMenu.jsx'
+import PrintPreviewModal from '../components/PrintPreviewModal.jsx'
 import {
   CalendarDays,
   CreditCard,
+  Download,
   DollarSign,
   Eye,
   History,
+  Mail,
+  MessageCircle,
   Plus,
+  Printer,
   ReceiptText,
   RefreshCcw,
   Search,
+  Share2,
   ShoppingCart,
   SquareMenu,
   Trash2,
   WalletCards,
+  X,
 } from '../components/Icons.jsx'
 import './SalesBills.css'
 
@@ -56,6 +63,19 @@ const getShamsiShortLabel = (isoDate) => {
   } catch {
     return isoDate
   }
+}
+
+const formatDateInput = (date) => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+const parseDateInput = (value) => (value ? new Date(`${value}T12:00:00`) : null)
+const formatShortDate = (value) => {
+  const date = parseDateInput(value)
+  return date ? date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : ''
 }
 
 const escapeHtml = (value) => String(value ?? '')
@@ -151,26 +171,120 @@ const printInvoice = (sale, companyInfo, t) => {
   window.setTimeout(() => printWindow.print(), 250)
 }
 
-function ActionMenu({ onDelete, onEdit, onHistory, onPrint, onRefund, onView, sale, t }) {
+function SalesDateRangePicker({ end, onChange, start, t }) {
+  const rootRef = useRef(null)
+  const initialMonth = parseDateInput(start) || parseDateInput(end) || new Date()
+  const [open, setOpen] = useState(false)
+  const [monthDate, setMonthDate] = useState(initialMonth)
+
+  useEffect(() => {
+    const close = (event) => {
+      if (!rootRef.current?.contains(event.target)) setOpen(false)
+    }
+    document.addEventListener('mousedown', close)
+    return () => document.removeEventListener('mousedown', close)
+  }, [])
+
+  const monthStart = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1)
+  const firstGridDay = new Date(monthStart)
+  firstGridDay.setDate(firstGridDay.getDate() - firstGridDay.getDay())
+  const days = Array.from({ length: 42 }, (_, index) => {
+    const date = new Date(firstGridDay)
+    date.setDate(firstGridDay.getDate() + index)
+    return date
+  })
+  const startDate = parseDateInput(start)
+  const endDate = parseDateInput(end)
+  const label = start && end
+    ? `${formatShortDate(start)} - ${formatShortDate(end)}`
+    : start
+      ? formatShortDate(start)
+      : (t.selectDateRange ?? 'Select date range')
+
+  const selectDate = (date) => {
+    const value = formatDateInput(date)
+    if (!start || (start && end)) {
+      onChange({ start: value, end: '' })
+      return
+    }
+    const currentStart = parseDateInput(start)
+    if (date < currentStart) onChange({ start: value, end: start })
+    else onChange({ start, end: value })
+  }
+
+  return (
+    <div className="sales-date-range-picker" ref={rootRef}>
+      <button className="sales-date-range-btn" type="button" onClick={() => setOpen((current) => !current)}>
+        <CalendarDays size={16} />
+        <span>{label}</span>
+      </button>
+      {open && (
+        <div className="sales-date-calendar">
+          <div className="calendar-head">
+            <button type="button" onClick={() => setMonthDate(new Date(monthDate.getFullYear(), monthDate.getMonth() - 1, 1))}>‹</button>
+            <strong>{monthDate.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}</strong>
+            <button type="button" onClick={() => setMonthDate(new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 1))}>›</button>
+          </div>
+          <div className="calendar-weekdays">
+            {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => <span key={day}>{day}</span>)}
+          </div>
+          <div className="calendar-days">
+            {days.map((date) => {
+              const value = formatDateInput(date)
+              const inMonth = date.getMonth() === monthDate.getMonth()
+              const isStart = value === start
+              const isEnd = value === end
+              const selected = isStart || isEnd
+              const inRange = startDate && endDate && date >= startDate && date <= endDate
+              return (
+                <button
+                  className={`${inMonth ? '' : 'muted'} ${selected ? 'selected' : ''} ${isStart ? 'range-start' : ''} ${isEnd ? 'range-end' : ''} ${inRange ? 'in-range' : ''}`}
+                  key={value}
+                  type="button"
+                  onClick={() => selectDate(date)}
+                >
+                  {date.getDate()}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ActionMenu({ onAddPayment, onDelete, onEdit, onHistory, onMarkPaid, onPrint, onRefund, onView, sale, t }) {
   const run = (action) => {
     action(sale)
   }
-
-  return <FloatingActionMenu ariaLabel={t.actions} className="sales-action-dropdown" width={190} actions={[
+  const hasLoan = Number(sale.balance || 0) > 0 || sale.paymentStatus === 'loan'
+  const actions = [
     { icon: <Eye size={15} />, label: t.viewDetails, onClick: () => run(onView) },
     { icon: <ReceiptText size={15} />, label: t.printInvoice, onClick: () => run(onPrint) },
     { icon: <SquareMenu size={15} />, label: t.editBill, onClick: () => run(onEdit) },
     { icon: <History size={15} />, label: t.paymentHistory, onClick: () => run(onHistory) },
+  ]
+
+  if (hasLoan) {
+    actions.push(
+      { icon: <Plus size={15} />, label: t.addPayment, onClick: () => run(onAddPayment) },
+      { icon: <DollarSign size={15} />, label: t.markAsPaid ?? 'Mark as paid', onClick: () => run(onMarkPaid) },
+    )
+  }
+
+  actions.push(
     { className: 'refund-action', icon: <RefreshCcw size={15} />, label: t.refund, onClick: () => run(onRefund) },
     { danger: true, icon: <Trash2 size={15} />, label: t.delete, onClick: () => run(onDelete) },
-  ]} />
+  )
+
+  return <FloatingActionMenu ariaLabel={t.actions} className="sales-action-dropdown" width={210} actions={actions} />
 }
 
 function InvoiceDetailsModal({ onClose, onPrint, sale, t }) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="sales-detail-modal" onClick={(event) => event.stopPropagation()}>
-        <button className="modal-close" type="button" onClick={onClose}>×</button>
         <header className="sales-modal-title">
           <h2>{t.invoice} #{sale.invoiceNumber}</h2>
           <span className={sale.paymentStatus === 'paid' ? 'status-pill active' : 'status-pill warning'}>{sale.paymentStatus === 'paid' ? t.paidStatus : t.loanStatus}</span>
@@ -217,7 +331,7 @@ function AddPaymentModal({ onClose, onRecord, sale, t }) {
   const canRecord = parsedAmount > 0 && parsedAmount <= remaining
 
   return (
-    <div className="modal-backdrop payment-nested-backdrop" onClick={onClose}>
+    <div className="modal-backdrop" onClick={onClose}>
       <form
         className="add-payment-modal"
         onClick={(event) => event.stopPropagation()}
@@ -227,7 +341,6 @@ function AddPaymentModal({ onClose, onRecord, sale, t }) {
           onRecord(sale, parsedAmount, notes)
         }}
       >
-        <button className="modal-close" type="button" onClick={onClose}>×</button>
         <h2>{t.addPayment}</h2>
         <div className="payment-facts">
           <span>{t.invoice}:</span><strong>{sale.invoiceNumber}</strong>
@@ -252,15 +365,13 @@ function AddPaymentModal({ onClose, onRecord, sale, t }) {
   )
 }
 
-function PaymentHistoryModal({ onClose, onRecordPayment, sale, t }) {
-  const [addOpen, setAddOpen] = useState(false)
+function PaymentHistoryModal({ onAddPayment, onClose, sale, t }) {
   const payments = sale.paymentHistory || []
   const remaining = Math.max(0, Number(sale.balance || 0))
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="payment-history-modal" onClick={(event) => event.stopPropagation()}>
-        <button className="modal-close" type="button" onClick={onClose}>×</button>
         <header className="sales-modal-title">
           <h2><DollarSign size={20} /> {t.paymentHistory} — {sale.invoiceNumber}</h2>
         </header>
@@ -271,7 +382,7 @@ function PaymentHistoryModal({ onClose, onRecordPayment, sale, t }) {
         </div>
         <div className="history-toolbar">
           <span>{payments.length} {t.paymentEntries}</span>
-          {remaining > 0 && <button className="primary-btn" type="button" onClick={() => setAddOpen(true)}><Plus size={16} /> {t.addPayment}</button>}
+          {remaining > 0 && <button className="primary-btn" type="button" onClick={() => onAddPayment(sale)}><Plus size={16} /> {t.addPayment}</button>}
         </div>
         {payments.length === 0 ? (
           <div className="payment-empty">
@@ -292,17 +403,6 @@ function PaymentHistoryModal({ onClose, onRecordPayment, sale, t }) {
             ))}
           </div>
         )}
-        {addOpen && (
-          <AddPaymentModal
-            onClose={() => setAddOpen(false)}
-            onRecord={(currentSale, amount, notes) => {
-              onRecordPayment(currentSale, amount, notes)
-              setAddOpen(false)
-            }}
-            sale={sale}
-            t={t}
-          />
-        )}
       </div>
     </div>
   )
@@ -310,17 +410,21 @@ function PaymentHistoryModal({ onClose, onRecordPayment, sale, t }) {
 
 function InvoicePrintPreviewModal({ companyInfo, onClose, onPrint, sale, t }) {
   const invoiceRef = useRef(null)
+  const encodedSubject = encodeURIComponent(`${t.invoicePreview} ${sale.invoiceNumber}`)
+  const encodedBody = encodeURIComponent(`${sale.invoiceNumber}\n${sale.customerName}`)
 
   return (
     <div className="modal-backdrop print-backdrop" onClick={onClose}>
       <div className="invoice-preview-modal" onClick={(event) => event.stopPropagation()}>
         <div className="invoice-preview-top">
           <strong>{t.invoicePreview} — {sale.invoiceNumber}</strong>
-          <div>
-            <button type="button" onClick={() => navigator.share?.({ title: sale.invoiceNumber, text: `${sale.invoiceNumber}\n${sale.customerName}` })}>{t.share}</button>
-            <button type="button" onClick={() => onPrint(sale)}>PDF</button>
-            <button className="primary-btn" type="button" onClick={() => onPrint(sale)}>{t.print}</button>
-            <button type="button" onClick={onClose}>×</button>
+          <div className="print-action-bar">
+            <button type="button" onClick={onClose}><X size={14} /> {t.cancel}</button>
+            <button type="button" onClick={() => navigator.share?.({ title: sale.invoiceNumber, text: `${sale.invoiceNumber}\n${sale.customerName}` })}><Share2 size={15} /> {t.share}</button>
+            <a className="print-top-link" href={`https://wa.me/?text=${encodedSubject}%20${encodedBody}`} target="_blank" rel="noreferrer"><MessageCircle size={15} /> WhatsApp</a>
+            <a className="print-top-link" href={`mailto:?subject=${encodedSubject}&body=${encodedBody}`}><Mail size={15} /> {t.email ?? 'Email'}</a>
+            <button type="button" onClick={() => onPrint(sale)}><Download size={15} /> PDF</button>
+            <button className="primary-btn print-confirm-btn" type="button" onClick={() => onPrint(sale)}><Printer size={15} /> {t.print}</button>
           </div>
         </div>
         <div className="invoice-scroll">
@@ -456,7 +560,6 @@ function RefundModal({ onClose, onConfirm, sale, t }) {
           })
         }}
       >
-        <button className="modal-close" type="button" onClick={onClose}>×</button>
         <header className="sales-modal-title">
           <h2><RefreshCcw size={20} /> {t.processRefund} — {sale.invoiceNumber}</h2>
         </header>
@@ -538,19 +641,28 @@ function RefundModal({ onClose, onConfirm, sale, t }) {
   )
 }
 
-function SalesBillsPage({ companyInfo, onEditBill, onNotify, onProductsChange, onSalesChange, sales, t }) {
+function SalesBillsPage({ companyInfo, onEditBill, onNotify, onProductsChange, onSalesChange, printSettings, sales, t }) {
   const [query, setQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [dateFilter, setDateFilter] = useState('all')
+  const [customStartDate, setCustomStartDate] = useState('')
+  const [customEndDate, setCustomEndDate] = useState('')
   const [detailsSale, setDetailsSale] = useState(null)
   const [historySale, setHistorySale] = useState(null)
   const [previewSale, setPreviewSale] = useState(null)
+  const [reportPreviewOpen, setReportPreviewOpen] = useState(false)
+  const [addPaymentSale, setAddPaymentSale] = useState(null)
   const [deleteSale, setDeleteSale] = useState(null)
   const [refundSale, setRefundSale] = useState(null)
 
   const filteredSales = useMemo(() => {
     const needle = query.trim().toLowerCase()
     const now = new Date()
+    now.setHours(0, 0, 0, 0)
+    const dateFromRange = {
+      start: customStartDate ? new Date(`${customStartDate}T00:00:00`) : null,
+      end: customEndDate ? new Date(`${customEndDate}T23:59:59`) : null,
+    }
     return sales.filter((sale) => {
       const matchesQuery = !needle
         || sale.invoiceNumber.toLowerCase().includes(needle)
@@ -558,14 +670,24 @@ function SalesBillsPage({ companyInfo, onEditBill, onNotify, onProductsChange, o
         || sale.items.some((item) => [item.name, item.code].some((value) => String(value || '').toLowerCase().includes(needle)))
         || String(sale.total).includes(needle)
         || sale.date.includes(needle)
-      const matchesStatus = statusFilter === 'all' || sale.paymentStatus === statusFilter
+      const isRefunded = (sale.refundHistory || []).length > 0
+      const isLoan = Number(sale.balance || 0) > 0 || sale.paymentStatus === 'loan'
+      const matchesStatus = statusFilter === 'all'
+        || (statusFilter === 'paid' && sale.paymentStatus === 'paid')
+        || (statusFilter === 'pending' && isLoan)
+        || (statusFilter === 'credit' && isLoan)
+        || (statusFilter === 'refunded' && isRefunded)
       const saleDate = new Date(`${sale.date}T12:00:00`)
+      const daysOld = Math.floor((now - new Date(saleDate.toDateString())) / 86400000)
       const matchesDate = dateFilter === 'all'
         || (dateFilter === 'today' && sale.date === now.toISOString().slice(0, 10))
-        || (dateFilter === 'month' && saleDate.getMonth() === now.getMonth() && saleDate.getFullYear() === now.getFullYear())
+        || (dateFilter === 'weekly' && daysOld <= 7)
+        || (dateFilter === 'monthly' && daysOld <= 31)
+        || (dateFilter === 'annual' && daysOld <= 366)
+        || (dateFilter === 'custom' && (!dateFromRange.start || saleDate >= dateFromRange.start) && (!dateFromRange.end || saleDate <= dateFromRange.end))
       return matchesQuery && matchesStatus && matchesDate
     })
-  }, [dateFilter, query, sales, statusFilter])
+  }, [customEndDate, customStartDate, dateFilter, query, sales, statusFilter])
 
   const totalSales = filteredSales.reduce((sum, sale) => sum + sale.total, 0)
   const totalPaid = filteredSales.reduce((sum, sale) => sum + sale.paidAmount, 0)
@@ -574,49 +696,28 @@ function SalesBillsPage({ companyInfo, onEditBill, onNotify, onProductsChange, o
   const displayCurrency = filteredSales[0]?.currency || sales[0]?.currency || 'AFN'
   const statusOptions = useMemo(() => [
     { value: 'all', label: t.allStatuses },
-    { value: 'paid', label: t.paid },
-    { value: 'loan', label: t.loan },
-  ], [t.allStatuses, t.loan, t.paid])
+    { value: 'paid', label: t.paidStatus ?? t.paid },
+    { value: 'pending', label: t.pendingStatus ?? t.pending },
+    { value: 'credit', label: t.onCredit ?? 'ON CREDIT' },
+    { value: 'refunded', label: t.refundedStatus ?? t.refunded },
+  ], [t.allStatuses, t.onCredit, t.paid, t.paidStatus, t.pending, t.pendingStatus, t.refunded, t.refundedStatus])
   const dateOptions = useMemo(() => [
     { value: 'all', label: t.allTime },
     { value: 'today', label: t.today },
-    { value: 'month', label: t.thisMonth },
-  ], [t.allTime, t.thisMonth, t.today])
+    { value: 'weekly', label: t.weekly ?? 'Weekly' },
+    { value: 'monthly', label: t.monthly ?? 'Monthly' },
+    { value: 'annual', label: t.annual ?? 'Annual' },
+    { value: 'custom', label: t.custom ?? 'Custom' },
+  ], [t.allTime, t.annual, t.custom, t.monthly, t.today, t.weekly])
 
-  const printReport = () => {
-    const html = `
-      <!doctype html>
-      <html>
-        <head>
-          <title>${t.salesManagement}</title>
-          <style>
-            body { font-family: Arial, sans-serif; margin: 28px; color: #111827; }
-            h1 { margin: 0 0 6px; }
-            p { margin: 0 0 18px; color: #64748b; }
-            table { width: 100%; border-collapse: collapse; }
-            th, td { padding: 10px; border-bottom: 1px solid #e5e7eb; text-align: left; font-size: 12px; }
-            th { background: #f8fafc; }
-          </style>
-        </head>
-        <body>
-          <h1>${t.salesManagement}</h1>
-          <p>${new Date().toLocaleString()}</p>
-          <table>
-            <thead><tr><th>${t.invoice}</th><th>${t.customer}</th><th>${t.items}</th><th>${t.total}</th><th>${t.paid}</th><th>${t.status}</th><th>${t.date}</th></tr></thead>
-            <tbody>
-              ${filteredSales.map((sale) => `<tr><td>${sale.invoiceNumber}</td><td>${sale.customerName}</td><td>${sale.items.length}</td><td>${formatMoney(sale.total, sale.currency)}</td><td>${formatMoney(sale.paidAmount, sale.currency)}</td><td>${sale.paymentStatus}</td><td>${sale.date}</td></tr>`).join('')}
-            </tbody>
-          </table>
-        </body>
-      </html>
-    `
-    const printWindow = window.open('', '_blank', 'width=1000,height=760')
-    if (!printWindow) return
-    printWindow.document.write(html)
-    printWindow.document.close()
-    printWindow.focus()
-    window.setTimeout(() => printWindow.print(), 250)
-  }
+  const reportRows = useMemo(() => filteredSales.map((sale) => ({
+    ...sale,
+    itemsCount: sale.items.length,
+    totalFormatted: formatMoney(sale.total, sale.currency),
+    paidFormatted: formatMoney(sale.paidAmount, sale.currency),
+    statusLabel: sale.paymentStatus === 'paid' ? t.paidStatus : t.loanStatus,
+    dateLabel: getGregorianLabel(sale.date),
+  })), [filteredSales, t.loanStatus, t.paidStatus])
 
   const handlePrintInvoice = (sale) => printInvoice(sale, companyInfo, t)
 
@@ -648,7 +749,14 @@ function SalesBillsPage({ companyInfo, onEditBill, onNotify, onProductsChange, o
         paymentHistory: [...(current.paymentHistory || []), payment],
       }
       : current)
+    setAddPaymentSale(null)
     onNotify?.(t.paymentRecorded)
+  }
+
+  const markSalePaid = (sale) => {
+    const remaining = Math.max(0, Number(sale.balance || 0))
+    if (remaining <= 0) return
+    recordPayment(sale, remaining, t.markAsPaid ?? 'Mark as paid')
   }
 
   const confirmDelete = () => {
@@ -716,7 +824,7 @@ function SalesBillsPage({ companyInfo, onEditBill, onNotify, onProductsChange, o
     <div className="sales-content">
       <div className="entity-heading">
         <div><h1>{t.salesManagement}</h1><p>{t.salesSubtitle}</p></div>
-        <div className="entity-actions"><button type="button" onClick={printReport}><ReceiptText size={16} /> {t.printReport}</button></div>
+        <div className="entity-actions"><button type="button" onClick={() => setReportPreviewOpen(true)}><ReceiptText size={16} /> {t.printReport}</button></div>
       </div>
 
       <div className="sales-summary-grid">
@@ -733,6 +841,17 @@ function SalesBillsPage({ companyInfo, onEditBill, onNotify, onProductsChange, o
         </div>
         <CustomSelect ariaLabel={t.status} options={statusOptions} value={statusFilter} onChange={setStatusFilter} />
         <CustomSelect ariaLabel={t.date} options={dateOptions} value={dateFilter} onChange={setDateFilter} />
+        {dateFilter === 'custom' && (
+          <SalesDateRangePicker
+            end={customEndDate}
+            onChange={({ end: nextEnd, start: nextStart }) => {
+              setCustomStartDate(nextStart)
+              setCustomEndDate(nextEnd)
+            }}
+            start={customStartDate}
+            t={t}
+          />
+        )}
       </div>
 
       <div className="data-panel sales-table-panel">
@@ -755,9 +874,11 @@ function SalesBillsPage({ companyInfo, onEditBill, onNotify, onProductsChange, o
                 <td><span className="stacked-cell">{getGregorianLabel(sale.date)}<small>{getShamsiShortLabel(sale.date)}</small></span></td>
                 <td>
                   <ActionMenu
+                    onAddPayment={setAddPaymentSale}
                     onDelete={setDeleteSale}
                     onEdit={onEditBill}
                     onHistory={setHistorySale}
+                    onMarkPaid={markSalePaid}
                     onPrint={setPreviewSale}
                     onRefund={setRefundSale}
                     onView={setDetailsSale}
@@ -770,9 +891,29 @@ function SalesBillsPage({ companyInfo, onEditBill, onNotify, onProductsChange, o
           </tbody>
         </table>
       </div>
-      {detailsSale && <InvoiceDetailsModal onClose={() => setDetailsSale(null)} onPrint={handlePrintInvoice} sale={detailsSale} t={t} />}
-      {historySale && <PaymentHistoryModal onClose={() => setHistorySale(null)} onRecordPayment={recordPayment} sale={historySale} t={t} />}
+      {detailsSale && <InvoiceDetailsModal onClose={() => setDetailsSale(null)} onPrint={setPreviewSale} sale={detailsSale} t={t} />}
+      {historySale && <PaymentHistoryModal onAddPayment={setAddPaymentSale} onClose={() => setHistorySale(null)} sale={historySale} t={t} />}
       {previewSale && <InvoicePrintPreviewModal companyInfo={companyInfo} onClose={() => setPreviewSale(null)} onPrint={handlePrintInvoice} sale={previewSale} t={t} />}
+      {reportPreviewOpen && (
+        <PrintPreviewModal
+          companyInfo={companyInfo}
+          columns={[
+            { key: 'invoiceNumber', label: t.invoice },
+            { key: 'customerName', label: t.customer },
+            { key: 'itemsCount', label: t.items },
+            { key: 'totalFormatted', label: t.total },
+            { key: 'paidFormatted', label: t.paid },
+            { key: 'statusLabel', label: t.status },
+            { key: 'dateLabel', label: t.date },
+          ]}
+          onClose={() => setReportPreviewOpen(false)}
+          printSettings={printSettings}
+          rows={reportRows}
+          t={t}
+          title={t.salesManagement}
+        />
+      )}
+      {addPaymentSale && <AddPaymentModal onClose={() => setAddPaymentSale(null)} onRecord={recordPayment} sale={addPaymentSale} t={t} />}
       {deleteSale && <ConfirmDeleteModal onClose={() => setDeleteSale(null)} onConfirm={confirmDelete} sale={deleteSale} t={t} />}
       {refundSale && <RefundModal onClose={() => setRefundSale(null)} onConfirm={processRefund} sale={refundSale} t={t} />}
     </div>

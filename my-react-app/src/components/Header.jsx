@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import CustomSelect from './CustomSelect.jsx'
-import { Archive, Search, Trash2, WalletCards } from './Icons.jsx'
+import { Archive, Download, Search, Trash2, Upload, WalletCards } from './Icons.jsx'
 import {
   accountMenuItems,
   headerActions,
@@ -47,7 +47,15 @@ function WalletModal({ cashWallet, onClose, onSave, t }) {
   const canSubmit = parsedAmount > 0
   const saveWalletChange = () => {
     if (!canSubmit) return
-    onSave(mode === 'deposit' ? parsedAmount : -parsedAmount)
+    onSave({
+      amount: parsedAmount,
+      currency,
+      date: new Date().toISOString().slice(0, 10),
+      delta: mode === 'deposit' ? parsedAmount : -parsedAmount,
+      id: crypto.randomUUID(),
+      note: note.trim() || (mode === 'deposit' ? t.deposit : t.withdraw),
+      type: mode,
+    })
   }
 
   return (
@@ -64,8 +72,8 @@ function WalletModal({ cashWallet, onClose, onSave, t }) {
           <strong>{Number(cashWallet || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ؋</strong>
         </div>
         <div className="wallet-mode-tabs">
-          <button className={mode === 'deposit' ? 'active' : ''} type="button" onClick={() => setMode('deposit')}>{t.deposit}</button>
-          <button className={mode === 'withdraw' ? 'active' : ''} type="button" onClick={() => setMode('withdraw')}>{t.withdraw}</button>
+          <button className={`deposit-mode ${mode === 'deposit' ? 'active' : ''}`} type="button" onClick={() => setMode('deposit')}><Download size={15} /> <span>{t.deposit}</span></button>
+          <button className={`withdraw-mode ${mode === 'withdraw' ? 'active' : ''}`} type="button" onClick={() => setMode('withdraw')}><Upload size={15} /> <span>{t.withdraw}</span></button>
         </div>
         <div className="wallet-form-grid">
           <label><span>{t.amount} *</span><input autoFocus min="0" step="0.01" type="number" placeholder="0.00" value={amount} onChange={(event) => setAmount(event.target.value)} /></label>
@@ -125,7 +133,7 @@ function NotificationPanel({ t }) {
   )
 }
 
-function Header({ cashWallet, language, onCashWalletChange, onLanguageChange, onNavigate, onThemeToggle, t, theme }) {
+function Header({ cashWallet, language, onCashWalletChange, onLanguageChange, onNavigate, onThemeToggle, onWalletEntriesChange, t, theme }) {
   const [accountOpen, setAccountOpen] = useState(false)
   const [languageOpen, setLanguageOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
@@ -265,8 +273,9 @@ function Header({ cashWallet, language, onCashWalletChange, onLanguageChange, on
       <span className="theme-state" aria-hidden="true">
         {theme === 'dark' ? 'dark' : 'light'}
       </span>
-      {walletOpen && <WalletModal cashWallet={cashWallet} onClose={() => setWalletOpen(false)} onSave={(delta) => {
-        onCashWalletChange((current) => Number(current || 0) + delta)
+      {walletOpen && <WalletModal cashWallet={cashWallet} onClose={() => setWalletOpen(false)} onSave={(entry) => {
+        onCashWalletChange((current) => Number(current || 0) + entry.delta)
+        onWalletEntriesChange?.((current) => [{ ...entry, createdAt: new Date().toISOString() }, ...current])
         setWalletOpen(false)
       }} t={t} />}
       {searchOpen && <SearchModal onClose={() => setSearchOpen(false)} t={t} />}

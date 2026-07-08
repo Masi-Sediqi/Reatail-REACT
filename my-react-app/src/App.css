@@ -310,8 +310,8 @@
 .pill-mini {
   padding: 2px 6px;
   border-radius: 5px;
-  background: var(--accent);
-  color: #020617;
+  background: #111827;
+  color: #ffffff;
   font-size: 10px;
   font-weight: 800;
 }
@@ -435,8 +435,8 @@
   place-items: center;
   flex: 0 0 auto;
   border-radius: 8px;
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: #eef2ff;
+  color: #2563eb;
 }
 
 .header-shared-modal h2 {
@@ -478,7 +478,7 @@
 }
 
 .wallet-balance-card strong {
-  color: var(--accent);
+  color: #2563eb;
   font-size: 24px;
 }
 
@@ -544,8 +544,8 @@
 .wallet-form-grid input:focus,
 .wallet-form-grid textarea:focus,
 .global-search-input:focus-within {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  border-color: var(--border);
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.16);
 }
 
 .global-search-modal {
@@ -648,8 +648,8 @@
   display: grid;
   place-items: center;
   border-radius: 999px;
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: #eef2ff;
+  color: #2563eb;
 }
 
 .notification-item.danger .notification-symbol {
@@ -794,6 +794,19 @@
   overflow: hidden;
 }
 
+.metric-card-clickable {
+  width: 100%;
+  text-align: start;
+  cursor: pointer;
+  font: inherit;
+}
+
+.metric-card-clickable:hover {
+  transform: translateY(-1px);
+  border-color: #cbd5e1;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
+}
+
 [dir="rtl"] .metric-card {
   padding: 18px 24px 18px 20px;
 }
@@ -887,10 +900,111 @@
   overflow: hidden;
 }
 
+.trend-chart-wrap {
+  position: relative;
+  cursor: crosshair;
+}
+
 .chart-wrap svg {
   display: block;
   width: 100%;
-  min-height: 250px;
+  min-height: 300px;
+}
+
+.trend-line {
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.trend-line.navy,
+.trend-dot.navy {
+  stroke: var(--chart-line);
+  fill: var(--chart-line);
+}
+
+.trend-line.red,
+.trend-dot.red {
+  stroke: #ef4444;
+  fill: #ef4444;
+}
+
+.trend-line.orange,
+.trend-dot.orange {
+  stroke: #f59e0b;
+  fill: #f59e0b;
+}
+
+.trend-line.purple,
+.trend-dot.purple {
+  stroke: #8b5cf6;
+  fill: #8b5cf6;
+}
+
+.trend-line.green,
+.trend-dot.green {
+  stroke: #10b981;
+  fill: #10b981;
+}
+
+.trend-dot {
+  stroke-width: 2;
+  stroke: var(--panel-bg);
+}
+
+.trend-dot.active {
+  filter: drop-shadow(0 2px 4px rgba(15, 23, 42, 0.2));
+}
+
+.trend-active-line {
+  stroke: color-mix(in srgb, var(--muted) 52%, transparent);
+  stroke-width: 1.3;
+}
+
+.trend-html-tooltip {
+  position: absolute;
+  top: 36px;
+  z-index: 5;
+  width: 170px;
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-bg);
+  color: var(--text);
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.16);
+  pointer-events: none;
+  transform: translateX(-8px);
+}
+
+.trend-html-tooltip strong {
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.trend-html-tooltip span {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.tooltip-line.navy {
+  color: var(--chart-line);
+}
+
+.tooltip-line.red {
+  color: #ef4444;
+}
+
+.tooltip-line.orange {
+  color: #f59e0b;
+}
+
+.tooltip-line.purple {
+  color: #8b5cf6;
+}
+
+.tooltip-line.green {
+  color: #10b981;
 }
 
 .axis-label {
@@ -1147,7 +1261,8 @@
 }
 
 .profile-form input:focus {
-  border-color: #60a5fa;
+  border-color: var(--border);
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.16);
 }
 
 .account-stats {
@@ -1338,7 +1453,8 @@
 
 .settings-form input:focus,
 .settings-form select:focus {
-  border-color: var(--accent);
+  border-color: var(--border);
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.16);
 }
 
 .theme-grid {
@@ -1409,6 +1525,159 @@
   min-height: 220px;
 }
 
+.settings-general-stack {
+  display: grid;
+  gap: 18px;
+}
+
+.sharing-settings-card .settings-card-head h2,
+.inventory-cost-card h2 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.sharing-form {
+  margin-top: 22px;
+}
+
+.sharing-form label span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sharing-form small,
+.tax-adjustment-card small,
+.inventory-cost-card small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.kpi-route-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.kpi-route-row {
+  min-height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--panel-bg);
+}
+
+.kpi-route-row strong,
+.kpi-route-row span {
+  display: block;
+}
+
+.kpi-route-row strong {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.kpi-route-row span {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.kpi-route-row .toggle {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.kpi-route-row .toggle span {
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.22);
+  transition: transform 160ms ease;
+}
+
+.kpi-route-row .toggle.on {
+  background: var(--navy);
+}
+
+.kpi-route-row .toggle.on span {
+  transform: translateX(22px);
+}
+
+[dir="rtl"] .kpi-route-row .toggle span {
+  left: auto;
+  right: 4px;
+}
+
+[dir="rtl"] .kpi-route-row .toggle.on span {
+  transform: translateX(-22px);
+}
+
+.print-config-grid.three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.inventory-cost-card .single-field {
+  width: min(384px, 100%);
+  margin-top: 26px;
+  margin-bottom: 10px;
+}
+
+.app-confirm-backdrop {
+  z-index: 3600;
+  place-items: center;
+  padding: 24px;
+}
+
+.app-confirm-modal {
+  width: min(512px, calc(100vw - 32px));
+  display: grid;
+  gap: 14px;
+  padding: 28px 24px 24px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel-bg);
+  color: var(--text);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
+  animation: modalZoomIn 160ms ease both;
+}
+
+.app-confirm-modal h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.app-confirm-modal p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.app-confirm-modal .danger-btn {
+  min-height: 40px;
+  border: 1px solid #ef4444;
+  border-radius: 9px;
+  background: #ef4444;
+  color: #fff;
+  padding: 0 16px;
+  cursor: pointer;
+  font-weight: 900;
+}
+
 .settings-card-head,
 .entity-heading,
 .print-preview-top {
@@ -1473,8 +1742,8 @@
 .settings-form select:focus,
 .print-controls select:focus,
 .print-config-grid select:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  border-color: var(--border);
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.16);
   transform: translateY(-1px);
 }
 
@@ -1536,9 +1805,9 @@
 
 .smooth-select-btn.active,
 .smooth-select-btn:focus-visible {
-  border-color: var(--accent);
+  border-color: var(--border);
   background: var(--panel-bg);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.16);
   outline: none;
 }
 
@@ -1571,7 +1840,7 @@
   visibility: hidden;
   transform: translateY(-6px) scale(0.98);
   transform-origin: top;
-  transition: opacity 160ms ease, transform 160ms ease, visibility 160ms ease;
+  transition: opacity 190ms cubic-bezier(0.16, 1, 0.3, 1), transform 190ms cubic-bezier(0.16, 1, 0.3, 1), visibility 190ms ease;
 }
 
 
@@ -1647,7 +1916,7 @@
 }
 
 .smooth-select-menu button.selected {
-  background: var(--accent-soft);
+  background: var(--panel-soft);
   color: var(--text);
 }
 
@@ -1658,7 +1927,7 @@
 }
 
 .smooth-select-menu button.selected .smooth-select-check {
-  border: 4px solid var(--accent);
+  border: 4px solid #94a3b8;
   background: var(--panel-bg);
 }
 
@@ -1824,6 +2093,7 @@
   margin: 0 0 6px;
   color: var(--text);
   font-size: 24px;
+  font-weight: 950;
 }
 
 .entity-heading p {
@@ -1857,6 +2127,83 @@
   box-shadow: var(--shadow-soft);
 }
 
+.main-area h1,
+.main-area h2,
+.main-area h3 {
+  font-weight: 950;
+}
+
+.entity-actions button:not(.camera-icon-btn),
+.primary-btn,
+.save-btn,
+.scanner-active-btn,
+.payroll-btn,
+.print-pdf-btn,
+.wide-print-btn,
+.empty-bin-btn,
+.barcode-print-btn,
+.supplier-portal-page .supplier-portal-head > button {
+  min-width: 132px;
+  min-height: 42px;
+  height: 42px;
+  border-radius: 10px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.entity-actions button:not(.primary-btn):not(.camera-icon-btn),
+.print-pdf-btn,
+.wide-print-btn {
+  position: relative;
+  overflow: hidden;
+  border: 0;
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.22);
+}
+
+.entity-actions button:not(.primary-btn):not(.camera-icon-btn)::before,
+.print-pdf-btn::before,
+.wide-print-btn::before {
+  display: none;
+}
+
+.primary-btn,
+.save-btn,
+.barcode-print-btn,
+.supplier-portal-page .supplier-portal-head > button {
+  border: 0;
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(34, 197, 94, 0.22);
+}
+
+.scanner-active-btn {
+  border: 0;
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.24);
+}
+
+.payroll-btn {
+  border: 0;
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(245, 158, 11, 0.24);
+}
+
+.theme-dark .entity-actions button:not(.primary-btn):not(.camera-icon-btn),
+.theme-dark .print-pdf-btn,
+.theme-dark .wide-print-btn,
+.theme-dark .primary-btn,
+.theme-dark .save-btn,
+.theme-dark .scanner-active-btn,
+.theme-dark .payroll-btn,
+.theme-dark .barcode-print-btn {
+  color: #fff;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.32);
+}
+
 .entity-actions button svg,
 .primary-btn svg,
 .save-btn svg,
@@ -1865,20 +2212,31 @@
 }
 
 .primary-btn {
-  border-color: var(--accent);
+  border: 0;
   background: var(--accent);
-  color: var(--accent-contrast);
+  color: #fff;
+}
+
+.retail-shell button:not(:disabled):not(.active):not(.modal-close):not(.icon-btn):not(.collapse-btn):not(.smooth-select-btn):not(.floating-action-trigger):not(.theme-choice):not(.dropdown-menu button):not(.notifications-panel button):not(.billing-panel button):not(.segmented-row button):not(.segmented-view button):not(.toggle-filter-btn):hover {
+  border-color: var(--border);
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.16);
+}
+
+.retail-shell .side-nav button:not(.active):hover {
+  box-shadow: none;
 }
 
 .print-preview-top .primary-btn {
-  border-color: var(--accent);
+  border: 0;
   background: var(--accent);
-  color: var(--accent-contrast);
+  color: #fff;
 }
 
 .filter-card,
 .filter-bar {
   display: grid;
+  position: relative;
+  z-index: 70;
   align-items: center;
   gap: 16px;
   margin-bottom: 24px;
@@ -2428,9 +2786,9 @@
 
 .modal-actions .primary-btn,
 .entity-modal .primary-btn {
+  border: 0;
   background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-contrast);
+  color: #fff;
 }
 
 .toggle-label {
@@ -3045,9 +3403,9 @@
     grid-column: 1;
   }
 
-  .metric-card {
-    min-height: 86px;
-  }
+.metric-card {
+  min-height: 86px;
+}
 
   .trend-panel,
   .quick-panel,
@@ -3189,9 +3547,9 @@
 
 .smooth-select-btn.active,
 .smooth-select-btn:focus {
-  border-color: var(--accent);
+  border-color: var(--border);
   background: var(--panel-bg);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.16);
 }
 
 .smooth-select-btn svg {
@@ -3211,10 +3569,21 @@
   padding: 6px;
   box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
   z-index: 9999;
-  animation: selectFadeIn 180ms ease both;
+  animation: dropdownSoftIn 190ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 @keyframes selectFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes dropdownSoftIn {
   from {
     opacity: 0;
     transform: translateY(-8px) scale(0.98);
@@ -3247,12 +3616,2547 @@
 }
 
 .floating-select-menu button.selected {
-  background: var(--accent);
-  color: var(--accent-contrast);
+  background: var(--panel-soft);
+  color: var(--text);
 }
 
 .filter-card,
 .data-panel,
 .entity-content {
   overflow: visible !important;
+}
+
+.data-panel {
+  position: relative;
+  z-index: 1;
+}
+
+.filter-card,
+.filter-bar,
+.sales-filter-card,
+.products-filter-card {
+  isolation: isolate;
+}
+
+.date-range-picker {
+  position: relative;
+  min-width: 220px;
+}
+
+.filter-card .search-field,
+.filter-bar .search-field,
+.products-filter-card .search-field,
+.sales-filter-card .search-field {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.filter-card .search-field input,
+.filter-bar .search-field input,
+.products-filter-card .search-field input,
+.sales-filter-card .search-field input {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  min-height: 38px;
+  padding: 0;
+}
+
+.filter-card .search-field:focus-within,
+.filter-bar .search-field:focus-within,
+.products-filter-card .search-field:focus-within,
+.sales-filter-card .search-field:focus-within,
+.date-range-picker:focus-within .date-range-btn {
+  border-color: var(--border);
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.16);
+}
+
+.filter-card .date-range-picker,
+.filter-bar .date-range-picker,
+.products-filter-card .date-range-picker,
+.sales-filter-card .date-range-picker {
+  min-width: 0;
+  width: 100%;
+}
+
+.date-range-btn {
+  width: 100%;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-soft);
+  color: var(--text);
+  padding: 0 12px;
+  cursor: pointer;
+  font: inherit;
+  text-align: start;
+}
+
+.date-range-btn span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.date-range-calendar {
+  position: absolute;
+  top: calc(100% + 8px);
+  inset-inline-end: 0;
+  z-index: 10020;
+  width: min(278px, calc(100vw - 32px));
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel-bg);
+  color: var(--text);
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.22);
+  animation: dropdownIn 140ms ease both;
+}
+
+.date-range-calendar .calendar-head {
+  display: grid;
+  grid-template-columns: 30px 1fr 30px;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-range-calendar .calendar-head strong {
+  text-align: center;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.date-range-calendar .calendar-head button,
+.date-range-calendar .calendar-days button {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  display: grid !important;
+  place-items: center !important;
+  border: 1px solid var(--border) !important;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  font: inherit !important;
+}
+
+.date-range-calendar .calendar-head button {
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 8px !important;
+}
+
+.date-range-calendar .calendar-weekdays,
+.date-range-calendar .calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.date-range-calendar .calendar-weekdays span {
+  display: grid;
+  place-items: center;
+  min-height: 22px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.date-range-calendar .calendar-days button {
+  aspect-ratio: 1;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+.date-range-calendar .calendar-days button.muted {
+  color: color-mix(in srgb, var(--muted) 70%, transparent) !important;
+}
+
+.date-range-calendar .calendar-days button.in-range {
+  background: var(--accent-soft) !important;
+  border-color: var(--accent-soft) !important;
+}
+
+.date-range-calendar .calendar-days button.selected {
+  border-color: var(--accent) !important;
+  background: var(--accent) !important;
+  color: var(--accent-contrast) !important;
+}
+
+.dashboard-date-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  gap: 10px;
+  align-items: start;
+}
+
+.dashboard-date-control {
+  position: relative;
+  width: 148px;
+  flex: 0 0 148px;
+}
+
+.dashboard-date-control .smooth-select,
+.dashboard-date-control .smooth-select-btn {
+  width: 100%;
+}
+
+.dashboard-date-control .smooth-select-btn {
+  min-height: 44px;
+  padding-inline: 42px 28px;
+  border-radius: 12px;
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--navy) 10%, transparent);
+}
+
+.dashboard-filter-icon {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: 16px;
+  transform: translateY(-50%);
+  z-index: 2;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.dashboard-range-shell {
+  position: relative;
+  width: 246px;
+  flex: 0 0 246px;
+}
+
+.dashboard-range-shell .date-range-picker,
+.dashboard-range-shell .date-range-btn {
+  width: 100%;
+}
+
+.dashboard-range-shell .date-range-btn {
+  min-height: 44px;
+  padding-inline: 14px 38px;
+  border-radius: 8px;
+  background: var(--panel-bg);
+}
+
+.dashboard-range-shell .date-range-btn svg {
+  display: none;
+}
+
+.dashboard-filter-reset {
+  position: absolute;
+  top: 50%;
+  inset-inline-end: 10px;
+  z-index: 4;
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  box-shadow: none;
+}
+
+.dashboard-filter-reset:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.dashboard-date-range {
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 760px) {
+  html,
+  body,
+  #root {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .app-shell,
+  .main-area,
+  .content-area,
+  .entity-content,
+  .dashboard-page,
+  .products-page,
+  .sales-page,
+  .staff-page,
+  .customers-page,
+  .godown-page,
+  .suppliers-page,
+  .loans-page,
+  .recycle-page {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .filter-card,
+  .filter-bar,
+  .sales-filter-card,
+  .products-filter-card {
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .filter-card > *,
+  .filter-bar > *,
+  .sales-filter-card > *,
+  .products-filter-card > * {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .data-panel,
+  .supplier-section-card,
+  .godown-table-card,
+  .table-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .data-panel .data-table,
+  .supplier-section-card .data-table,
+  .godown-table-card .data-table,
+  .table-card .data-table {
+    min-width: 680px;
+  }
+
+  .date-range-picker {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .date-range-calendar {
+    position: fixed !important;
+    inset-inline: 12px !important;
+    top: auto !important;
+    bottom: max(12px, env(safe-area-inset-bottom)) !important;
+    width: auto !important;
+    max-height: min(430px, calc(100dvh - 30px));
+    overflow-y: auto;
+    z-index: 10050 !important;
+  }
+
+  .dashboard-date-actions {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .dashboard-date-control {
+    width: 100%;
+    flex: 1 1 150px;
+  }
+
+  .dashboard-range-shell,
+  .dashboard-date-range {
+    width: 100%;
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .notifications-panel {
+    position: fixed !important;
+    inset-inline: 10px !important;
+    top: max(72px, env(safe-area-inset-top)) !important;
+    width: auto !important;
+    max-height: calc(100dvh - 88px);
+    overflow-y: auto;
+    z-index: 10060 !important;
+  }
+}
+
+.retail-shell .main-area :where(h1, h2, h3),
+.retail-shell[dir="ltr"] .main-area :where(h1, h2, h3),
+.retail-shell[dir="rtl"] .main-area :where(h1, h2, h3) {
+  font-weight: 950 !important;
+}
+
+.retail-shell .entity-actions button:not(.primary-btn):not(.camera-icon-btn):not(.scanner-active-btn):not(.payroll-btn),
+.retail-shell .print-pdf-btn,
+.retail-shell .wide-print-btn,
+.retail-shell .cash-wallet-top-actions > button:not(.cash-wallet-add-btn) {
+  min-width: 150px;
+  min-height: 42px;
+  height: 42px;
+  border: 0 !important;
+  border-radius: 10px;
+  background: var(--accent) !important;
+  color: #fff !important;
+  font-weight: 900 !important;
+  white-space: nowrap;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.22);
+}
+
+.retail-shell .primary-btn,
+.retail-shell .save-btn,
+.retail-shell .barcode-print-btn,
+.retail-shell .supplier-portal-page .supplier-portal-head > button {
+  min-width: 150px;
+  min-height: 42px;
+  height: 42px;
+  border: 0 !important;
+  border-radius: 10px;
+  background: var(--accent) !important;
+  color: #fff !important;
+  font-weight: 900 !important;
+  white-space: nowrap;
+  box-shadow: 0 10px 24px rgba(34, 197, 94, 0.22);
+}
+
+.retail-shell .scanner-active-btn {
+  min-width: 150px;
+  min-height: 42px;
+  height: 42px;
+  border: 0 !important;
+  border-radius: 10px;
+  background: var(--accent) !important;
+  color: #fff !important;
+  font-weight: 900 !important;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.24);
+}
+
+.retail-shell .payroll-btn {
+  min-width: 150px;
+  min-height: 42px;
+  height: 42px;
+  border: 0 !important;
+  border-radius: 10px;
+  background: var(--accent) !important;
+  color: #fff !important;
+  font-weight: 900 !important;
+  box-shadow: 0 10px 24px rgba(245, 158, 11, 0.24);
+}
+
+.retail-shell .camera-icon-btn {
+  min-width: 42px;
+}
+
+.retail-shell .entity-actions button:not(.primary-btn):not(.camera-icon-btn):not(.scanner-active-btn):not(.payroll-btn):not(.date-range-btn),
+.retail-shell .print-pdf-btn,
+.retail-shell .wide-print-btn,
+.retail-shell .cash-wallet-top-actions > button:not(.cash-wallet-add-btn):not(.date-range-btn) {
+  position: relative;
+  overflow: hidden;
+  min-width: 150px;
+  min-height: 42px;
+  height: 42px;
+  border: 0 !important;
+  border-radius: 10px;
+  background: var(--accent) !important;
+  color: #fff !important;
+  font-weight: 900 !important;
+  white-space: nowrap;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.22);
+}
+
+.retail-shell .primary-btn,
+.retail-shell .save-btn,
+.retail-shell .barcode-print-btn,
+.retail-shell .supplier-portal-page .supplier-portal-head > button {
+  position: relative;
+  overflow: hidden;
+  min-width: 150px;
+  min-height: 42px;
+  height: 42px;
+  border: 0 !important;
+  border-radius: 10px;
+  background: var(--accent) !important;
+  color: #fff !important;
+  font-weight: 900 !important;
+  white-space: nowrap;
+  box-shadow: 0 10px 24px rgba(34, 197, 94, 0.22);
+}
+
+.retail-shell .scanner-active-btn {
+  position: relative;
+  overflow: hidden;
+  background: var(--accent) !important;
+}
+
+.retail-shell .payroll-btn {
+  position: relative;
+  overflow: hidden;
+  background: var(--accent) !important;
+}
+
+.retail-shell .entity-actions button:not(.camera-icon-btn):not(.date-range-btn)::before,
+.retail-shell .primary-btn::before,
+.retail-shell .save-btn::before,
+.retail-shell .scanner-active-btn::before,
+.retail-shell .payroll-btn::before,
+.retail-shell .print-pdf-btn::before,
+.retail-shell .wide-print-btn::before,
+.retail-shell .cash-wallet-top-actions > button:not(.cash-wallet-add-btn):not(.date-range-btn)::before {
+  display: none;
+}
+
+.retail-shell .date-range-btn,
+.retail-shell .date-range-picker .date-range-btn,
+.retail-shell .financial-date-control .date-range-btn,
+.retail-shell .report-date-control .date-range-btn {
+  position: static !important;
+  overflow: visible !important;
+  min-width: 0 !important;
+  border: 1px solid var(--border) !important;
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+  animation: none !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+.retail-shell .date-range-btn::before,
+.retail-shell .date-range-calendar button::before {
+  display: none !important;
+}
+
+.retail-shell .date-range-calendar button {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  border: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+  animation: none !important;
+}
+
+.retail-shell .date-range-calendar .calendar-day.is-selected,
+.retail-shell .date-range-calendar .calendar-day.selected,
+.retail-shell .date-range-calendar button.is-selected,
+.retail-shell .date-range-calendar button.selected {
+  background: var(--accent) !important;
+  color: var(--accent-contrast) !important;
+}
+
+.retail-shell .date-range-calendar .calendar-day.is-in-range,
+.retail-shell .date-range-calendar .calendar-day.in-range,
+.retail-shell .date-range-calendar button.is-in-range,
+.retail-shell .date-range-calendar button.in-range {
+  background: var(--accent-soft) !important;
+  color: var(--text) !important;
+}
+
+.sidebar-footer {
+  position: relative;
+}
+
+.sidebar-help-menu {
+  position: absolute;
+  left: calc(100% + 8px);
+  bottom: 36px;
+  width: 192px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-bg);
+  box-shadow: var(--shadow-strong);
+  z-index: 1200;
+}
+
+.retail-shell[dir="rtl"] .sidebar-help-menu {
+  left: auto;
+  right: calc(100% + 8px);
+}
+
+.sidebar-help-menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 32px;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  text-align: start;
+  font-weight: 700;
+}
+
+.sidebar-help-menu button:hover {
+  background: var(--muted-bg);
+}
+
+.terms-privacy-page {
+  min-height: calc(100dvh - 92px);
+  padding: clamp(20px, 4vw, 46px);
+  display: flex;
+  justify-content: center;
+  color: var(--text);
+}
+
+.terms-privacy-inner {
+  width: min(920px, 100%);
+}
+
+.terms-hero {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  margin-bottom: 26px;
+  text-align: center;
+}
+
+.terms-logo {
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: #fff;
+  font-weight: 950;
+  background: linear-gradient(135deg, #111827, #64748b);
+  box-shadow: var(--shadow-soft);
+}
+
+.terms-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.terms-hero h1 {
+  margin: 0;
+  font-size: clamp(1.65rem, 4vw, 2.5rem);
+}
+
+.terms-hero p {
+  margin: 0;
+  color: var(--muted-text);
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.terms-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  padding: 4px;
+  margin: 0 auto 14px;
+  border-radius: 8px;
+  background: var(--muted-bg);
+}
+
+.terms-tabs button {
+  min-height: 38px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted-text);
+  font-weight: 900;
+}
+
+.terms-tabs button.active {
+  border-color: var(--accent);
+  background: var(--panel-bg);
+  color: var(--text);
+  box-shadow: var(--shadow-soft);
+}
+
+.terms-card {
+  padding: clamp(20px, 3vw, 30px);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-bg);
+  box-shadow: var(--shadow-soft);
+}
+
+.terms-card h2 {
+  margin: 0 0 18px;
+}
+
+.terms-list {
+  display: grid;
+  gap: 18px;
+  color: var(--muted-text);
+  line-height: 1.8;
+}
+
+.terms-list p {
+  margin: 0;
+}
+
+.app-loader {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 9999;
+  background: color-mix(in srgb, var(--page-bg) 82%, transparent);
+  backdrop-filter: blur(6px);
+}
+
+.app-loader-card {
+  min-width: 210px;
+  min-height: 112px;
+  display: grid;
+  place-items: center;
+  gap: 12px;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel-bg);
+  box-shadow: var(--shadow-strong);
+}
+
+.app-loader-card span {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  animation: retailSpin 0.8s linear infinite;
+}
+
+@keyframes retailSpin {
+  to { transform: rotate(360deg); }
+}
+
+.notification-sound-toolbar,
+.settings-form.two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.notification-sound-toolbar {
+  display: grid;
+  align-items: end;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.notification-sound-toolbar label {
+  display: grid;
+  gap: 8px;
+}
+
+.notification-sound-toolbar label > span {
+  font-size: 0.88rem;
+  font-weight: 850;
+}
+
+.notification-sound-toolbar > button {
+  justify-self: end;
+  min-height: 42px;
+}
+
+.notification-sound-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.notification-sound-option {
+  width: 100%;
+  min-height: 64px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-bg);
+  color: var(--text);
+  padding: 12px 14px;
+  text-align: start;
+}
+
+.notification-sound-option svg:first-child {
+  color: #2563eb;
+}
+
+.notification-sound-option > span {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.notification-sound-option strong,
+.notification-sound-option small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notification-sound-option strong {
+  font-size: 0.92rem;
+  font-weight: 950;
+}
+
+.notification-sound-option small {
+  color: var(--muted-text);
+  font-size: 0.8rem;
+}
+
+.notification-sound-option.active {
+  border-color: #94a3b8;
+  background: #f8fafc;
+  box-shadow: inset 0 0 0 1px #cbd5e1;
+}
+
+.backup-action-list {
+  display: grid;
+  gap: 14px;
+}
+
+.backup-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-bg);
+}
+
+.backup-action-row.danger {
+  border-color: rgba(239, 68, 68, 0.5);
+  background: rgba(239, 68, 68, 0.07);
+}
+
+.backup-action-row > div,
+.backup-action-row strong {
+  display: grid;
+  gap: 4px;
+}
+
+.backup-action-row strong {
+  grid-auto-flow: column;
+  justify-content: start;
+  align-items: center;
+  gap: 8px;
+  font-weight: 950;
+}
+
+.backup-action-row span {
+  color: var(--muted-text);
+}
+
+.automatic-backup-card {
+  display: grid;
+  gap: 16px;
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-bg);
+}
+
+.automatic-backup-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.automatic-backup-head h3,
+.automatic-backup-head p {
+  margin: 0;
+}
+
+.automatic-backup-head p,
+.backup-schedule-meta {
+  color: var(--muted-text);
+}
+
+.backup-schedule-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 32px;
+  font-size: 0.9rem;
+}
+
+.financial-actions,
+.report-actions,
+.cash-wallet-top-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 18px !important;
+}
+
+.financial-actions > button,
+.report-actions > button,
+.cash-wallet-top-actions > button {
+  flex: 0 0 auto;
+}
+
+.retail-shell button:not(.quick-action):not(.dots-btn):not(.row-action-menu button):not(.tiny-plus):not(.barcode-generate-btn):not(.supplier-custom-btn):not(.margin-apply-btn):not(.product-date-range-btn):not(.sales-date-range-btn):not(.metric-card-clickable):not(.search-shell):not(.smooth-select-btn):not(.smooth-select-menu button):not(.floating-select-menu button):not(.category-search-menu button):not(.customer-search-btn):not(.customer-search-menu button):not(.currency-trigger):not(.currency-menu button):not(.global-search-list button):not(.dropdown-menu button):not(.notifications-panel button):not(.segmented-row button):not(.segmented-view button):not(.toggle-filter-btn):not(.billing-panel button):not(.godown-filter-bar button):not(.date-range-btn):not(.calendar-head button):not(.calendar-days button):not(.date-range-calendar button):not(.modal-close):not(.icon-btn):not(.collapse-btn):not(.avatar-btn):not(.dashboard-filter-reset):not(.cash-wallet-add-btn):not(.toggle):not(.theme-choice):not(.print-template):not(.notification-sound-option):not(.help-menu-trigger):not(.sidebar-help-menu button):not(.side-nav button):not(.settings-tabs button):not(.brand-language-tabs button):not(.terms-tabs button):not(:disabled) {
+  position: relative;
+  overflow: hidden;
+  min-height: 42px;
+  padding: 0 18px;
+  border: 0 !important;
+  border-radius: 12px;
+  color: #fff !important;
+  font-weight: 900;
+  white-space: nowrap;
+  background: var(--accent);
+  box-shadow: 0 10px 25px rgba(124, 58, 237, 0.28);
+}
+/* Financials / Reports header controls fix */
+.retail-shell .financial-actions,
+.retail-shell .report-actions {
+  gap: 18px !important;
+}
+
+.retail-shell .financial-date-control,
+.retail-shell .report-date-control {
+  gap: 12px !important;
+  margin-inline-end: 10px !important;
+}
+
+/* All Time select ساده باشد */
+.retail-shell .financial-date-control .smooth-select-btn,
+.retail-shell .report-date-control .smooth-select-btn {
+  border: 1px solid var(--border) !important;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+
+
+.retail-shell button:not(.quick-action):not(.dots-btn):not(.row-action-menu button):not(.tiny-plus):not(.barcode-generate-btn):not(.supplier-custom-btn):not(.margin-apply-btn):not(.product-date-range-btn):not(.sales-date-range-btn):not(.metric-card-clickable):not(.search-shell):not(.smooth-select-btn):not(.smooth-select-menu button):not(.floating-select-menu button):not(.category-search-menu button):not(.customer-search-btn):not(.customer-search-menu button):not(.currency-trigger):not(.currency-menu button):not(.global-search-list button):not(.dropdown-menu button):not(.notifications-panel button):not(.segmented-row button):not(.segmented-view button):not(.toggle-filter-btn):not(.billing-panel button):not(.godown-filter-bar button):not(.date-range-btn):not(.calendar-head button):not(.calendar-days button):not(.date-range-calendar button):not(.modal-close):not(.icon-btn):not(.collapse-btn):not(.avatar-btn):not(.dashboard-filter-reset):not(.cash-wallet-add-btn):not(.toggle):not(.theme-choice):not(.print-template):not(.help-menu-trigger):not(.sidebar-help-menu button):not(.side-nav button):not(.settings-tabs button):not(.brand-language-tabs button):not(.terms-tabs button):not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(37, 99, 235, 0.34);
+}
+
+.retail-shell button:not(.quick-action):not(.dots-btn):not(.row-action-menu button):not(.tiny-plus):not(.barcode-generate-btn):not(.supplier-custom-btn):not(.margin-apply-btn):not(.product-date-range-btn):not(.sales-date-range-btn):not(.metric-card-clickable):not(.search-shell):not(.smooth-select-btn):not(.smooth-select-menu button):not(.floating-select-menu button):not(.category-search-menu button):not(.customer-search-btn):not(.customer-search-menu button):not(.currency-trigger):not(.currency-menu button):not(.global-search-list button):not(.dropdown-menu button):not(.notifications-panel button):not(.segmented-row button):not(.segmented-view button):not(.toggle-filter-btn):not(.billing-panel button):not(.godown-filter-bar button):not(.date-range-btn):not(.calendar-head button):not(.calendar-days button):not(.date-range-calendar button):not(.modal-close):not(.icon-btn):not(.collapse-btn):not(.avatar-btn):not(.dashboard-filter-reset):not(.cash-wallet-add-btn):not(.toggle):not(.theme-choice):not(.print-template):not(.help-menu-trigger):not(.sidebar-help-menu button):not(.side-nav button):not(.settings-tabs button):not(.brand-language-tabs button):not(.terms-tabs button):not(:disabled)::before {
+  display: none;
+}
+
+.retail-shell button svg,
+.retail-shell button span {
+  position: relative;
+  z-index: 1;
+}
+
+.date-range-btn,
+.smooth-select-btn,
+.date-range-calendar button,
+.calendar-head button,
+.calendar-days button {
+  animation: none !important;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+.date-range-calendar .calendar-days button.selected,
+.date-range-calendar button.selected {
+  background: var(--accent) !important;
+  color: var(--accent-contrast) !important;
+}
+
+.retail-shell :is(
+  .metric-card,
+  .metric-card-clickable,
+  .search-shell,
+  .filter-card,
+  .filter-bar,
+  .products-filter-card,
+  .sales-filter-card,
+  .search-field,
+  .products-search-field,
+  .global-search-input,
+  .global-search-head,
+  .smooth-select-btn,
+  .smooth-select-menu,
+  .smooth-select-menu button,
+  .date-range-btn,
+  .date-range-calendar,
+  .date-range-calendar button,
+  .calendar-head button,
+  .calendar-days button,
+  .theme-choice,
+  .print-template,
+  .notification-sound-option,
+  .settings-tabs button,
+  .terms-tabs button,
+  .brand-language-tabs button,
+  .backup-action-row,
+  .automatic-backup-card,
+  .kpi-route-row,
+  .quick-card,
+  .activity-item,
+  .data-panel,
+  .settings-card,
+  .trend-panel,
+  .quick-panel,
+  .activity-panel
+) {
+  background-image: none !important;
+  animation: none !important;
+}
+
+.retail-shell :is(
+  .metric-card-clickable,
+  .search-shell,
+  .smooth-select-menu button,
+  .date-range-btn,
+  .date-range-calendar button,
+  .calendar-head button,
+  .calendar-days button,
+  .theme-choice,
+  .print-template,
+  .notification-sound-option,
+  .settings-tabs button,
+  .terms-tabs button,
+  .brand-language-tabs button
+) {
+  color: var(--text) !important;
+}
+
+.retail-shell :is(
+  .metric-card-clickable,
+  .search-shell,
+  .smooth-select-menu button,
+  .date-range-btn,
+  .date-range-calendar button,
+  .calendar-head button,
+  .calendar-days button,
+  .theme-choice,
+  .print-template,
+  .notification-sound-option,
+  .settings-tabs button,
+  .terms-tabs button,
+  .brand-language-tabs button
+)::before {
+  display: none !important;
+}
+
+.retail-shell .metric-card,
+.retail-shell .metric-card-clickable {
+  background: var(--panel-bg) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+.retail-shell .search-shell {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .metric-card-clickable:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent) !important;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12) !important;
+}
+
+.retail-shell :is(.smooth-select-btn, .date-range-btn, .theme-choice, .print-template, .notification-sound-option) {
+  background: var(--panel-bg) !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+.retail-shell :is(.filter-card, .products-filter-card, .sales-filter-card, .settings-card, .trend-panel, .quick-panel, .activity-panel, .data-panel) {
+  background: var(--panel-bg) !important;
+}
+
+.retail-shell :is(.smooth-select-menu button.selected, .settings-tabs button.active, .terms-tabs button.active, .brand-language-tabs button.active, .print-template.active, .theme-choice.active, .notification-sound-option.active) {
+  border-color: var(--border) !important;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+}
+
+.retail-shell :is(.primary-btn, .save-btn, .print-pdf-btn, .wide-print-btn, .barcode-print-btn, .scanner-active-btn, .payroll-btn),
+.retail-shell .entity-actions button:not(.camera-icon-btn):not(.date-range-btn):not(.dashboard-filter-reset),
+.retail-shell .backup-action-row > button,
+.retail-shell .automatic-backup-card > button,
+.retail-shell .cash-wallet-top-actions > button:not(.cash-wallet-add-btn):not(.date-range-btn) {
+  background: var(--accent) !important;
+  background-image: none !important;
+  background-size: auto !important;
+  color: #fff !important;
+  animation: none !important;
+}
+
+.retail-shell :is(.primary-btn, .save-btn, .print-pdf-btn, .wide-print-btn, .barcode-print-btn, .scanner-active-btn, .payroll-btn)::before,
+.retail-shell .entity-actions button:not(.camera-icon-btn):not(.date-range-btn):not(.dashboard-filter-reset)::before,
+.retail-shell .backup-action-row > button::before,
+.retail-shell .automatic-backup-card > button::before,
+.retail-shell .cash-wallet-top-actions > button:not(.cash-wallet-add-btn):not(.date-range-btn)::before {
+  display: none !important;
+}
+
+.retail-shell :is(.date-range-calendar button, .date-range-calendar .calendar-day, .calendar-days button),
+.retail-shell :is(.date-range-calendar button.selected, .date-range-calendar button.is-selected, .date-range-calendar button.in-range, .date-range-calendar button.is-in-range, .date-range-calendar .calendar-day.selected, .date-range-calendar .calendar-day.is-selected, .date-range-calendar .calendar-day.in-range, .date-range-calendar .calendar-day.is-in-range) {
+  border-color: var(--border) !important;
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+  animation: none !important;
+}
+
+.retail-shell :is(.print-template span, .theme-preview) {
+  border: 1px solid var(--border) !important;
+}
+
+.retail-shell :is(.print-top-link) {
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+  animation: none !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+.retail-shell :is(.print-top-link)::before {
+  display: none !important;
+}
+
+.retail-shell button {
+  background-image: none !important;
+  animation: none !important;
+}
+
+.retail-shell button::before {
+  display: none !important;
+}
+
+.retail-shell button:not(.primary-btn):not(.save-btn):not(.print-pdf-btn):not(.wide-print-btn):not(.barcode-print-btn):not(.scanner-active-btn):not(.payroll-btn):not(.cash-wallet-add-btn) {
+  color: var(--text) !important;
+}
+
+.retail-shell :is(.primary-btn, .save-btn, .print-pdf-btn, .wide-print-btn, .barcode-print-btn, .scanner-active-btn, .payroll-btn, .cash-wallet-add-btn),
+.retail-shell .entity-actions button:not(.camera-icon-btn):not(.date-range-btn):not(.dashboard-filter-reset),
+.retail-shell .backup-action-row > button,
+.retail-shell .automatic-backup-card > button,
+.retail-shell .cash-wallet-top-actions > button {
+  background: var(--accent) !important;
+  color: #fff !important;
+}
+
+.retail-shell .sidebar,
+.retail-shell .sidebar * {
+  color: #ffffff !important;
+}
+
+.retail-shell .brand-block small,
+.retail-shell .sidebar-footer {
+  color: #d7deea !important;
+}
+
+.retail-shell .side-nav button {
+  background: transparent !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .side-nav button svg {
+  color: currentColor !important;
+}
+
+.retail-shell .side-nav button.active,
+.retail-shell .side-nav button:hover {
+  background: var(--accent) !important;
+  color: #020617 !important;
+}
+
+.retail-shell .side-nav button:not(.active):not(:hover),
+.retail-shell .side-nav button:not(.active):not(:hover) span,
+.retail-shell .side-nav button:not(.active):not(:hover) svg {
+  color: #ffffff !important;
+}
+
+.retail-shell .side-nav button:not(.active):hover,
+.retail-shell .side-nav button:not(.active):hover span,
+.retail-shell .side-nav button:not(.active):hover svg {
+  color: #020617 !important;
+}
+
+.retail-shell .sidebar-help-menu {
+  background: #ffffff !important;
+  border-color: var(--border) !important;
+  box-shadow: var(--shadow-strong) !important;
+}
+
+.retail-shell .sidebar-help-menu button,
+.retail-shell .sidebar-help-menu button span,
+.retail-shell .sidebar-help-menu button svg {
+  color: var(--text) !important;
+}
+
+.retail-shell .sidebar-help-menu button:hover {
+  background: var(--accent) !important;
+  color: #020617 !important;
+}
+
+.retail-shell .sidebar-help-menu button:hover span,
+.retail-shell .sidebar-help-menu button:hover svg {
+  color: #020617 !important;
+}
+
+.retail-shell .print-preview-modal {
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+}
+
+.retail-shell .print-controls {
+  background: #111c31 !important;
+  color: #ffffff !important;
+}
+
+.retail-shell .print-controls span,
+.retail-shell .print-controls .control-caption {
+  color: #aebbd1 !important;
+}
+
+.retail-shell .print-controls :is(.smooth-select-btn, input, select) {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #dbe3ef !important;
+}
+
+.retail-shell .mini-template-grid button,
+.retail-shell .watermark-btn {
+  background: #1e293b !important;
+  color: #ffffff !important;
+  border-color: #334155 !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .mini-template-grid button.active,
+.retail-shell .mini-template-grid button:hover,
+.retail-shell .watermark-btn:hover {
+  border-color: #60a5fa !important;
+  box-shadow: inset 0 0 0 1px #60a5fa !important;
+}
+
+.retail-shell .mini-template-grid button span {
+  width: 24px !important;
+  height: 16px !important;
+  flex: 0 0 24px !important;
+  border: 0 !important;
+  border-radius: 4px !important;
+  background-image: inherit;
+}
+
+.retail-shell .mini-template-grid button span[style] {
+  border: 0 !important;
+}
+
+.retail-shell .watermark-btn {
+  min-height: 30px !important;
+  border: 1px solid #334155 !important;
+  border-radius: 5px !important;
+  background: #1e293b !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+}
+
+.retail-shell .watermark-btn span {
+  color: #ffffff !important;
+}
+
+.retail-shell .print-preview-top button,
+.retail-shell .print-top-link {
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+  box-shadow: none !important;
+}
+
+
+.retail-shell :is(
+  input:focus,
+  textarea:focus,
+  select:focus,
+  .smooth-select-btn.active,
+  .smooth-select-btn:focus,
+  .smooth-select-btn:focus-visible,
+  .category-search:focus-within input,
+  .search-field:focus-within,
+  .date-range-picker:focus-within .date-range-btn
+) {
+  border-color: var(--border) !important;
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.16) !important;
+  outline: none !important;
+}
+
+.retail-shell :is(
+  .smooth-select-menu button,
+  .floating-select-menu button,
+  .category-search-menu button
+) {
+  background: transparent !important;
+  color: var(--text) !important;
+}
+
+.retail-shell :is(
+  .smooth-select-menu button:hover,
+  .smooth-select-menu button.selected,
+  .floating-select-menu button:hover,
+  .floating-select-menu button.selected,
+  .customer-search-menu > button:hover,
+  .customer-search-menu > button.selected,
+  .currency-menu button:hover,
+  .currency-menu button.selected,
+  .category-search-menu button:hover,
+  .category-search-menu .add-category-option
+) {
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+}
+
+.retail-shell :is(
+  .customer-search-menu > button:hover small,
+  .customer-search-menu > button.selected small
+) {
+  color: var(--muted) !important;
+}
+
+.retail-shell .smooth-select-menu button.selected .smooth-select-check {
+  border-color: #94a3b8 !important;
+}
+
+.retail-shell .main-area :is(
+  .customer-search-btn,
+  .currency-trigger,
+  .smooth-select-btn,
+  .date-range-btn,
+  .dropdown-menu button,
+  .language-menu button,
+  .segmented-row button,
+  .segmented-view button,
+  .toggle-filter-btn,
+  .notification-sound-option,
+  .settings-tabs button,
+  .terms-tabs button,
+  .brand-language-tabs button
+) {
+  border-color: var(--border) !important;
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .main-area :is(
+  .customer-search-btn:hover,
+  .currency-trigger:hover,
+  .smooth-select-btn:hover,
+  .smooth-select-menu button:hover,
+  .smooth-select-menu button.selected,
+  .floating-select-menu button:hover,
+  .floating-select-menu button.selected,
+  .category-search-menu button:hover,
+  .category-search-menu .add-category-option,
+  .customer-search-menu > button:hover,
+  .customer-search-menu > button.selected,
+  .currency-menu button:hover,
+  .currency-menu button.selected,
+  .dropdown-menu button:hover,
+  .dropdown-menu button.selected,
+  .language-menu button:hover,
+  .language-menu button.selected,
+  .segmented-row button.active,
+  .segmented-view button:hover,
+  .toggle-filter-btn:not(.active):hover,
+  .settings-tabs button.active,
+  .terms-tabs button.active,
+  .brand-language-tabs button.active,
+  .notification-sound-option.active
+) {
+  border-color: var(--border) !important;
+  background: var(--panel-soft) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+  box-shadow: inset 0 0 0 1px var(--border) !important;
+}
+
+.retail-shell .main-area :is(
+  .segmented-row button.active,
+  .segmented-view button.active,
+  .toggle-filter-btn.active
+) {
+  border-color: #2563eb !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.18) !important;
+}
+
+.retail-shell .main-area :is(
+  .customer-search-menu,
+  .currency-menu,
+  .smooth-select-menu,
+  .floating-select-menu,
+  .category-search-menu,
+  .dropdown-menu,
+  .language-menu
+) {
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+.retail-shell .main-area .notifications-panel button {
+  min-height: 34px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 9px !important;
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .main-area .notifications-panel > header button:hover {
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+}
+
+.retail-shell .main-area .notification-item > button {
+  width: 34px !important;
+  min-width: 34px !important;
+  padding: 0 !important;
+  background: color-mix(in srgb, #ef4444 12%, var(--panel-bg)) !important;
+  color: #ef4444 !important;
+}
+
+.retail-shell .main-area .notification-item > button:hover {
+  background: color-mix(in srgb, #ef4444 18%, var(--panel-bg)) !important;
+  color: #dc2626 !important;
+}
+
+.retail-shell .main-area .notification-symbol {
+  background: color-mix(in srgb, #2563eb 12%, var(--panel-bg)) !important;
+  color: #2563eb !important;
+}
+
+.retail-shell .main-area .notification-item.danger .notification-symbol {
+  background: color-mix(in srgb, #ef4444 14%, var(--panel-bg)) !important;
+  color: #dc2626 !important;
+}
+
+.retail-shell .main-area .notification-item.success .notification-symbol {
+  background: color-mix(in srgb, #22c55e 14%, var(--panel-bg)) !important;
+  color: #16a34a !important;
+}
+
+.retail-shell .main-area .notification-sound-option svg:first-child {
+  color: #2563eb !important;
+}
+
+.retail-shell .dropdown-menu,
+.retail-shell .account-menu,
+.retail-shell .language-menu,
+.retail-shell .notifications-panel {
+  background: var(--panel-bg) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+.retail-shell .dropdown-menu strong,
+.retail-shell .notifications-panel strong,
+.retail-shell .notifications-panel p,
+.retail-shell .notifications-panel small {
+  color: var(--text) !important;
+}
+
+.retail-shell .notifications-panel p,
+.retail-shell .notifications-panel small {
+  color: var(--muted) !important;
+}
+
+.retail-shell .dropdown-menu button,
+.retail-shell .language-menu button,
+.retail-shell .account-menu button {
+  min-height: 38px !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .dropdown-menu button:hover,
+.retail-shell .dropdown-menu button.selected,
+.retail-shell .language-menu button:hover,
+.retail-shell .language-menu button.selected,
+.retail-shell .account-menu button:hover {
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+}
+
+.retail-shell .notifications-panel > header button {
+  width: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 0 !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 9px !important;
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .notifications-panel > header button:hover {
+  background: color-mix(in srgb, #2563eb 12%, var(--panel-bg)) !important;
+  color: #2563eb !important;
+}
+
+.retail-shell .notification-item > button {
+  width: 34px !important;
+  min-width: 34px !important;
+  min-height: 38px !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 0 !important;
+  border: 1px solid transparent !important;
+  border-radius: 9px !important;
+  background: color-mix(in srgb, #ef4444 12%, var(--panel-bg)) !important;
+  color: #ef4444 !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .notification-item > button:hover {
+  background: color-mix(in srgb, #ef4444 18%, var(--panel-bg)) !important;
+  color: #dc2626 !important;
+}
+
+.retail-shell .theme-choice .theme-preview,
+.retail-shell .print-template span {
+  background-image: var(--inline-preview, inherit);
+}
+
+.retail-shell .theme-choice.active,
+.retail-shell .print-template.active {
+  border-color: #2563eb !important;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+  box-shadow: inset 0 0 0 1px #2563eb !important;
+}
+
+.retail-shell .main-area :is(
+  input,
+  textarea,
+  select,
+  .search-field,
+  .products-search-field,
+  .sales-search-field,
+  .date-input-shell,
+  .customer-search-input,
+  .currency-trigger,
+  .customer-search-btn,
+  .smooth-select-btn,
+  .date-range-btn
+) {
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+.retail-shell .main-area :is(
+  input:focus,
+  textarea:focus,
+  select:focus,
+  .search-field:focus-within,
+  .products-search-field:focus-within,
+  .sales-search-field:focus-within,
+  .customer-search-input:focus-within,
+  .smooth-select-btn.active,
+  .smooth-select-btn:focus,
+  .date-range-btn:focus
+) {
+  border-color: var(--border) !important;
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.18) !important;
+  outline: none !important;
+}
+
+.retail-shell .main-area :is(
+  .billing-panel button:not(.primary-btn):not(.active),
+  .segmented-row button:not(.active),
+  .segmented-view button:not(.active),
+  .toggle-filter-btn:not(.active),
+  .godown-tabs button:not(.active),
+  .supplier-tabs button:not(.active),
+  .wallet-mode-tabs button:not(.active),
+  .smooth-select-menu button,
+  .floating-select-menu button,
+  .customer-search-menu button,
+  .currency-menu button,
+  .category-search-menu button
+) {
+  background: transparent !important;
+  background-image: none !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .main-area :is(
+  .segmented-row button.active,
+  .segmented-view button.active,
+  .toggle-filter-btn.active,
+  .godown-tabs button.active,
+  .supplier-tabs button.active,
+  .wallet-mode-tabs button.active
+) {
+  border-color: #2563eb !important;
+  background: #2563eb !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.18) !important;
+}
+
+.retail-shell .main-area :is(
+  .smooth-select-menu button:hover,
+  .smooth-select-menu button.selected,
+  .floating-select-menu button:hover,
+  .floating-select-menu button.selected,
+  .customer-search-menu button:hover,
+  .customer-search-menu button.selected,
+  .currency-menu button:hover,
+  .currency-menu button.selected,
+  .category-search-menu button:hover,
+  .category-search-menu .add-category-option
+) {
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+  box-shadow: inset 0 0 0 1px var(--border) !important;
+}
+
+.retail-shell .main-area :is(
+  .primary-btn,
+  .save-btn,
+  .scanner-active-btn,
+  .print-pdf-btn,
+  .wide-print-btn,
+  .barcode-print-btn,
+  .payroll-btn,
+  .cash-wallet-add-btn
+) {
+  border-color: #2563eb !important;
+  background: #2563eb !important;
+  background-image: none !important;
+  color: #ffffff !important;
+}
+
+@media (max-width: 760px) {
+  .terms-privacy-page {
+    padding: 18px 12px 28px;
+  }
+
+  .terms-tabs,
+  .notification-sound-toolbar,
+  .settings-form.two {
+    grid-template-columns: 1fr;
+  }
+
+  .notification-sound-toolbar > button {
+    justify-self: stretch;
+  }
+
+  .notification-sound-list {
+    grid-template-columns: 1fr;
+  }
+
+  .backup-action-row,
+  .automatic-backup-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .backup-action-row > button,
+  .automatic-backup-card > button {
+    width: 100%;
+  }
+
+  .financial-actions,
+  .report-actions,
+  .cash-wallet-top-actions {
+    justify-content: stretch;
+  }
+}
+
+/* Unified form-control polish */
+.retail-shell {
+  --control-height: 42px;
+  --control-radius: 10px;
+  --control-padding-x: 13px;
+  --control-bg: var(--panel-bg);
+  --control-hover-bg: var(--panel-soft);
+  --control-border: var(--border);
+  --control-focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.13);
+  --control-shadow: 0 12px 28px rgba(15, 23, 42, 0.1);
+  --dropdown-shadow: 0 18px 44px rgba(15, 23, 42, 0.16);
+}
+
+.retail-shell .main-area :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+  textarea,
+  select
+) {
+  width: 100%;
+  min-height: var(--control-height) !important;
+  border: 1px solid var(--control-border) !important;
+  border-radius: var(--control-radius) !important;
+  background: var(--control-bg) !important;
+  color: var(--text) !important;
+  padding-inline: var(--control-padding-x) !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease !important;
+}
+
+.retail-shell .main-area textarea {
+  min-height: 82px !important;
+  padding-block: 11px !important;
+}
+
+.retail-shell .main-area :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):focus,
+  textarea:focus,
+  select:focus,
+  .search-field:focus-within,
+  .products-search-field:focus-within,
+  .sales-search:focus-within,
+  .filter-search:focus-within,
+  .global-search-input:focus-within,
+  .customer-search-input:focus-within,
+  .category-search:focus-within input,
+  .date-input-shell:focus-within,
+  .smooth-select-btn:focus,
+  .smooth-select-btn:focus-visible,
+  .smooth-select-btn.active,
+  .date-range-btn:focus,
+  .product-date-range-btn:focus,
+  .sales-date-range-btn:focus,
+  .customer-search-btn:focus,
+  .currency-trigger:focus
+) {
+  border-color: #93b4e8 !important;
+  box-shadow: var(--control-focus-ring) !important;
+  outline: none !important;
+}
+
+.retail-shell .main-area :is(
+  .search-field,
+  .products-search-field,
+  .sales-search,
+  .filter-search,
+  .global-search-input,
+  .customer-search-input
+) {
+  position: relative;
+  min-height: var(--control-height) !important;
+  height: var(--control-height) !important;
+  display: grid !important;
+  grid-template-columns: 18px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 9px !important;
+  padding: 0 var(--control-padding-x) !important;
+  border: 1px solid var(--control-border) !important;
+  border-radius: var(--control-radius) !important;
+  background: var(--control-bg) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+  overflow: hidden;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease !important;
+}
+
+.retail-shell .main-area :is(
+  .search-field,
+  .products-search-field,
+  .sales-search,
+  .filter-search,
+  .global-search-input,
+  .customer-search-input
+) > svg {
+  position: static !important;
+  width: 17px !important;
+  height: 17px !important;
+  transform: none !important;
+  color: var(--muted) !important;
+  pointer-events: none;
+}
+
+.retail-shell .main-area :is(
+  .search-field,
+  .products-search-field,
+  .sales-search,
+  .filter-search,
+  .global-search-input,
+  .customer-search-input
+) input {
+  min-width: 0 !important;
+  min-height: calc(var(--control-height) - 2px) !important;
+  height: calc(var(--control-height) - 2px) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .main-area :is(
+  .search-field,
+  .products-search-field,
+  .sales-search,
+  .filter-search,
+  .global-search-input,
+  .customer-search-input
+) input:focus {
+  box-shadow: none !important;
+}
+
+.retail-shell .main-area :is(
+  .smooth-select,
+  .date-range-picker,
+  .product-date-range-picker,
+  .sales-date-range-picker,
+  .customer-search-select
+) {
+  min-width: 0;
+}
+
+.retail-shell .main-area :is(
+  .smooth-select-btn,
+  .date-range-btn,
+  .product-date-range-btn,
+  .sales-date-range-btn,
+  .customer-search-btn,
+  .currency-trigger
+) {
+  width: 100%;
+  min-height: var(--control-height) !important;
+  height: var(--control-height) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  border: 1px solid var(--control-border) !important;
+  border-radius: var(--control-radius) !important;
+  background: var(--control-bg) !important;
+  color: var(--text) !important;
+  padding: 0 var(--control-padding-x) !important;
+  box-shadow: none !important;
+  overflow: hidden;
+  text-align: start !important;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease,
+    transform 160ms ease !important;
+}
+
+.retail-shell .main-area :is(
+  .smooth-select-btn:hover,
+  .date-range-btn:hover,
+  .product-date-range-btn:hover,
+  .sales-date-range-btn:hover,
+  .customer-search-btn:hover,
+  .currency-trigger:hover
+) {
+  background: var(--control-hover-bg) !important;
+  border-color: color-mix(in srgb, var(--control-border) 70%, #2563eb) !important;
+}
+
+.retail-shell .main-area :is(
+  .smooth-select-label,
+  .date-range-btn span,
+  .product-date-range-btn span,
+  .sales-date-range-btn span,
+  .customer-search-btn span
+) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.retail-shell .main-area :is(.products-date-filter, .date-filter-shell) {
+  position: relative;
+}
+
+.retail-shell .main-area :is(.products-date-filter, .date-filter-shell) > svg {
+  position: absolute !important;
+  top: 50% !important;
+  inset-inline-start: 13px !important;
+  z-index: 2;
+  transform: translateY(-50%) !important;
+  color: var(--muted) !important;
+  pointer-events: none;
+}
+
+.retail-shell .main-area :is(.products-date-filter, .date-filter-shell) .smooth-select-btn {
+  padding-inline-start: 40px !important;
+}
+
+.retail-shell .main-area .date-input-shell {
+  min-height: var(--control-height) !important;
+  height: var(--control-height) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  padding: 0 var(--control-padding-x) !important;
+  border: 1px solid var(--control-border) !important;
+  border-radius: var(--control-radius) !important;
+  background: var(--control-bg) !important;
+}
+
+.retail-shell .main-area .date-input-shell input {
+  min-height: calc(var(--control-height) - 2px) !important;
+  height: calc(var(--control-height) - 2px) !important;
+  border: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.retail-shell .main-area .date-input-shell input:focus {
+  box-shadow: none !important;
+}
+
+.retail-shell :is(
+  .dropdown-menu,
+  .language-menu,
+  .account-menu,
+  .notifications-panel,
+  .smooth-select-menu,
+  .floating-select-menu,
+  .customer-search-menu,
+  .currency-menu,
+  .category-search-menu,
+  .product-date-calendar,
+  .sales-date-calendar,
+  .date-range-calendar,
+  .sales-action-dropdown,
+  .sidebar-help-menu
+) {
+  border: 1px solid var(--control-border) !important;
+  border-radius: 12px !important;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+  box-shadow: var(--dropdown-shadow) !important;
+  transform-origin: top center;
+  animation: controlMenuIn 170ms cubic-bezier(0.16, 1, 0.3, 1) both !important;
+  will-change: opacity, transform;
+}
+
+.retail-shell :is(.smooth-select-menu, .floating-select-menu, .customer-search-menu, .currency-menu, .category-search-menu) {
+  display: grid !important;
+  gap: 4px !important;
+  padding: 7px !important;
+}
+
+.retail-shell :is(
+  .smooth-select-menu button,
+  .floating-select-menu button,
+  .customer-search-menu > button,
+  .currency-menu button,
+  .category-search-menu button,
+  .dropdown-menu button,
+  .language-menu button,
+  .account-menu button,
+  .sales-action-dropdown button
+) {
+  min-height: 36px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 9px !important;
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  color: var(--text) !important;
+  padding: 0 10px !important;
+  box-shadow: none !important;
+  text-align: start !important;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    transform 150ms ease !important;
+}
+
+.retail-shell :is(
+  .smooth-select-menu button:hover,
+  .floating-select-menu button:hover,
+  .customer-search-menu > button:hover,
+  .currency-menu button:hover,
+  .category-search-menu button:hover,
+  .dropdown-menu button:hover,
+  .language-menu button:hover,
+  .account-menu button:hover,
+  .sales-action-dropdown button:hover
+) {
+  border-color: transparent !important;
+  background: var(--control-hover-bg) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+
+.retail-shell :is(
+  .smooth-select-menu button.selected,
+  .floating-select-menu button.selected,
+  .customer-search-menu > button.selected,
+  .currency-menu button.selected,
+  .dropdown-menu button.selected,
+  .language-menu button.selected
+) {
+  border-color: color-mix(in srgb, #2563eb 24%, var(--control-border)) !important;
+  background: color-mix(in srgb, #2563eb 9%, var(--panel-bg)) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .smooth-select-menu button span:first-child,
+.retail-shell .floating-select-menu button span:first-child {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.retail-shell .smooth-select-check {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 999px;
+  background: transparent;
+}
+
+.retail-shell .smooth-select-menu button.selected .smooth-select-check,
+.retail-shell .floating-select-menu button.selected .smooth-select-check {
+  background: #2563eb !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14) !important;
+}
+
+.retail-shell :is(.category-search, .customer-search-input) input {
+  box-shadow: none !important;
+}
+
+.retail-shell :is(.category-search-menu, .customer-search-menu) input {
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) {
+  width: min(300px, calc(100vw - 28px)) !important;
+  padding: 12px !important;
+  overflow: hidden;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-head strong {
+  color: var(--text) !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) :is(.calendar-weekdays, .calendar-days) {
+  display: grid !important;
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+  gap: 4px !important;
+  text-align: center !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-weekdays span {
+  color: var(--muted) !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-head button {
+  width: 32px !important;
+  min-width: 32px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  display: grid !important;
+  place-items: center !important;
+  border: 1px solid var(--control-border) !important;
+  border-radius: 9px !important;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-days button {
+  min-width: 0 !important;
+  min-height: 32px !important;
+  height: 32px !important;
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  color: var(--text) !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  font-size: 13px !important;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    box-shadow 140ms ease !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-days button.muted {
+  color: color-mix(in srgb, var(--muted) 72%, transparent) !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-days button:hover:not(.selected):not(.in-range) {
+  background: var(--control-hover-bg) !important;
+  color: var(--text) !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-days button.in-range {
+  border-color: transparent !important;
+  background: color-mix(in srgb, #2563eb 12%, var(--panel-bg)) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-days button.in-range:hover:not(.selected) {
+  background: color-mix(in srgb, #2563eb 12%, var(--panel-bg)) !important;
+  color: var(--text) !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-days button.selected,
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-days button.range-start,
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-days button.range-end,
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-days button.selected:hover {
+  border-color: #2563eb !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22) !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-days button.range-start {
+  border-start-end-radius: 8px !important;
+  border-end-end-radius: 8px !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-days button.range-end {
+  border-start-start-radius: 8px !important;
+  border-end-start-radius: 8px !important;
+}
+
+.retail-shell .main-area :is(
+  .filter-card,
+  .filter-bar,
+  .sales-filter-card,
+  .products-filter-card,
+  .godown-filter-bar,
+  .cash-wallet-filters,
+  .metric-detail-filter,
+  .customer-filter,
+  .customer-profile-filter,
+  .supplier-filter-row,
+  .staff-filter,
+  .expenses-filter,
+  .loans-filter-bar
+) {
+  overflow: visible !important;
+}
+
+@keyframes controlMenuIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.975);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 760px) {
+  .retail-shell {
+    --control-height: 42px;
+  }
+
+  .retail-shell .main-area :is(
+    .smooth-select,
+    .date-range-picker,
+    .product-date-range-picker,
+    .sales-date-range-picker,
+    .products-date-filter,
+    .date-filter-shell,
+    .customer-date-filter
+  ) {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) {
+    width: min(300px, calc(100vw - 24px)) !important;
+  }
+}
+
+.retail-shell.retail-shell.retail-shell .date-range-calendar .calendar-days button.selected.selected.selected.selected,
+.retail-shell.retail-shell.retail-shell .date-range-calendar .calendar-days button.range-start.range-start.range-start.range-start,
+.retail-shell.retail-shell.retail-shell .date-range-calendar .calendar-days button.range-end.range-end.range-end.range-end,
+.retail-shell.retail-shell.retail-shell .product-date-calendar .calendar-days button.selected.selected.selected.selected,
+.retail-shell.retail-shell.retail-shell .product-date-calendar .calendar-days button.range-start.range-start.range-start.range-start,
+.retail-shell.retail-shell.retail-shell .product-date-calendar .calendar-days button.range-end.range-end.range-end.range-end,
+.retail-shell.retail-shell.retail-shell .sales-date-calendar .calendar-days button.selected.selected.selected.selected,
+.retail-shell.retail-shell.retail-shell .sales-date-calendar .calendar-days button.range-start.range-start.range-start.range-start,
+.retail-shell.retail-shell.retail-shell .sales-date-calendar .calendar-days button.range-end.range-end.range-end.range-end {
+  border-color: #2563eb !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22) !important;
+}
+/* Print preview action buttons - neutral style */
+.retail-shell .print-preview-top .print-action-bar button,
+.retail-shell .print-preview-top .print-action-bar a,
+.retail-shell .print-preview-top .print-action-bar .primary-btn,
+.retail-shell .print-preview-top .print-action-bar button:last-child {
+  min-width: auto !important;
+  min-height: 32px !important;
+  height: 32px !important;
+  padding: 0 12px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+  font-weight: 700 !important;
+}
+
+.retail-shell .print-preview-top .print-action-bar button:hover,
+.retail-shell .print-preview-top .print-action-bar a:hover {
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.retail-shell .print-preview-top .print-action-bar svg {
+  color: currentColor !important;
+}
+/* Print preview top actions visibility fix */
+.retail-shell .print-preview-top {
+  min-height: 58px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.retail-shell .print-preview-top .print-action-bar {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: nowrap !important;
+}
+
+.retail-shell .print-preview-top .print-action-bar button,
+.retail-shell .print-preview-top .print-action-bar a,
+.retail-shell .print-preview-top .print-action-bar .primary-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+
+  min-width: 82px !important;
+  width: auto !important;
+  height: 34px !important;
+  min-height: 34px !important;
+
+  padding: 0 13px !important;
+  border: 1px solid #dbe3ef !important;
+  border-radius: 8px !important;
+
+  background: #ffffff !important;
+  color: #0f172a !important;
+
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  box-shadow: none !important;
+
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+}
+
+.retail-shell .print-preview-top .print-action-bar button svg,
+.retail-shell .print-preview-top .print-action-bar a svg {
+  width: 15px !important;
+  height: 15px !important;
+  color: #0f172a !important;
+  stroke: #0f172a !important;
+  opacity: 1 !important;
+  display: inline-block !important;
+}
+
+.retail-shell .print-preview-top .print-action-bar button:hover,
+.retail-shell .print-preview-top .print-action-bar a:hover {
+  background: #f6f7f9 !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+.retail-shell .print-preview-top .print-action-bar button,
+.retail-shell .print-preview-top .print-action-bar a {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  min-width: auto !important;
+  width: auto !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 12px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  color: #0f172a !important;
+  box-shadow: none !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+}
+
+.retail-shell .print-preview-top .print-action-label {
+  display: inline-block !important;
+  color: #0f172a !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  white-space: nowrap !important;
+}
+
+.retail-shell .print-preview-top .print-action-bar svg {
+  width: 15px !important;
+  height: 15px !important;
+  color: #0f172a !important;
+  stroke: #0f172a !important;
+}/* FINAL FIX - Print preview header actions */
+.retail-shell .print-preview-top .print-action-bar {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: nowrap !important;
+}
+
+.retail-shell .print-preview-top .print-action-bar button,
+.retail-shell .print-preview-top .print-action-bar a,
+.retail-shell .print-preview-top .print-action-bar .print-top-link,
+.retail-shell .print-preview-top .print-action-bar .print-confirm-btn {
+  min-width: auto !important;
+  width: auto !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 12px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+
+  border: 1px solid #dbe3ef !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+}
+
+.retail-shell .print-preview-top .print-action-bar button:hover,
+.retail-shell .print-preview-top .print-action-bar a:hover {
+  background: #f6f7f9 !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.retail-shell .print-preview-top .print-action-bar svg,
+.retail-shell .print-preview-top .print-action-bar span {
+  color: #0f172a !important;
+  stroke: #0f172a !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}.retail-shell .print-preview-top .print-action-bar {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: nowrap !important;
+}
+
+.retail-shell .print-preview-top .print-top-link {
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 12px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  border: 1px solid #dbe3ef !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+.retail-shell .print-preview-top .print-top-link:hover {
+  background: #f6f7f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .print-preview-top .print-top-link svg,
+.retail-shell .print-preview-top .print-top-link span {
+  color: #0f172a !important;
+  stroke: #0f172a !important;
+}/* Remove container only from WhatsApp and Email */
+.retail-shell .print-preview-top .print-action-bar a.print-top-link {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 6px !important;
+  min-width: auto !important;
+  height: 34px !important;
+  min-height: 34px !important;
+}
+
+.retail-shell .print-preview-top .print-action-bar a.print-top-link:hover {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+/* Normal header action buttons */
+.retail-shell .financial-actions > button,
+.retail-shell .report-actions > button {
+  min-width: 120px !important;
+  height: 42px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+.retail-shell .financial-actions > button:hover,
+.retail-shell .report-actions > button:hover {
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+  transform: none !important;
+}/* Date range calendar normal style */
+
+.retail-shell .date-range-calendar .calendar-days button:hover {
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+}
+
+.retail-shell .date-range-calendar .calendar-days button.muted {
+  color: var(--muted) !important;
+}/* FINAL: Financials & Reports date calendar must be normal */
+.retail-shell.retail-shell.retail-shell.retail-shell
+.main-area .financial-date-range .date-range-calendar .calendar-days button,
+.retail-shell.retail-shell.retail-shell.retail-shell
+.main-area .report-date-range .date-range-calendar .calendar-days button,
+.retail-shell.retail-shell.retail-shell.retail-shell
+.main-area .financial-date-range .date-range-calendar .calendar-days button.selected,
+.retail-shell.retail-shell.retail-shell.retail-shell
+.main-area .report-date-range .date-range-calendar .calendar-days button.selected,
+.retail-shell.retail-shell.retail-shell.retail-shell
+.main-area .financial-date-range .date-range-calendar .calendar-days button.in-range,
+.retail-shell.retail-shell.retail-shell.retail-shell
+.main-area .report-date-range .date-range-calendar .calendar-days button.in-range,
+.retail-shell.retail-shell.retail-shell.retail-shell
+.main-area .financial-date-range .date-range-calendar .calendar-days button.range-start,
+.retail-shell.retail-shell.retail-shell.retail-shell
+.main-area .report-date-range .date-range-calendar .calendar-days button.range-start,
+.retail-shell.retail-shell.retail-shell.retail-shell
+.main-area .financial-date-range .date-range-calendar .calendar-days button.range-end,
+.retail-shell.retail-shell.retail-shell.retail-shell
+.main-area .report-date-range .date-range-calendar .calendar-days button.range-end {
+  background: transparent !important;
+  background-color: transparent !important;
+  color: var(--text) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .financial-date-range .date-range-calendar .calendar-days button:hover,
+.retail-shell .report-date-range .date-range-calendar .calendar-days button:hover {
+  background: var(--panel-soft) !important;
+}
+
+/* Date range highlight */
+.retail-shell .date-range-calendar .calendar-days button.in-range {
+  background: #e8f0ff !important;
+  color: var(--text) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .date-range-calendar .calendar-days button.range-start,
+.retail-shell .date-range-calendar .calendar-days button.range-end,
+.retail-shell .date-range-calendar .calendar-days button.selected {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22) !important;
+}
+
+.retail-shell .date-range-calendar .calendar-days button:hover:not(.selected):not(.range-start):not(.range-end) {
+  background: #eef4ff !important;
 }
