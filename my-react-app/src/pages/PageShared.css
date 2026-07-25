@@ -1950,6 +1950,80 @@
   box-shadow: 0 10px 24px rgba(37, 99, 235, 0.18) !important;
 }
 
+/* RTL metric cards: reserve a fixed icon lane so icons never sit on text/values. */
+#root#root#root .retail-shell[dir="rtl"] .main-area :is(
+  .sales-summary-grid article,
+  .staff-summary-grid article,
+  .staff-profile-summary-grid > article,
+  .supplier-summary-card,
+  .bundle-summary-grid > article,
+  .bundle-detail-summary > article,
+  .summary-grid article,
+  .metric-card,
+  .detail-summary-card,
+  .cash-wallet-card
+) {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+#root#root#root .retail-shell[dir="rtl"] .main-area :is(
+  .sales-summary-grid article,
+  .staff-summary-grid article,
+  .staff-profile-summary-grid > article,
+  .supplier-summary-card,
+  .bundle-summary-grid > article,
+  .bundle-detail-summary > article
+) {
+  padding-inline: 72px 20px !important;
+}
+
+#root#root#root .retail-shell[dir="rtl"] .main-area :is(
+  .bundle-summary-grid > article
+) {
+  padding-inline: 54px 16px !important;
+}
+
+#root#root#root .retail-shell[dir="rtl"] .main-area :is(
+  .sales-summary-grid article > svg,
+  .staff-summary-grid article > svg,
+  .staff-profile-summary-grid > article > svg,
+  .supplier-summary-card > svg,
+  .bundle-summary-grid > article > svg,
+  .bundle-detail-summary > article > svg
+) {
+  inset-inline-start: auto !important;
+  inset-inline-end: 22px !important;
+  left: auto !important;
+  right: auto !important;
+  transform: translateY(-50%) !important;
+}
+
+#root#root#root .retail-shell[dir="rtl"] .main-area :is(
+  .bundle-summary-grid > article > svg
+) {
+  inset-inline-end: 15px !important;
+}
+
+#root#root#root .retail-shell[dir="rtl"] .main-area :is(
+  .sales-summary-grid article span,
+  .sales-summary-grid article strong,
+  .staff-summary-grid article span,
+  .staff-summary-grid article strong,
+  .staff-profile-summary-grid > article > span,
+  .staff-profile-summary-grid > article > strong,
+  .supplier-summary-card span,
+  .supplier-summary-card strong,
+  .supplier-summary-card small,
+  .bundle-summary-grid > article > span,
+  .bundle-summary-grid > article > strong,
+  .bundle-detail-summary > article > span,
+  .bundle-detail-summary > article > strong
+) {
+  max-width: 100%;
+  text-align: right !important;
+}
+
 .retail-shell {
   --control-height: 42px;
   --control-radius: 10px;

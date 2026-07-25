@@ -617,6 +617,7 @@ function App() {
     if (module === 'customers') setCustomers((current) => current.filter((customer) => customer.id !== item.id))
     if (module === 'expenses') setExpenses((current) => current.filter((expense) => expense.id !== item.id))
     if (module === 'staffMembers') setStaffMembers((current) => current.filter((staff) => staff.id !== item.id))
+    if (module === 'bundles') setBundles((current) => current.filter((bundle) => bundle.id !== item.id))
     showToast(t.movedToRecycle)
   }
 
@@ -635,6 +636,7 @@ function App() {
     if (item.module === 'customers') setCustomers((current) => current.some((customer) => customer.id === item.id) ? current : [...current, item.data])
     if (item.module === 'expenses') setExpenses((current) => current.some((expense) => expense.id === item.id) ? current : [...current, item.data])
     if (item.module === 'staffMembers') setStaffMembers((current) => current.some((staff) => staff.id === item.id) ? current : [...current, item.data])
+    if (item.module === 'bundles') setBundles((current) => current.some((bundle) => bundle.id === item.id) ? current : [...current, item.data])
     setDeletedItems((current) => current.filter((deleted) => deleted.recycleId !== item.recycleId))
     showToast(t.restoredSuccessfully)
   }
@@ -712,11 +714,11 @@ function App() {
 ) : page === 'helpCenter' ? (
   <HelpCenter t={t} onNavigate={navigate} />
 ) : page === 'about' ? (
-  <About companyInfo={companyInfo} />
+  <About companyInfo={companyInfo} t={t} />
 ) : page === 'faq' ? (
-  <FAQ />
+  <FAQ t={t} />
 ) : page === 'workflows' ? (
-  <Workflows />
+  <Workflows t={t} />
 ) : page === 'settings' ? (
   
             <SettingsPage
@@ -772,6 +774,7 @@ function App() {
               bundles={bundles}
               companyInfo={companyInfo}
               onBundlesChange={setBundles}
+              onMoveToRecycle={moveToRecycle}
               onSuppliersChange={setSuppliers}
               printSettings={printSettings}
               suppliers={suppliers}

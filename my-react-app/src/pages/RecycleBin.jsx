@@ -13,6 +13,9 @@ function RecycleBinPage({ deletedItems, onEmptyBin, onPermanentDelete, onRestore
     { value: 'products', label: t.products },
     { value: 'suppliers', label: t.suppliers },
     { value: 'customers', label: t.customers },
+    { value: 'expenses', label: t.expenses },
+    { value: 'staffMembers', label: t.staffMembers ?? t.staff },
+    { value: 'bundles', label: t.bundlesManagement ?? 'Bundles' },
   ]
 
   return (
@@ -41,7 +44,13 @@ function RecycleBinPage({ deletedItems, onEmptyBin, onPermanentDelete, onRestore
             ) : filteredItems.map((item) => (
               <tr key={item.recycleId}>
                 <td>{item.name}</td>
-                <td>{t[item.module] ?? item.module}</td>
+                <td>{
+                  item.module === 'bundles'
+                    ? (t.bundlesManagement ?? 'Bundles')
+                    : item.module === 'staffMembers'
+                      ? (t.staffMembers ?? t.staff)
+                      : (t[item.module] ?? item.module)
+                }</td>
                 <td>{new Date(item.deletedAt).toLocaleDateString()}</td>
                 <td>{item.daysLeft ?? 30}</td>
                 <td>
