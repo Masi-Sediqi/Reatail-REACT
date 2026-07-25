@@ -20,7 +20,7 @@ const aboutContent = {
     bio: 'Specialized in building dynamic, optimized business management systems. Turns ideas into reality for local and medium businesses using modern cloud computing and web technologies.',
     partnership: 'Partnership',
     partnerText: 'Technology development company specializing in software, websites, and application building.',
-    rights: '© 2026 NEXORA. All rights reserved.',
+    rights: '© 2026 AFHAN POWER. All rights reserved.',
     features: [
       { icon: Archive, title: 'Offline-First', text: 'All data stored locally in IndexedDB - works without internet' },
       { icon: Globe2, title: 'Multi-Language', text: 'English, Dari, and Pashto with full RTL support' },
