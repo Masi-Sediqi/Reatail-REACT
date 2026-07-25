@@ -388,8 +388,6 @@ function SearchModal({ initialQuery = '', onClose, onNavigate, searchData = {}, 
           <Search size={18} />
           <input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t.searchEverythingPlaceholder} />
         </div>
-<<<<<<< HEAD
-
         {!searchTerm ? (
           <div className="search-suggestion-grid">
             {sections.slice(0, 8).map((section) => (
@@ -416,29 +414,6 @@ function SearchModal({ initialQuery = '', onClose, onNavigate, searchData = {}, 
             <span>{t.searchEverythingPlaceholder}</span>
           </div>
         )}
-=======
-        <div className="search-suggestion-grid">
-          <button type="button">
-            <span>{t.products}</span>
-            <small>{t.searchProductsHint ?? 'Search inventory items'}</small>
-          </button>
-
-          <button type="button">
-            <span>{t.customers}</span>
-            <small>{t.searchCustomersHint ?? 'Find customer records'}</small>
-          </button>
-
-          <button type="button">
-            <span>{t.suppliers}</span>
-            <small>{t.searchSuppliersHint ?? 'Browse suppliers'}</small>
-          </button>
-
-          <button type="button">
-            <span>{t.salesBills}</span>
-            <small>{t.searchSalesHint ?? 'Search invoices and bills'}</small>
-          </button>
-        </div>
->>>>>>> eb655fb288c673f5fa37162cf04a74f71b72a14f
       </div>
     </HeaderModalFrame>
   )
@@ -1137,21 +1112,12 @@ function Header({
               ...current,
             ])
 
-<<<<<<< HEAD
-      setWalletOpen(false)
-    }}
-    t={t}
-  />
-)}
-      {searchOpen && <SearchModal initialQuery={headerSearchQuery} onClose={() => setSearchOpen(false)} onNavigate={onNavigate} searchData={searchData} t={t} />}
-=======
             setWalletOpen(false)
           }}
           t={t}
         />
       )}
-      {searchOpen && <SearchModal onClose={() => setSearchOpen(false)} t={t} />}
->>>>>>> eb655fb288c673f5fa37162cf04a74f71b72a14f
+      {searchOpen && <SearchModal initialQuery={headerSearchQuery} onClose={() => setSearchOpen(false)} onNavigate={onNavigate} searchData={searchData} t={t} />}
     </header>
   )
 }
