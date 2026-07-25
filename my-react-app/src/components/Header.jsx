@@ -50,14 +50,14 @@ function HeaderModalFrame({
         onClick={(event) => event.stopPropagation()}
       >
         <button
-  className="modal-close header-modal-close"
-  type="button"
-  aria-label="Close modal"
-  title="Close"
-  onClick={onClose}
->
-  <X size={16} />
-</button>
+          className="modal-close header-modal-close"
+          type="button"
+          aria-label="Close modal"
+          title="Close"
+          onClick={onClose}
+        >
+          <X size={16} />
+        </button>
 
         <header className="header-shared-modal-head">
           <span className="header-shared-modal-icon">
@@ -112,15 +112,15 @@ function WalletModal({ onClose, onSave, t }) {
 
   return (
     <HeaderModalFrame
-  className="cash-wallet-header-modal"
-  icon={<WalletCards size={19} />}
-  onClose={onClose}
-  subtitle={
-    t.cashWalletHint ??
-    'Track owner cash deposits and withdrawals.'
-  }
-  title={t.cashWallet ?? 'Cash Wallet'}
->
+      className="cash-wallet-header-modal"
+      icon={<WalletCards size={19} />}
+      onClose={onClose}
+      subtitle={
+        t.cashWalletHint ??
+        'Track owner cash deposits and withdrawals.'
+      }
+      title={t.cashWallet ?? 'Cash Wallet'}
+    >
       <form
         className={`wallet-modal-body wallet-mode-${mode}`}
         onSubmit={(event) => {
@@ -134,9 +134,8 @@ function WalletModal({ onClose, onSave, t }) {
           aria-label={t.cashWallet ?? 'Cash Wallet'}
         >
           <button
-            className={`deposit-mode ${
-              mode === 'deposit' ? 'active' : ''
-            }`}
+            className={`deposit-mode ${mode === 'deposit' ? 'active' : ''
+              }`}
             type="button"
             role="tab"
             aria-selected={mode === 'deposit'}
@@ -147,9 +146,8 @@ function WalletModal({ onClose, onSave, t }) {
           </button>
 
           <button
-            className={`withdraw-mode ${
-              mode === 'withdraw' ? 'active' : ''
-            }`}
+            className={`withdraw-mode ${mode === 'withdraw' ? 'active' : ''
+              }`}
             type="button"
             role="tab"
             aria-selected={mode === 'withdraw'}
@@ -242,26 +240,26 @@ function SearchModal({ onClose, t }) {
           <input autoFocus placeholder={t.searchEverythingPlaceholder} />
         </div>
         <div className="search-suggestion-grid">
-  <button type="button">
-    <span>{t.products}</span>
-    <small>{t.searchProductsHint ?? 'Search inventory items'}</small>
-  </button>
+          <button type="button">
+            <span>{t.products}</span>
+            <small>{t.searchProductsHint ?? 'Search inventory items'}</small>
+          </button>
 
-  <button type="button">
-    <span>{t.customers}</span>
-    <small>{t.searchCustomersHint ?? 'Find customer records'}</small>
-  </button>
+          <button type="button">
+            <span>{t.customers}</span>
+            <small>{t.searchCustomersHint ?? 'Find customer records'}</small>
+          </button>
 
-  <button type="button">
-    <span>{t.suppliers}</span>
-    <small>{t.searchSuppliersHint ?? 'Browse suppliers'}</small>
-  </button>
+          <button type="button">
+            <span>{t.suppliers}</span>
+            <small>{t.searchSuppliersHint ?? 'Browse suppliers'}</small>
+          </button>
 
-  <button type="button">
-    <span>{t.salesBills}</span>
-    <small>{t.searchSalesHint ?? 'Search invoices and bills'}</small>
-  </button>
-</div>
+          <button type="button">
+            <span>{t.salesBills}</span>
+            <small>{t.searchSalesHint ?? 'Search invoices and bills'}</small>
+          </button>
+        </div>
       </div>
     </HeaderModalFrame>
   )
@@ -341,9 +339,8 @@ function NotificationPanel({
           <div className="notification-list">
             {notifications.map((item) => (
               <article
-                className={`notification-item ${
-                  item.tone ?? 'warning'
-                }`}
+                className={`notification-item ${item.tone ?? 'warning'
+                  }`}
                 key={item.id}
               >
                 <span className="notification-symbol">
@@ -401,6 +398,7 @@ function Header({
   onCashWalletChange,
   onExchangeCurrencyChange,
   onLanguageChange,
+  onLockScreen,
   onMissingCurrencyRate,
   onNavigate,
   onNotificationsChange,
@@ -441,19 +439,22 @@ function Header({
   }
 
   const deleteNotification = (notificationId) => {
-  onNotificationsChange?.((current) =>
-    current.filter((item) => item.id !== notificationId),
-  )
-}
+    onNotificationsChange?.((current) =>
+      current.filter((item) => item.id !== notificationId),
+    )
+  }
 
-const clearNotifications = () => {
-  onNotificationsChange?.([])
-}
+  const clearNotifications = () => {
+    onNotificationsChange?.([])
+  }
 
   const languageMenuStyle = menuPosition(languageButtonRef.current, 192)
-  const accountMenuStyle = menuPosition(accountButtonRef.current, 224)
-  const businessCurrencyMenuStyle = menuPosition(businessCurrencyButtonRef.current, 236)
-  const exchangeCurrencyMenuStyle = menuPosition(exchangeCurrencyButtonRef.current, 236)
+  const accountMenuStyle = menuPosition(accountButtonRef.current, 192)
+  const businessCurrencyMenuStyle =
+    menuPosition(businessCurrencyButtonRef.current, 192)
+
+  const exchangeCurrencyMenuStyle =
+    menuPosition(exchangeCurrencyButtonRef.current, 192)
 
   const closeMenus = () => {
     setAccountOpen(false)
@@ -463,31 +464,73 @@ const clearNotifications = () => {
     setNotificationsOpen(false)
   }
 
-useEffect(() => {
-  if (!accountOpen && !businessCurrencyOpen && !exchangeCurrencyOpen && !languageOpen && !notificationsOpen) {
-    return undefined
-  }
+  useEffect(() => {
+    const anyMenuOpen =
+      accountOpen ||
+      businessCurrencyOpen ||
+      exchangeCurrencyOpen ||
+      languageOpen ||
+      notificationsOpen
 
-  const closeOnOutside = (event) => {
-    const clickedInsideHeaderMenu = event.target.closest(
-  '.language-tool-wrap, .header-language-menu, .account-wrap, .account-menu, .notifications-panel, .business-currency-wrap, .exchange-currency-wrap, .header-currency-menu',
-)
+    if (!anyMenuOpen) return undefined
 
-    if (!clickedInsideHeaderMenu) {
+    const closeOnOutside = (event) => {
+      const target = event.target
+
+      if (!(target instanceof Element)) return
+
+      const clickedInsideHeaderMenu = target.closest(
+        [
+          '.language-tool-wrap',
+          '.header-language-menu',
+          '.account-wrap',
+          '.account-menu',
+          '.notifications-panel',
+          '.business-currency-wrap',
+          '.exchange-currency-wrap',
+          '.header-currency-menu',
+        ].join(', '),
+      )
+
+      if (!clickedInsideHeaderMenu) {
+        closeMenus()
+      }
+    }
+
+    const closeOnPageScroll = (event) => {
+      const target = event.target
+
+      // اجازه اسکرول داخل Dropdownهای Currency
+      if (
+        target instanceof Element &&
+        target.closest(
+          '.header-currency-menu, .header-currency-simple-options, .header-language-menu, .notifications-panel',
+        )
+      ) {
+        return
+      }
+
       closeMenus()
     }
-  }
 
-  document.addEventListener('pointerdown', closeOnOutside)
-  window.addEventListener('resize', closeMenus)
-  window.addEventListener('scroll', closeMenus, true)
+    document.addEventListener('pointerdown', closeOnOutside)
+    window.addEventListener('resize', closeMenus)
 
-  return () => {
-    document.removeEventListener('pointerdown', closeOnOutside)
-    window.removeEventListener('resize', closeMenus)
-    window.removeEventListener('scroll', closeMenus, true)
-  }
-}, [accountOpen, businessCurrencyOpen, exchangeCurrencyOpen, languageOpen, notificationsOpen])
+    // capture=true باقی می‌ماند، ولی اسکرول داخل Dropdown نادیده گرفته می‌شود
+    window.addEventListener('scroll', closeOnPageScroll, true)
+
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutside)
+      window.removeEventListener('resize', closeMenus)
+      window.removeEventListener('scroll', closeOnPageScroll, true)
+    }
+  }, [
+    accountOpen,
+    businessCurrencyOpen,
+    exchangeCurrencyOpen,
+    languageOpen,
+    notificationsOpen,
+  ])
 
   const selectedBusinessCurrency = getCurrencyMeta(businessCurrencyFilter)
   const selectedExchangeCurrency = getCurrencyMeta(exchangeCurrency)
@@ -517,49 +560,74 @@ useEffect(() => {
     onSelect,
     selectedValue,
     title,
-  }) => createPortal(
-    <div
-      className="header-currency-menu"
-      role="menu"
-      aria-label={title}
-      style={menuStyle}
-      onPointerDown={(event) => event.stopPropagation()}
-    >
-      <div className="header-currency-title">{title}</div>
-
-      <button
-        className={`header-currency-option ${selectedValue === firstValue ? 'is-selected' : ''}`}
-        type="button"
-        role="menuitemradio"
-        aria-checked={selectedValue === firstValue}
-        onClick={() => onSelect(firstValue)}
+  }) =>
+    createPortal(
+      <div
+        className="header-language-menu header-currency-menu header-currency-simple-menu"
+        role="menu"
+        aria-label={title}
+        style={menuStyle}
+        onPointerDown={(event) => event.stopPropagation()}
       >
-        <span>{firstLabel}</span>
-        <span className="header-currency-check">{selectedValue === firstValue ? '✓' : ''}</span>
-      </button>
+        <div className="header-language-title">
+          {title}
+        </div>
 
-      <div className="header-currency-list">
-        {currencies.map((currency) => {
-          const isSelected = selectedValue === currency.code
+        <div className="header-language-options header-currency-simple-options">
+          <button
+            className={`header-language-option header-currency-option ${selectedValue === firstValue ? 'is-selected' : ''
+              }`}
+            type="button"
+            role="menuitemradio"
+            aria-checked={selectedValue === firstValue}
+            onClick={(event) => {
+              event.stopPropagation()
+              onSelect(firstValue)
+            }}
+          >
+            <span>{firstLabel}</span>
 
-          return (
-            <button
-              className={`header-currency-option ${isSelected ? 'is-selected' : ''}`}
-              type="button"
-              key={currency.code}
-              role="menuitemradio"
-              aria-checked={isSelected}
-              onClick={() => onSelect(currency.code)}
+            <span
+              className="header-language-check header-currency-check"
+              aria-hidden="true"
             >
-              <span>{currency.symbol} {currency.name}</span>
-              <span className="header-currency-check">{isSelected ? '✓' : ''}</span>
-            </button>
-          )
-        })}
-      </div>
-    </div>,
-    portalRoot,
-  )
+              {selectedValue === firstValue ? '✓' : ''}
+            </span>
+          </button>
+
+          {currencies.map((currency) => {
+            const isSelected = selectedValue === currency.code
+
+            return (
+              <button
+                className={`header-language-option header-currency-option ${isSelected ? 'is-selected' : ''
+                  }`}
+                type="button"
+                key={currency.code}
+                role="menuitemradio"
+                aria-checked={isSelected}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  onSelect(currency.code)
+                }}
+              >
+                <span>
+                  {currency.code} - {currency.name}
+                </span>
+
+                <span
+                  className="header-language-check header-currency-check"
+                  aria-hidden="true"
+                >
+                  {isSelected ? '✓' : ''}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      </div>,
+      portalRoot,
+    )
 
   return (
     <header className="app-header">
@@ -568,225 +636,232 @@ useEffect(() => {
       </button>
 
       <div className="header-tools">
-      {headerActions.map((action) => {
-  const isLanguage =
-    action.key === 'language' ||
-    action.action === 'language'
+        {headerActions.map((action) => {
+          const isLanguage =
+            action.key === 'language' ||
+            action.action === 'language'
 
-  const isTheme =
-    action.key === 'theme' ||
-    action.action === 'theme'
-  const isBusinessCurrency = action.key === 'filter'
-  const isExchangeCurrency = action.key === 'sync'
+          const isTheme =
+            action.key === 'theme' ||
+            action.action === 'theme'
+          const isBusinessCurrency = action.key === 'filter'
+          const isExchangeCurrency = action.key === 'sync'
 
-  const ActionIcon = isTheme
-  ? isDarkMode
-    ? Moon
-    : Sun
-  : action.icon
+          const ActionIcon = isTheme
+            ? isDarkMode
+              ? Moon
+              : Sun
+            : action.icon
 
-  return (
-    <div
-  className={[
-    'tool-wrap',
-    `header-tool-${action.key}`,
-    isLanguage ? 'language-tool-wrap' : '',
-    isBusinessCurrency ? 'business-currency-wrap' : '',
-    isExchangeCurrency ? 'exchange-currency-wrap' : '',
-  ]
-    .filter(Boolean)
-    .join(' ')}
-  key={action.key}
->
-      <button
-        ref={isLanguage ? languageButtonRef : isBusinessCurrency ? businessCurrencyButtonRef : isExchangeCurrency ? exchangeCurrencyButtonRef : undefined}
-        className={[
-  'icon-btn',
-  action.key === 'notifications' ? 'notification-trigger' : '',
-  isLanguage && languageOpen ? 'active' : '',
-  isBusinessCurrency && businessCurrencyOpen ? 'active' : '',
-  isExchangeCurrency && exchangeCurrencyOpen ? 'active' : '',
-  isTheme ? 'theme-toggle-btn' : '',
-]
-  .filter(Boolean)
-  .join(' ')}
-        type="button"
-        title={
-  isTheme
-    ? isDarkMode
-      ? (t.lightMode ?? 'Light mode')
-      : (t.darkMode ?? 'Dark mode')
-    : (t[action.key] ?? action.key)
-}
-        aria-label={
-  isTheme
-    ? isDarkMode
-      ? (t.lightMode ?? 'Light mode')
-      : (t.darkMode ?? 'Dark mode')
-    : (t[action.key] ?? action.key)
-}
-        aria-expanded={isLanguage ? languageOpen : isBusinessCurrency ? businessCurrencyOpen : isExchangeCurrency ? exchangeCurrencyOpen : undefined}
-        aria-haspopup={isLanguage || isBusinessCurrency || isExchangeCurrency ? 'menu' : undefined}
-        onClick={(event) => {
-          event.stopPropagation()
-
-          if (isTheme) {
-            onThemeToggle()
-            closeMenus()
-            return
-          }
-
-          if (isBusinessCurrency) {
-            setBusinessCurrencyOpen((current) => !current)
-            setExchangeCurrencyOpen(false)
-            setLanguageOpen(false)
-            setNotificationsOpen(false)
-            setAccountOpen(false)
-            return
-          }
-
-          if (isExchangeCurrency) {
-            setExchangeCurrencyOpen((current) => !current)
-            setBusinessCurrencyOpen(false)
-            setLanguageOpen(false)
-            setNotificationsOpen(false)
-            setAccountOpen(false)
-            return
-          }
-
-          if (action.key === 'wallet') {
-            setWalletOpen(true)
-            closeMenus()
-            return
-          }
-
-          if (action.key === 'notifications') {
-            setNotificationsOpen((current) => !current)
-            setBusinessCurrencyOpen(false)
-            setExchangeCurrencyOpen(false)
-            setLanguageOpen(false)
-            setAccountOpen(false)
-            return
-          }
-
-          if (isLanguage) {
-            setLanguageOpen((current) => !current)
-            setBusinessCurrencyOpen(false)
-            setExchangeCurrencyOpen(false)
-            setNotificationsOpen(false)
-            setAccountOpen(false)
-          }
-        }}
-      >
-        <ActionIcon size={20} />
-
-        {isBusinessCurrency && (
-          <span className="pill-mini business-currency-pill">
-            {businessCurrencyFilter === 'all' ? 'ALL' : selectedBusinessCurrency.code}
-          </span>
-        )}
-
-        {isExchangeCurrency && exchangeCurrency !== 'original' && (
-          <span className="pill-mini exchange-currency-pill">
-            {selectedExchangeCurrency.code}
-          </span>
-        )}
-
-        {action.key === 'notifications' && notifications.length > 0 && (
-  <span className="notification-badge">
-    {notifications.length > 99 ? '99+' : notifications.length}
-  </span>
-)}
-      </button>
-
-     {isBusinessCurrency && businessCurrencyOpen && renderCurrencyMenu({
-       firstLabel: 'All — All Currencies',
-       firstValue: 'all',
-       menuStyle: businessCurrencyMenuStyle,
-       onSelect: chooseBusinessCurrency,
-       selectedValue: businessCurrencyFilter,
-       title: 'Business Currency Filter',
-     })}
-
-     {isExchangeCurrency && exchangeCurrencyOpen && renderCurrencyMenu({
-       firstLabel: 'Original (No Conversion)',
-       firstValue: 'original',
-       menuStyle: exchangeCurrencyMenuStyle,
-       onSelect: chooseExchangeCurrency,
-       selectedValue: exchangeCurrency,
-       title: 'Exchange Currency',
-     })}
-
-     {isLanguage && languageOpen && (
-  createPortal(
-  <div
-    className="header-language-menu"
-    role="menu"
-    aria-label={t.language ?? 'Language'}
-    style={languageMenuStyle}
-    onPointerDown={(event) => event.stopPropagation()}
-  >
-    <div className="header-language-title">
-      {t.language ?? 'Language'}
-    </div>
-
-    <div className="header-language-options">
-      {languages.map((item) => {
-        const isSelected = language === item.code
-
-        return (
-          <button
-            className={`header-language-option ${
-              isSelected ? 'is-selected' : ''
-            }`}
-            type="button"
-            key={item.code}
-            role="menuitemradio"
-            aria-checked={isSelected}
-            onClick={(event) => {
-              event.stopPropagation()
-              onLanguageChange(item.code)
-              setLanguageOpen(false)
-            }}
-          >
-            <span>{item.label}</span>
-
-            <span
-              className="header-language-check"
-              aria-hidden="true"
+          return (
+            <div
+              className={[
+                'tool-wrap',
+                `header-tool-${action.key}`,
+                isLanguage ? 'language-tool-wrap' : '',
+                isBusinessCurrency ? 'business-currency-wrap' : '',
+                isExchangeCurrency ? 'exchange-currency-wrap' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+              key={action.key}
             >
-              {isSelected ? '✓' : ''}
-            </span>
-          </button>
-        )
-      })}
-    </div>
-  </div>
-  , portalRoot)
-)}
+              <button
+                ref={isLanguage ? languageButtonRef : isBusinessCurrency ? businessCurrencyButtonRef : isExchangeCurrency ? exchangeCurrencyButtonRef : undefined}
+                className={[
+                  'icon-btn',
+                  action.key === 'notifications' ? 'notification-trigger' : '',
+                  isLanguage && languageOpen ? 'active' : '',
+                  isBusinessCurrency && businessCurrencyOpen ? 'active' : '',
+                  isExchangeCurrency && exchangeCurrencyOpen ? 'active' : '',
+                  isTheme ? 'theme-toggle-btn' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                type="button"
+                title={
+                  isTheme
+                    ? isDarkMode
+                      ? (t.lightMode ?? 'Light mode')
+                      : (t.darkMode ?? 'Dark mode')
+                    : (t[action.key] ?? action.key)
+                }
+                aria-label={
+                  isTheme
+                    ? isDarkMode
+                      ? (t.lightMode ?? 'Light mode')
+                      : (t.darkMode ?? 'Dark mode')
+                    : (t[action.key] ?? action.key)
+                }
+                aria-expanded={isLanguage ? languageOpen : isBusinessCurrency ? businessCurrencyOpen : isExchangeCurrency ? exchangeCurrencyOpen : undefined}
+                aria-haspopup={isLanguage || isBusinessCurrency || isExchangeCurrency ? 'menu' : undefined}
+                onClick={(event) => {
+                  event.stopPropagation()
 
-      {action.key === 'notifications' &&
-  notificationsOpen && (
-    <NotificationPanel
-      notifications={notifications}
-      onDelete={deleteNotification}
-      onClear={clearNotifications}
-      t={t}
-    />
-  )}
-    </div>
-  )
-})}
+                  if (isTheme) {
+                    onThemeToggle()
+                    closeMenus()
+                    return
+                  }
+
+                  if (isBusinessCurrency) {
+                    setBusinessCurrencyOpen((current) => !current)
+                    setExchangeCurrencyOpen(false)
+                    setLanguageOpen(false)
+                    setNotificationsOpen(false)
+                    setAccountOpen(false)
+                    return
+                  }
+
+                  if (isExchangeCurrency) {
+                    setExchangeCurrencyOpen((current) => !current)
+                    setBusinessCurrencyOpen(false)
+                    setLanguageOpen(false)
+                    setNotificationsOpen(false)
+                    setAccountOpen(false)
+                    return
+                  }
+
+                  if (action.key === 'wallet') {
+                    setWalletOpen(true)
+                    closeMenus()
+                    return
+                  }
+
+                  if (action.key === 'notifications') {
+                    setNotificationsOpen((current) => !current)
+                    setBusinessCurrencyOpen(false)
+                    setExchangeCurrencyOpen(false)
+                    setLanguageOpen(false)
+                    setAccountOpen(false)
+                    return
+                  }
+
+                  if (isLanguage) {
+                    setLanguageOpen((current) => !current)
+                    setBusinessCurrencyOpen(false)
+                    setExchangeCurrencyOpen(false)
+                    setNotificationsOpen(false)
+                    setAccountOpen(false)
+                  }
+                }}
+              >
+                <ActionIcon size={20} />
+
+                {isBusinessCurrency && (
+                  <span className="pill-mini business-currency-pill">
+                    {businessCurrencyFilter === 'all' ? 'ALL' : selectedBusinessCurrency.code}
+                  </span>
+                )}
+
+                {isExchangeCurrency && exchangeCurrency !== 'original' && (
+                  <span className="pill-mini exchange-currency-pill">
+                    {selectedExchangeCurrency.code}
+                  </span>
+                )}
+
+                {action.key === 'notifications' && notifications.length > 0 && (
+                  <span className="notification-badge">
+                    {notifications.length > 99 ? '99+' : notifications.length}
+                  </span>
+                )}
+              </button>
+
+              {businessCurrencyOpen &&
+                renderCurrencyMenu({
+                  firstLabel: t.allCurrencies ?? 'All currencies',
+                  firstValue: 'all',
+                  menuStyle: businessCurrencyMenuStyle,
+                  onSelect: chooseBusinessCurrency,
+                  selectedValue: businessCurrencyFilter,
+                  title: t.businessCurrencyFilter ?? 'Business Currency Filter',
+                  type: 'business',
+                })}
+
+              {exchangeCurrencyOpen &&
+                renderCurrencyMenu({
+                  firstLabel: t.originalCurrency ?? 'Original currency',
+                  firstValue: 'original',
+                  menuStyle: exchangeCurrencyMenuStyle,
+                  onSelect: chooseExchangeCurrency,
+                  selectedValue: exchangeCurrency,
+                  title: t.exchangeCurrency ?? 'Exchange Currency',
+                  type: 'exchange',
+                })}
+
+              {isLanguage && languageOpen && (
+                createPortal(
+                  <div
+                    className="header-language-menu"
+                    role="menu"
+                    aria-label={t.language ?? 'Language'}
+                    style={languageMenuStyle}
+                    onPointerDown={(event) => event.stopPropagation()}
+                  >
+                    <div className="header-language-title">
+                      {t.language ?? 'Language'}
+                    </div>
+
+                    <div className="header-language-options">
+                      {languages.map((item) => {
+                        const isSelected = language === item.code
+
+                        return (
+                          <button
+                            className={`header-language-option ${isSelected ? 'is-selected' : ''
+                              }`}
+                            type="button"
+                            key={item.code}
+                            role="menuitemradio"
+                            aria-checked={isSelected}
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              onLanguageChange(item.code)
+                              setLanguageOpen(false)
+                            }}
+                          >
+                            <span>{item.label}</span>
+
+                            <span
+                              className="header-language-check"
+                              aria-hidden="true"
+                            >
+                              {isSelected ? '✓' : ''}
+                            </span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                  , portalRoot)
+              )}
+
+              {action.key === 'notifications' &&
+                notificationsOpen && (
+                  <NotificationPanel
+                    notifications={notifications}
+                    onDelete={deleteNotification}
+                    onClear={clearNotifications}
+                    t={t}
+                  />
+                )}
+            </div>
+          )
+        })}
 
         <div className="account-wrap">
           <button
             ref={accountButtonRef}
-            className="avatar-btn"
+            className={`avatar-btn ${accountOpen ? 'active' : ''}`}
             type="button"
-            aria-label={t.myAccount}
+            aria-label={t.myAccount ?? 'My Account'}
+            aria-haspopup="menu"
+            aria-expanded={accountOpen}
             onClick={(event) => {
+              event.preventDefault()
               event.stopPropagation()
-              setAccountOpen((open) => !open)
+
+              setAccountOpen((current) => !current)
               setBusinessCurrencyOpen(false)
               setExchangeCurrencyOpen(false)
               setLanguageOpen(false)
@@ -796,63 +871,87 @@ useEffect(() => {
             A
           </button>
 
-          {accountOpen && (
+          {accountOpen &&
             createPortal(
-            <div
-              className="dropdown-menu account-menu"
-              style={accountMenuStyle}
-              onPointerDown={(event) => event.stopPropagation()}
-            >
-              <strong>{t.myAccount}</strong>
-              {accountMenuItems.map((item) => {
-                const ItemIcon = item.icon
+              <div
+                className="header-language-menu account-language-menu"
+                role="menu"
+                aria-label={t.myAccount ?? 'My Account'}
+                style={accountMenuStyle}
+                onClick={(event) => event.stopPropagation()}
+                onPointerDown={(event) => event.stopPropagation()}
+              >
+                <div className="header-language-title">
+                  {t.myAccount ?? 'My Account'}
+                </div>
 
-                return (
-                  <button
-                    className={`${item.divided ? 'divided' : ''} ${item.danger ? 'danger' : ''}`}
-                    type="button"
-                    key={item.key}
-                    onClick={() => {
-                      if (item.page) {
-                        onNavigate(item.page)
-                      }
-                      closeMenus()
-                    }}
-                  >
-                    <ItemIcon size={18} />
-                    <span>{t[item.key]}</span>
-                  </button>
-                )
-              })}
-            </div>
-            , portalRoot)
-          )}
+                <div className="header-language-options">
+                  {accountMenuItems
+                    .filter((item) => item.key !== 'exportBackup' && item.key !== 'importBackup')
+                    .map((item) => {
+
+                    return (
+                      <button
+                        key={item.key}
+                        className={`header-language-option account-language-option ${item.danger ? 'account-lock-option' : ''
+                          }`}
+                        type="button"
+                        role="menuitem"
+                        onClick={(event) => {
+                          event.stopPropagation()
+
+                          if (item.page) {
+                            onNavigate?.(item.page)
+                          }
+
+                          if (item.key === 'lockScreen') {
+                            onLockScreen?.()
+                          }
+
+                          closeMenus()
+                        }}
+                      >
+                          <span>
+                            {t[item.key] ?? item.label ?? item.key}
+                          </span>
+
+                        <span
+                          className="header-language-check"
+                          aria-hidden="true"
+                        />
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>,
+              portalRoot,
+            )}
         </div>
       </div>
       <span className="theme-state" aria-hidden="true">
         {theme === 'dark' ? 'dark' : 'light'}
       </span>
       {walletOpen && (
-  <WalletModal
-    onClose={() => setWalletOpen(false)}
-    onSave={(entry) => {
-      onCashWalletChange(
-        (current) => Number(current || 0) + entry.delta,
-      )
+        <WalletModal
+          onClose={() => setWalletOpen(false)}
+          onSave={(entry) => {
+            onCashWalletChange(
+              (current) => Number(current || 0) + entry.delta,
+            )
 
-      onWalletEntriesChange?.((current) => [
-        {
-          ...entry,
-          createdAt: new Date().toISOString(),
-        },
-        ...current,
-      ])
+            onWalletEntriesChange?.((current) => [
+              {
+                ...entry,
+                createdAt: new Date().toISOString(),
+              },
+              ...current,
+            ])
 
-      setWalletOpen(false)
-    }}
-    t={t}
-  />
-)}
+            setWalletOpen(false)
+          }}
+          t={t}
+        />
+      )}
       {searchOpen && <SearchModal onClose={() => setSearchOpen(false)} t={t} />}
     </header>
   )

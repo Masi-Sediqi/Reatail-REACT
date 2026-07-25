@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import CustomSelect from '../components/CustomSelect.jsx'
-import { Archive, Bell, Box, Download, Factory, Mail, Play, Plus, Printer, Shuffle, Trash2, Truck, Upload, UserPlus, Users, Volume2, WalletCards, X } from '../components/Icons.jsx'
+import { Archive, Bell, Box, Download, Eye, Factory, Lock, Mail, Play, Plus, Printer, Shield, Shuffle, Trash2, Truck, Upload, UserPlus, Users, Volume2, WalletCards, X } from '../components/Icons.jsx'
 import { colorThemes, currencies, printTemplates, profileIcons, settingsTabs, sidebarItems } from '../data/dashboardData.js'
 import { playNotificationSound, soundOptions } from '../utils/notificationSounds.js'
+import { getPasswordStrength, hashPassword } from '../utils/security.js'
 import './Settings.css'
 
 const backupFrequencyOptions = [
@@ -67,6 +68,15 @@ const emptyCustomFieldDraft = () => ({
   options: '',
 })
 
+const getDeviceId = () => {
+  const key = 'retail-device-id'
+  const existing = window.localStorage.getItem(key)
+  if (existing) return existing
+  const next = crypto.randomUUID().replaceAll('-', '').slice(0, 7)
+  window.localStorage.setItem(key, next)
+  return next
+}
+
 const emptyUserForm = () => ({
   username: '',
   displayName: '',
@@ -124,6 +134,17 @@ function SettingsPage({
   const [activeCustomFieldModule, setActiveCustomFieldModule] = useState('products')
   const [customFieldModalOpen, setCustomFieldModalOpen] = useState(false)
   const [customFieldDraft, setCustomFieldDraft] = useState(emptyCustomFieldDraft)
+  const [setPasswordForm, setSetPasswordForm] = useState({
+    primary: { password: '', confirm: '' },
+    secondary: { password: '', confirm: '' },
+  })
+  const [changePasswordForm, setChangePasswordForm] = useState({
+    primary: { current: '', password: '', confirm: '', removeCurrent: '' },
+    secondary: { current: '', password: '', confirm: '', removeCurrent: '' },
+  })
+  const [showSecurityPasswords, setShowSecurityPasswords] = useState({ primary: false, secondary: false })
+  const [backupHistoryType, setBackupHistoryType] = useState('all')
+  const [backupHistoryStatus, setBackupHistoryStatus] = useState('all')
   const fileInputRef = useRef(null)
   const importInputRef = useRef(null)
   const SaveIcon = profileIcons.save
@@ -155,6 +176,17 @@ function SettingsPage({
   const systemUsers = companyInfo.systemUsers ?? []
   const customFormFields = companyInfo.customFormFields ?? {}
   const activeCustomFields = customFormFields[activeCustomFieldModule] ?? []
+  const securitySettings = companyInfo.securitySettings ?? { passwordHash: '', passwordHashes: {}, lockOnStart: false, passwordUpdatedAt: '' }
+  const passwordHashes = {
+    primary: securitySettings.passwordHashes?.primary || securitySettings.passwordHash || '',
+    secondary: securitySettings.passwordHashes?.secondary || '',
+  }
+  const securityPasswordSlots = [
+    { key: 'primary', label: 'Password 1' },
+    { key: 'secondary', label: 'Password 2' },
+  ]
+  const activePasswordCount = Object.values(passwordHashes).filter(Boolean).length
+  const hasSecurityPassword = activePasswordCount > 0
   const backupSettings = companyInfo.backupSettings ?? {
     automatic: false,
     frequency: 'daily',
@@ -162,6 +194,22 @@ function SettingsPage({
     lastRun: '',
     nextRun: '',
   }
+  const backupHistory = companyInfo.backupHistory ?? []
+  const liveActivity = companyInfo.liveActivity ?? []
+  const filteredBackupHistory = backupHistory.filter((item) => (
+    (backupHistoryType === 'all' || item.type === backupHistoryType)
+    && (backupHistoryStatus === 'all' || item.status === backupHistoryStatus)
+  ))
+  const backupTypeOptions = [
+    { value: 'all', label: t.allTypes ?? 'All types' },
+    { value: 'import', label: t.import ?? 'Import' },
+    { value: 'export', label: t.export ?? 'Export' },
+  ]
+  const backupStatusOptions = [
+    { value: 'all', label: t.allStatuses ?? 'All statuses' },
+    { value: 'success', label: t.success ?? 'Success' },
+    { value: 'failed', label: t.failed ?? 'Failed' },
+  ]
   const costingOptions = [
     { value: 'lifo', label: t.lifoCosting ?? 'LIFO — newest lot first (default)' },
     { value: 'fifo', label: t.fifoCosting ?? 'FIFO — oldest lot first' },
@@ -183,6 +231,153 @@ function SettingsPage({
 
   const updateNestedField = (group, field, value) => {
     onCompanyInfoChange((current) => ({ ...current, [group]: { ...(current[group] ?? {}), [field]: value } }))
+  }
+
+  const pushLiveActivity = (message, level = 'info') => {
+    onCompanyInfoChange((current) => ({
+      ...current,
+      liveActivity: [{
+        id: crypto.randomUUID(),
+        level,
+        message,
+        time: new Date().toISOString(),
+      }, ...(current.liveActivity ?? [])].slice(0, 120),
+    }))
+  }
+
+  const pushBackupHistory = (entry) => {
+    onCompanyInfoChange((current) => ({
+      ...current,
+      backupHistory: [{
+        id: crypto.randomUUID(),
+        device: getDeviceId(),
+        startedAt: new Date().toISOString(),
+        ...entry,
+      }, ...(current.backupHistory ?? [])].slice(0, 80),
+    }))
+  }
+
+  const updateSecuritySetting = (field, value) => {
+    onCompanyInfoChange((current) => ({
+      ...current,
+      securitySettings: {
+        passwordHash: '',
+        passwordHashes: {},
+        lockOnStart: false,
+        passwordUpdatedAt: '',
+        ...(current.securitySettings ?? {}),
+        [field]: value,
+      },
+    }))
+  }
+
+  const updateSetPasswordForm = (slot, field, value) => {
+    setSetPasswordForm((current) => ({
+      ...current,
+      [slot]: { ...current[slot], [field]: value },
+    }))
+  }
+
+  const updateChangePasswordForm = (slot, field, value) => {
+    setChangePasswordForm((current) => ({
+      ...current,
+      [slot]: { ...current[slot], [field]: value },
+    }))
+  }
+
+  const saveSecurityPassword = async (slot) => {
+    const draft = setPasswordForm[slot]
+    if (!draft.password || draft.password !== draft.confirm) {
+      onNotify?.(t.passwordsDoNotMatch ?? 'Please enter and confirm the password')
+      return
+    }
+
+    const passwordHash = await hashPassword(draft.password)
+    onCompanyInfoChange((current) => ({
+      ...current,
+      securitySettings: {
+        ...(current.securitySettings ?? {}),
+        passwordHash: slot === 'primary' ? passwordHash : (current.securitySettings?.passwordHash ?? ''),
+        passwordHashes: {
+          primary: current.securitySettings?.passwordHashes?.primary || current.securitySettings?.passwordHash || '',
+          secondary: current.securitySettings?.passwordHashes?.secondary || '',
+          [slot]: passwordHash,
+        },
+        passwordUpdatedAt: new Date().toISOString(),
+      },
+    }))
+    setSetPasswordForm((current) => ({ ...current, [slot]: { password: '', confirm: '' } }))
+    onNotify?.(t.passwordSet ?? 'Password set')
+  }
+
+  const changeSecurityPassword = async (slot) => {
+    const draft = changePasswordForm[slot]
+    if (!draft.current || !draft.password || draft.password !== draft.confirm) {
+      onNotify?.(t.passwordsDoNotMatch ?? 'Please complete password fields')
+      return
+    }
+
+    const currentHash = await hashPassword(draft.current)
+    if (currentHash !== passwordHashes[slot]) {
+      onNotify?.(t.currentPasswordIncorrect ?? 'Current password is incorrect')
+      return
+    }
+
+    const passwordHash = await hashPassword(draft.password)
+    onCompanyInfoChange((current) => ({
+      ...current,
+      securitySettings: {
+        ...(current.securitySettings ?? {}),
+        passwordHash: slot === 'primary' ? passwordHash : (current.securitySettings?.passwordHashes?.primary || current.securitySettings?.passwordHash || ''),
+        passwordHashes: {
+          primary: current.securitySettings?.passwordHashes?.primary || current.securitySettings?.passwordHash || '',
+          secondary: current.securitySettings?.passwordHashes?.secondary || '',
+          [slot]: passwordHash,
+        },
+        passwordUpdatedAt: new Date().toISOString(),
+      },
+    }))
+    setChangePasswordForm((current) => ({ ...current, [slot]: { current: '', password: '', confirm: '', removeCurrent: '' } }))
+    onNotify?.(t.passwordChanged ?? 'Password changed')
+  }
+
+  const removeSecurityPassword = async (slot) => {
+    const currentPassword = changePasswordForm[slot].removeCurrent
+    if (!currentPassword) {
+      onNotify?.(t.currentPasswordIncorrect ?? 'Enter current password first')
+      return
+    }
+
+    const currentHash = await hashPassword(currentPassword)
+    if (currentHash !== passwordHashes[slot]) {
+      onNotify?.(t.currentPasswordIncorrect ?? 'Current password is incorrect')
+      return
+    }
+
+    onCompanyInfoChange((current) => ({
+      ...current,
+      securitySettings: (() => {
+        const nextHashes = {
+          primary: current.securitySettings?.passwordHashes?.primary || current.securitySettings?.passwordHash || '',
+          secondary: current.securitySettings?.passwordHashes?.secondary || '',
+          [slot]: '',
+        }
+        return {
+        ...(current.securitySettings ?? {}),
+        passwordHash: nextHashes.primary,
+        passwordHashes: nextHashes,
+        lockOnStart: Boolean(nextHashes.primary || nextHashes.secondary) && Boolean(current.securitySettings?.lockOnStart),
+        passwordUpdatedAt: new Date().toISOString(),
+        }
+      })(),
+    }))
+    setSetPasswordForm((current) => ({ ...current, [slot]: { password: '', confirm: '' } }))
+    setChangePasswordForm((current) => ({ ...current, [slot]: { current: '', password: '', confirm: '', removeCurrent: '' } }))
+    onNotify?.(t.passwordRemoved ?? 'Password removed')
+  }
+
+  const clearLiveActivity = () => {
+    onCompanyInfoChange((current) => ({ ...current, liveActivity: [] }))
   }
 
   const openCustomFieldModal = () => {
@@ -447,6 +642,7 @@ function SettingsPage({
 
   const exportBackup = async (automatic = false) => {
     const exportedAt = new Date()
+    const started = performance.now()
     const delay = getBackupDelay(backupSettings)
     const nextRun = backupSettings.automatic ? new Date(exportedAt.getTime() + delay).toISOString() : ''
     const backupPayload = {
@@ -456,6 +652,15 @@ function SettingsPage({
     }
 
     downloadJson(backupPayload, `retailpro-backup-${exportedAt.toISOString().slice(0, 10)}.json`)
+    pushBackupHistory({
+      type: 'export',
+      mode: automatic ? 'automatic' : 'manual',
+      file: `retailpro-backup-${exportedAt.toISOString().slice(0, 10)}.json`,
+      duration: `${Math.max(1, Math.round(performance.now() - started))}ms`,
+      changes: '-',
+      status: 'success',
+    })
+    pushLiveActivity(`${automatic ? 'Automatic' : 'Manual'} backup exported`, 'success')
     updateNestedField('backupSettings', 'lastRun', exportedAt.toISOString())
     updateNestedField('backupSettings', 'nextRun', nextRun)
     await playNotificationSound(notificationSettings.sound)
@@ -465,14 +670,34 @@ function SettingsPage({
   const importBackup = (event) => {
     const file = event.target.files?.[0]
     if (!file) return
+    const started = performance.now()
 
     const reader = new FileReader()
     reader.onload = () => {
       try {
         const parsed = JSON.parse(String(reader.result || '{}'))
         const imported = onImportBackupData?.(parsed)
+        const duration = `${Math.max(1, Math.round(performance.now() - started))}ms`
+        pushBackupHistory({
+          type: 'import',
+          mode: parsed?.source ?? 'full',
+          file: file.name,
+          duration,
+          changes: '-',
+          status: imported ? 'success' : 'failed',
+        })
+        pushLiveActivity(imported ? `Backup imported: ${file.name}` : `Backup import failed: ${file.name}`, imported ? 'success' : 'error')
         if (imported) onNotify?.(t.backupImported ?? 'Backup imported')
-      } catch {
+      } catch (error) {
+        pushBackupHistory({
+          type: 'import',
+          mode: 'full',
+          file: file.name,
+          duration: `${Math.max(1, Math.round(performance.now() - started))}ms`,
+          changes: '-',
+          status: 'failed',
+        })
+        pushLiveActivity(`Invalid backup file: ${file.name} - ${error?.message ?? 'Parse error'}`, 'error')
         onNotify?.(t.invalidBackupFile ?? 'Invalid backup file')
       } finally {
         event.target.value = ''
@@ -758,6 +983,84 @@ function SettingsPage({
             </div>
           </div>
         </section>
+      ) : activeTab === 'advancedSync' ? (
+        <section className="advanced-sync-settings">
+          <div className="settings-card backup-history-card">
+            <div className="advanced-sync-head">
+              <h2><Archive size={22} /> {t.backupHistory ?? 'Backup History'} <span>{backupHistory.length}</span></h2>
+              <div className="advanced-sync-filters">
+                <CustomSelect
+                  ariaLabel={t.allTypes ?? 'All types'}
+                  options={backupTypeOptions}
+                  value={backupHistoryType}
+                  onChange={setBackupHistoryType}
+                />
+                <CustomSelect
+                  ariaLabel={t.allStatuses ?? 'All statuses'}
+                  options={backupStatusOptions}
+                  value={backupHistoryStatus}
+                  onChange={setBackupHistoryStatus}
+                />
+              </div>
+            </div>
+
+            <div className="backup-history-table-wrap">
+              <table className="backup-history-table">
+                <thead>
+                  <tr>
+                    <th>{t.type ?? 'Type'}</th>
+                    <th>{t.mode ?? 'Mode'}</th>
+                    <th>{t.file ?? 'File'}</th>
+                    <th>{t.device ?? 'Device'}</th>
+                    <th>{t.started ?? 'Started'}</th>
+                    <th>{t.duration ?? 'Duration'}</th>
+                    <th>+/-/=/!/X</th>
+                    <th>{t.status ?? 'Status'}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredBackupHistory.length ? filteredBackupHistory.map((entry) => (
+                    <tr key={entry.id}>
+                      <td><span className="backup-history-type">{entry.type}</span></td>
+                      <td>{entry.mode || '-'}</td>
+                      <td><code>{entry.file || '-'}</code></td>
+                      <td><code>{entry.device || '-'}</code></td>
+                      <td>{entry.startedAt ? new Date(entry.startedAt).toLocaleString() : '-'}</td>
+                      <td>{entry.duration || '-'}</td>
+                      <td>{entry.changes || '-'}</td>
+                      <td><span className={`backup-status-pill ${entry.status}`}>{entry.status === 'success' ? (t.success ?? 'Success') : (t.failed ?? 'Failed')}</span></td>
+                    </tr>
+                  )) : (
+                    <tr>
+                      <td className="backup-history-empty" colSpan="8">{t.noBackupHistory ?? 'No backup history yet.'}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="settings-card live-activity-card">
+            <div className="advanced-sync-head">
+              <h2><Shuffle size={22} /> {t.liveActivity ?? 'Live Activity'} <span>{liveActivity.length}</span></h2>
+              <button className="live-activity-clear" type="button" onClick={clearLiveActivity}>
+                <Trash2 size={16} />
+                <span>{t.clear ?? 'Clear'}</span>
+              </button>
+            </div>
+
+            <div className="live-activity-terminal">
+              {liveActivity.length ? liveActivity.map((item) => (
+                <div className={`live-activity-line ${item.level}`} key={item.id}>
+                  <span>{item.time ? new Date(item.time).toLocaleTimeString() : '--:--:--'}</span>
+                  <code>{item.message}</code>
+                </div>
+              )) : (
+                <p>{t.noRecentActivity ?? 'Idle - no recent activity.'}</p>
+              )}
+            </div>
+          </div>
+        </section>
       ) : activeTab === 'posPrinting' ? (
         <section className="pos-bridge-settings">
           <div className="settings-card pos-bridge-card">
@@ -899,7 +1202,341 @@ function SettingsPage({
             </div>
           )}
         </section>
-      ) : activeTab === 'forms' ? (
+      ) : activeTab === 'security' ? (
+        <section className="settings-card security-settings-card">
+          <div className="settings-card-head security-settings-head">
+            <div className="security-heading-copy">
+              <span className="security-heading-icon">
+                <Shield size={20} />
+              </span>
+
+              <div>
+                <h2>{t.securitySettings ?? 'Security Settings'}</h2>
+                <p>
+                  {t.securitySettingsHint ??
+                    'Protect your system, control startup access and manage the security password.'}
+                </p>
+              </div>
+            </div>
+
+            <button
+              className="save-btn security-save-btn"
+              type="button"
+              onClick={notifySaved}
+            >
+              <SaveIcon size={16} />
+              <span>{t.saveChanges}</span>
+            </button>
+          </div>
+
+          <div className="security-overview-grid">
+            <article
+              className={`security-overview-card ${
+                hasSecurityPassword ? 'is-secured' : 'is-warning'
+              }`}
+            >
+              <span className="security-overview-icon">
+                <Lock size={21} />
+              </span>
+
+              <div>
+                <small>Password protection</small>
+
+                <strong>
+                  {hasSecurityPassword
+                    ? `${activePasswordCount}/2 Active`
+                    : t.notProtected ?? 'Not protected'}
+                </strong>
+
+                <p>
+                  {hasSecurityPassword
+                    ? 'The system can be unlocked with any active password.'
+                    : t.noPasswordSet ??
+                      'Create at least one password to prevent unauthorized access.'}
+                </p>
+              </div>
+
+              <span className="security-status-badge">
+                {hasSecurityPassword ? 'Active' : 'Required'}
+              </span>
+            </article>
+
+            <article
+              className={`security-overview-card ${
+                securitySettings.lockOnStart ? 'is-secured' : ''
+              }`}
+            >
+              <span className="security-overview-icon">
+                <Shield size={21} />
+              </span>
+
+              <div>
+                <small>Startup protection</small>
+
+                <strong>
+                  {securitySettings.lockOnStart ? 'Enabled' : 'Disabled'}
+                </strong>
+
+                <p>
+                  Require the security password whenever the application opens.
+                </p>
+              </div>
+
+              <button
+                className={
+                  securitySettings.lockOnStart
+                    ? 'security-toggle active'
+                    : 'security-toggle'
+                }
+                type="button"
+                role="switch"
+                aria-checked={Boolean(securitySettings.lockOnStart)}
+                disabled={!hasSecurityPassword}
+                onClick={() =>
+                  updateSecuritySetting(
+                    'lockOnStart',
+                    !securitySettings.lockOnStart,
+                  )
+                }
+              >
+                <span className="security-toggle-track">
+                  <span className="security-toggle-thumb" />
+                </span>
+
+                <b>
+                  {securitySettings.lockOnStart ? 'ON' : 'OFF'}
+                </b>
+              </button>
+            </article>
+
+            <article className="security-overview-card">
+              <span className="security-overview-icon">
+                <Archive size={21} />
+              </span>
+
+              <div>
+                <small>Password updated</small>
+
+                <strong>
+                  {securitySettings.passwordUpdatedAt
+                    ? new Date(
+                        securitySettings.passwordUpdatedAt,
+                      ).toLocaleDateString()
+                    : 'Not available'}
+                </strong>
+
+                <p>
+                  The date on which the security password was last changed.
+                </p>
+              </div>
+            </article>
+          </div>
+
+          <div className="security-content-layout">
+            <div className="security-form-column">
+              {securityPasswordSlots.map((slot) => {
+                const isSet = Boolean(passwordHashes[slot.key])
+                const setDraft = setPasswordForm[slot.key]
+                const changeDraft = changePasswordForm[slot.key]
+                const strength = getPasswordStrength(isSet ? changeDraft.password : setDraft.password)
+                const showPassword = showSecurityPasswords[slot.key]
+
+                return (
+                  <form
+                    className="security-form-card"
+                    key={slot.key}
+                    onSubmit={(event) => {
+                      event.preventDefault()
+                      if (isSet) changeSecurityPassword(slot.key)
+                      else saveSecurityPassword(slot.key)
+                    }}
+                  >
+                    <header className="security-form-head">
+                      <span>{isSet ? <Shield size={20} /> : <Lock size={20} />}</span>
+                      <div>
+                        <h3>{slot.label}</h3>
+                        <p>{isSet ? 'Change or remove this password after entering the current password.' : 'Set an additional password that can unlock the system.'}</p>
+                      </div>
+                      <em className={isSet ? 'security-slot-state active' : 'security-slot-state'}>{isSet ? 'Set' : 'Empty'}</em>
+                    </header>
+
+                    {isSet && (
+                      <label>
+                        <span>{t.currentPassword ?? 'Current Password'}</span>
+                        <div className="security-password-input">
+                          <input
+                            type={showPassword ? 'text' : 'password'}
+                            value={changeDraft.current}
+                            placeholder="Enter current password"
+                            autoComplete="current-password"
+                            onChange={(event) => updateChangePasswordForm(slot.key, 'current', event.target.value)}
+                          />
+                          <button type="button" aria-label={t.showPassword ?? 'Show password'} onClick={() => setShowSecurityPasswords((current) => ({ ...current, [slot.key]: !current[slot.key] }))}>
+                            <Eye size={17} />
+                          </button>
+                        </div>
+                      </label>
+                    )}
+
+                    <div className="security-field-grid">
+                      <label>
+                        <span>{t.newPassword ?? 'New Password'}</span>
+                        <div className="security-password-input">
+                          <input
+                            type={showPassword ? 'text' : 'password'}
+                            value={isSet ? changeDraft.password : setDraft.password}
+                            placeholder={isSet ? 'Enter new password' : 'Enter a secure password'}
+                            autoComplete="new-password"
+                            onChange={(event) => isSet
+                              ? updateChangePasswordForm(slot.key, 'password', event.target.value)
+                              : updateSetPasswordForm(slot.key, 'password', event.target.value)}
+                          />
+                          <button type="button" aria-label={t.showPassword ?? 'Show password'} onClick={() => setShowSecurityPasswords((current) => ({ ...current, [slot.key]: !current[slot.key] }))}>
+                            <Eye size={17} />
+                          </button>
+                        </div>
+                        <div className={`security-strength ${strength.tone}`}>
+                          <div className="security-strength-track">
+                            <span style={{ width: `${(strength.score / 5) * 100}%` }} />
+                          </div>
+                          <b>{strength.label}</b>
+                        </div>
+                      </label>
+
+                      <label>
+                        <span>{t.confirmPassword ?? 'Confirm Password'}</span>
+                        <div className="security-password-input">
+                          <input
+                            type={showPassword ? 'text' : 'password'}
+                            value={isSet ? changeDraft.confirm : setDraft.confirm}
+                            placeholder="Enter the password again"
+                            autoComplete="new-password"
+                            onChange={(event) => isSet
+                              ? updateChangePasswordForm(slot.key, 'confirm', event.target.value)
+                              : updateSetPasswordForm(slot.key, 'confirm', event.target.value)}
+                          />
+                          <button type="button" aria-label={t.showPassword ?? 'Show password'} onClick={() => setShowSecurityPasswords((current) => ({ ...current, [slot.key]: !current[slot.key] }))}>
+                            <Eye size={17} />
+                          </button>
+                        </div>
+                        {(isSet ? changeDraft.confirm : setDraft.confirm) && (
+                          <small className={(isSet ? changeDraft.password === changeDraft.confirm : setDraft.password === setDraft.confirm) ? 'security-match-message success' : 'security-match-message error'}>
+                            {(isSet ? changeDraft.password === changeDraft.confirm : setDraft.password === setDraft.confirm) ? 'Passwords match' : 'Passwords do not match'}
+                          </small>
+                        )}
+                      </label>
+                    </div>
+
+                    <button
+                      className="security-primary-btn"
+                      type="submit"
+                      disabled={isSet
+                        ? (!changeDraft.current || !changeDraft.password || !changeDraft.confirm || changeDraft.password !== changeDraft.confirm)
+                        : (!setDraft.password || !setDraft.confirm || setDraft.password !== setDraft.confirm)}
+                    >
+                      {isSet ? <Shield size={16} /> : <Lock size={16} />}
+                      {isSet ? (t.changePassword ?? 'Change Password') : (t.setPassword ?? 'Set Password')}
+                    </button>
+
+                    {isSet && (
+                      <div className="security-remove-inline">
+                        <label>
+                          <span>Current password to remove</span>
+                          <div className="security-password-input">
+                            <input
+                              type={showPassword ? 'text' : 'password'}
+                              value={changeDraft.removeCurrent}
+                              placeholder="Enter current password"
+                              autoComplete="current-password"
+                              onChange={(event) => updateChangePasswordForm(slot.key, 'removeCurrent', event.target.value)}
+                            />
+                            <button type="button" aria-label={t.showPassword ?? 'Show password'} onClick={() => setShowSecurityPasswords((current) => ({ ...current, [slot.key]: !current[slot.key] }))}>
+                              <Eye size={17} />
+                            </button>
+                          </div>
+                        </label>
+                        <button className="security-remove-btn" type="button" onClick={() => removeSecurityPassword(slot.key)}>
+                          <Trash2 size={15} />
+                          {t.remove ?? 'Remove'}
+                        </button>
+                      </div>
+                    )}
+                  </form>
+                )
+              })}
+            </div>
+
+            <aside className="security-guide-card">
+              <div className="security-guide-head">
+                <span>
+                  <Shield size={20} />
+                </span>
+
+                <div>
+                  <h3>Security recommendations</h3>
+
+                  <p>
+                    Follow these steps to improve your account security.
+                  </p>
+                </div>
+              </div>
+
+              <ul className="security-guide-list">
+                <li>
+                  <span>1</span>
+
+                  <div>
+                    <strong>Use at least 8 characters</strong>
+                    <small>
+                      Longer passwords are more difficult to guess.
+                    </small>
+                  </div>
+                </li>
+
+                <li>
+                  <span>2</span>
+
+                  <div>
+                    <strong>Mix letters and numbers</strong>
+                    <small>
+                      Include uppercase, lowercase, numbers and symbols.
+                    </small>
+                  </div>
+                </li>
+
+                <li>
+                  <span>3</span>
+
+                  <div>
+                    <strong>Avoid personal information</strong>
+                    <small>
+                      Do not use names, phone numbers or easy dates.
+                    </small>
+                  </div>
+                </li>
+
+                <li>
+                  <span>4</span>
+
+                  <div>
+                    <strong>Enable startup protection</strong>
+                    <small>
+                      Require the password whenever the application opens.
+                    </small>
+                  </div>
+                </li>
+              </ul>
+
+              <div className="security-danger-zone">
+                <div>
+                  <strong>Two password unlock</strong>
+                  <span>The login screen accepts Password 1 or Password 2. Change and remove actions require the current password for that slot.</span>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </section>
+        ) : activeTab === 'forms' ? (
         <section className="settings-card custom-fields-card">
           <div className="settings-card-head custom-fields-head">
             <div>

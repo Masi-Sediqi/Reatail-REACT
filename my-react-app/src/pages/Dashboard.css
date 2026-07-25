@@ -498,3 +498,90 @@
   }
 
 }
+
+/* =====================================================
+   DASHBOARD TYPOGRAPHY
+===================================================== */
+
+.dashboard-page {
+  color: var(--text);
+}
+
+/* Main Dashboard title */
+
+.dashboard-page .page-heading {
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.dashboard-page .page-heading h1 {
+  margin: 0 0 4px !important;
+  color: var(--text) !important;
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.02em;
+}
+
+.dashboard-page .page-heading p {
+  margin: 0 !important;
+  color: var(--muted) !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  line-height: 1.45 !important;
+}
+
+/* Financial, Suppliers, Stock and Staff titles */
+
+.dashboard-page .dashboard-section {
+  margin-bottom: 28px;
+}
+
+.dashboard-page .dashboard-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.dashboard-page .dashboard-section-head h2,
+.dashboard-page .dashboard-section > h2 {
+  margin: 0 !important;
+  color: var(--text) !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  line-height: 1.3 !important;
+  letter-spacing: -0.015em;
+}
+
+/* Trend title */
+
+.dashboard-page .trend-panel h2 {
+  margin: 0 0 4px !important;
+  color: var(--text) !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  line-height: 1.3 !important;
+}
+
+/* Quick Actions and Recent Activity */
+
+.dashboard-page .quick-panel h2,
+.dashboard-page .activity-panel h2 {
+  margin: 0 0 16px !important;
+  color: var(--text) !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  line-height: 1.3 !important;
+  letter-spacing: -0.015em;
+}
+
+/* Prevent duplicated title spacing */
+
+.dashboard-page .dashboard-section-head + h2,
+.dashboard-page .dashboard-section > h2 + h2,
+.dashboard-page .quick-panel h2 + h2,
+.dashboard-page .activity-panel h2 + h2 {
+  display: none !important;
+}
