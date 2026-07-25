@@ -812,6 +812,92 @@
   text-align: center;
 }
 
+.app-splash-screen {
+  z-index: 6000;
+}
+
+.app-splash-card {
+  width: min(430px, calc(100vw - 34px));
+  padding: 38px 30px 34px;
+  animation: splashCardEnter 700ms ease both;
+}
+
+.app-splash-mark {
+  width: 68px;
+  height: 68px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.56);
+  border-radius: 999px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(226, 232, 240, 0.88));
+  color: #0f2d52;
+  font-size: 19px;
+  font-weight: 900;
+  letter-spacing: 0;
+  box-shadow:
+    0 16px 38px rgba(0, 0, 0, 0.28),
+    0 0 0 7px rgba(255, 255, 255, 0.07);
+}
+
+.app-splash-card h1 {
+  margin-bottom: 7px;
+  font-size: clamp(25px, 7vw, 38px);
+  font-weight: 900;
+}
+
+.app-splash-card p {
+  margin-bottom: 22px;
+  font-size: 13px;
+  letter-spacing: 0;
+}
+
+.app-splash-line {
+  width: min(190px, 64%);
+  height: 2px;
+  display: block;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.app-splash-line::after {
+  content: "";
+  width: 42%;
+  height: 100%;
+  display: block;
+  border-radius: inherit;
+  background: #ffffff;
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.7);
+  animation: splashLineMove 1.2s ease-in-out infinite;
+}
+
+@keyframes splashCardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes splashLineMove {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  50% {
+    transform: translateX(70%);
+  }
+
+  100% {
+    transform: translateX(240%);
+  }
+}
+
 /* =====================================================
    MOBILE
 ===================================================== */
@@ -836,6 +922,15 @@
     font-size: 22px;
   }
 
+  .app-splash-card h1 {
+    font-size: 26px;
+  }
+
+  .app-splash-mark {
+    width: 60px;
+    height: 60px;
+  }
+
   .app-lock-input input {
     height: 44px;
     min-height: 44px;
@@ -844,7 +939,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .app-lock-wallpaper,
-  .app-lock-wallpaper.second {
+  .app-lock-wallpaper.second,
+  .app-splash-card,
+  .app-splash-line::after {
     animation: none;
   }
 }

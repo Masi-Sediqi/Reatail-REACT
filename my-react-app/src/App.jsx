@@ -166,6 +166,191 @@ const mergeCategories = (storedCategories) => {
   return merged.filter((category, index) => merged.findIndex((item) => item.toLowerCase() === category.toLowerCase()) === index)
 }
 
+const asArray = (value) => (Array.isArray(value) ? value : [])
+const firstItem = (value) => (Array.isArray(value) ? value[0] : value)
+const toNumber = (value, fallback = 0) => {
+  const parsed = Number.parseFloat(value)
+  return Number.isFinite(parsed) ? parsed : fallback
+}
+
+const normalizeProductBackup = (product) => ({
+  ...product,
+  purchase: product.purchase ?? product.purchasePrice ?? '',
+  selling: product.selling ?? product.sellingPrice ?? '',
+  lowStock: product.lowStock ?? product.lowStockThreshold ?? '',
+  unit: product.unit ?? 'Pieces (pcs)',
+  currency: product.currency ?? 'AFN',
+  status:
+    product.status === 'active'
+      ? 'In Stock'
+      : product.status ?? (toNumber(product.quantity) > 0 ? 'In Stock' : 'Out of Stock'),
+  images: Array.isArray(product.images) ? product.images : [],
+  customFields: product.customFields ?? {},
+})
+
+const normalizeSaleBackup = (sale) => {
+  const subtotal = toNumber(sale.subtotal)
+  const total = toNumber(sale.total, subtotal)
+  const paidAmount = toNumber(sale.paidAmount)
+  const balance = Math.max(0, toNumber(sale.balance, total - paidAmount))
+
+  return {
+    ...sale,
+    date: String(sale.date || sale.createdAt || new Date().toISOString()).slice(0, 10),
+    discountMode: sale.discountMode ?? sale.discountType ?? 'flat',
+    discountTotal: sale.discountTotal ?? sale.discount ?? 0,
+    subtotal,
+    total,
+    paidAmount,
+    balance,
+    paymentStatus: balance <= 0 ? 'paid' : (sale.paymentStatus === 'pending' ? 'loan' : sale.paymentStatus ?? 'loan'),
+    paymentHistory: Array.isArray(sale.paymentHistory) ? sale.paymentHistory : [],
+    refundHistory: Array.isArray(sale.refundHistory) ? sale.refundHistory : [],
+    items: asArray(sale.items).map((item) => {
+      const price = toNumber(item.price ?? item.unitPrice)
+      const quantity = toNumber(item.quantity, 1)
+      const discount = toNumber(item.discount)
+      return {
+        ...item,
+        name: item.name ?? item.productName ?? '',
+        code: item.code ?? item.productCode ?? '',
+        price,
+        quantity,
+        discount,
+        lineTotal: item.lineTotal ?? Math.max(0, price * quantity - discount),
+      }
+    }),
+  }
+}
+
+const normalizeGodownBackup = (entries) => asArray(entries).map((entry) => {
+  if (Array.isArray(entry.rows)) return entry
+  const quantity = toNumber(entry.quantity)
+  const purchase = toNumber(entry.purchase ?? entry.purchasePrice)
+  const selling = toNumber(entry.selling ?? entry.sellingPrice)
+  const total = toNumber(entry.total, purchase * quantity)
+  const paid = toNumber(entry.paid, total)
+
+  return {
+    id: entry.purchaseBillId || entry.entryId || entry.id || crypto.randomUUID(),
+    billNumber: entry.billNumber || `#${String(entry.id || '').slice(0, 6).toUpperCase()}`,
+    date: String(entry.date || entry.createdAt || new Date().toISOString()).slice(0, 10),
+    currency: entry.currency || 'AFN',
+    supplierId: entry.supplierId || '',
+    supplierName: entry.supplierName || '',
+    paid,
+    total,
+    remaining: Math.max(0, total - paid),
+    paymentHistory: Array.isArray(entry.paymentHistory) ? entry.paymentHistory : [],
+    rows: [{
+      id: entry.id || crypto.randomUUID(),
+      productId: entry.productId || '',
+      name: entry.name || entry.productName || '',
+      code: entry.code || entry.productCode || '',
+      category: entry.category || 'Miscellaneous',
+      quantity,
+      originalQuantity: toNumber(entry.originalQuantity, quantity),
+      unit: entry.unit || 'pcs',
+      purchase,
+      selling,
+      currency: entry.currency || 'AFN',
+      date: String(entry.date || entry.createdAt || new Date().toISOString()).slice(0, 10),
+      expired: Boolean(entry.expired),
+    }],
+  }
+})
+
+const normalizeStaffBackup = (staff, staffPayments) => {
+  const paymentsByStaff = new Map()
+  asArray(staffPayments).forEach((payment) => {
+    const list = paymentsByStaff.get(payment.staffId) || []
+    list.push({
+      ...payment,
+      paidAmount: payment.paidAmount ?? payment.amount ?? 0,
+    })
+    paymentsByStaff.set(payment.staffId, list)
+  })
+
+  return asArray(staff).map((member) => {
+    const payrollHistory = Array.isArray(member.payrollHistory)
+      ? member.payrollHistory
+      : paymentsByStaff.get(member.id) || []
+    const paid = payrollHistory.reduce((sum, payment) => sum + toNumber(payment.paidAmount ?? payment.amount), 0)
+    return {
+      ...member,
+      payrollHistory,
+      paid: member.paid ?? member.paidAmount ?? String(paid),
+      payable: member.payable ?? String(Math.max(0, toNumber(member.salary) - paid)),
+      status: member.status === 'active' ? 'active' : member.status ?? 'active',
+    }
+  })
+}
+
+const normalizeWalletEntries = (entries) => asArray(entries).map((entry) => ({
+  ...entry,
+  type: entry.type === 'deposit' ? 'deposit' : 'withdraw',
+  note: entry.note || entry.reason || entry.description || '',
+  amount: toNumber(entry.amount),
+  currency: entry.currency || 'AFN',
+  date: entry.date || entry.createdAt || new Date().toISOString(),
+}))
+
+const normalizeDeletedItems = (items) => asArray(items).map((item) => ({
+  recycleId: item.recycleId || crypto.randomUUID(),
+  module: item.module || item.collection || item.type || 'products',
+  title: item.title || item.name || item.data?.name || item.data?.invoiceNumber || 'Deleted item',
+  deletedAt: item.deletedAt || item.createdAt || new Date().toISOString(),
+  data: item.data ?? item,
+}))
+
+const normalizeBackupData = (backup) => {
+  const data = backup?.data ?? backup
+  if (!data || typeof data !== 'object') return null
+  const settings = firstItem(data.settings) ?? {}
+  const companyInfo = {
+    ...defaultCompanyInfo,
+    ...(data.companyInfo ?? {}),
+    name: data.companyInfo?.name ?? settings.companyName ?? defaultCompanyInfo.name,
+    tagline: data.companyInfo?.tagline ?? settings.companySubtitle ?? defaultCompanyInfo.tagline,
+    address: data.companyInfo?.address ?? settings.address ?? '',
+    phone: data.companyInfo?.phone ?? settings.phone ?? '',
+    email: data.companyInfo?.email ?? settings.email ?? '',
+    website: data.companyInfo?.website ?? settings.website ?? '',
+    currency: data.companyInfo?.currency ?? settings.defaultCurrency ?? settings.baseCurrency ?? 'AFN',
+  }
+  const cashWalletEntries = Array.isArray(data.cashWalletEntries)
+    ? data.cashWalletEntries
+    : normalizeWalletEntries(data.cash_wallet)
+
+  return {
+    theme: data.theme ?? (settings.theme === 'dark' ? 'dark' : 'light'),
+    language: data.language ?? settings.language ?? 'en',
+    activeColorTheme: data.activeColorTheme ?? (settings.theme && settings.theme !== 'dark' ? settings.theme : 'default'),
+    suppliers: asArray(data.suppliers),
+    bundles: asArray(data.bundles),
+    products: asArray(data.products).map(normalizeProductBackup),
+    customers: asArray(data.customers),
+    expenses: asArray(data.expenses),
+    staffMembers: Array.isArray(data.staffMembers) ? data.staffMembers : normalizeStaffBackup(data.staff, data.staff_payments),
+    salesBills: Array.isArray(data.salesBills) ? data.salesBills : asArray(data.sales).map(normalizeSaleBackup),
+    godownEntries: Array.isArray(data.godownEntries) ? data.godownEntries : normalizeGodownBackup(data.godown),
+    cashWallet: toNumber(data.cashWallet, 120),
+    cashWalletEntries,
+    deletedItems: Array.isArray(data.deletedItems) ? data.deletedItems : normalizeDeletedItems(data.recycle_bin),
+    categories: mergeCategories(data.categories ?? asArray(data.products).map((product) => product.category).filter(Boolean)),
+    expenseCategories: Array.isArray(data.expenseCategories) && data.expenseCategories.length
+      ? data.expenseCategories
+      : [...defaultExpenseCategories, ...asArray(data.expenses).map((expense) => expense.category).filter(Boolean)]
+        .filter((category, index, all) => all.findIndex((item) => item.toLowerCase() === category.toLowerCase()) === index),
+    baseCurrency: data.baseCurrency ?? settings.baseCurrency ?? settings.defaultCurrency ?? 'AFN',
+    businessCurrencyFilter: data.businessCurrencyFilter ?? 'all',
+    exchangeCurrency: data.exchangeCurrency ?? 'original',
+    exchangeRates: data.exchangeRates ?? {},
+    printSettings: { ...defaultPrintSettings, ...(data.printSettings ?? {}) },
+    companyInfo,
+  }
+}
+
 const getContrastColor = (hexColor) => {
   const cleanHex = hexColor.replace('#', '')
   const red = parseInt(cleanHex.slice(0, 2), 16)
@@ -295,8 +480,24 @@ function LockScreen({
   )
 }
 
+function AppSplash() {
+  return (
+    <div className="app-lock-screen app-splash-screen" role="status" aria-live="polite">
+      <div className="app-lock-wallpaper" style={{ backgroundImage: `url("${lockWallpaper}")` }} />
+      <div className="app-lock-wallpaper second" style={{ backgroundImage: `url("${lockWallpaper}")` }} />
+      <section className="app-lock-card app-splash-card">
+        <div className="app-splash-mark">AP</div>
+        <h1>AFGHAN POWER</h1>
+        <p>Retail Management</p>
+        <span className="app-splash-line" />
+      </section>
+    </div>
+  )
+}
+
 function App() {
   const [storageLoaded, setStorageLoaded] = useState(false)
+  const [splashReady, setSplashReady] = useState(false)
   const [theme, setTheme] = useState(() => readStorage('retail-theme-mode', 'light'))
   const [language, setLanguage] = useState(() => readStorage('retail-language', 'en'))
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -465,7 +666,7 @@ function App() {
   }), [activeColorTheme, baseCurrency, bundles, businessCurrencyFilter, cashWallet, cashWalletEntries, categories, companyInfo, customers, deletedItems, exchangeCurrency, exchangeRates, expenseCategories, expenses, godownEntries, language, printSettings, products, salesBills, staffMembers, suppliers, theme])
 
   const importBackupData = (backup) => {
-    const data = backup?.data ?? backup
+    const data = normalizeBackupData(backup)
     if (!data || typeof data !== 'object') return false
     setTheme(data.theme ?? 'light')
     setLanguage(data.language ?? 'en')
@@ -544,6 +745,11 @@ function App() {
   }
 
   useEffect(() => {
+    const splashTimer = window.setTimeout(() => setSplashReady(true), 1300)
+    return () => window.clearTimeout(splashTimer)
+  }, [])
+
+  useEffect(() => {
     const syncPageFromPath = () => {
       setPage(getPageFromPath())
     }
@@ -555,28 +761,29 @@ function App() {
   useEffect(() => {
     let isActive = true
     const applyState = (data) => {
-      setTheme(data.theme ?? 'light')
-      setLanguage(data.language ?? 'en')
-      setActiveColorTheme(data.activeColorTheme ?? 'default')
-      setSuppliers(Array.isArray(data.suppliers) ? data.suppliers : [])
-      setBundles(Array.isArray(data.bundles) ? data.bundles : [])
-      setProducts(Array.isArray(data.products) ? data.products : [])
-      setCustomers(Array.isArray(data.customers) ? data.customers : [])
-      setExpenses(Array.isArray(data.expenses) ? data.expenses : [])
-      setStaffMembers(Array.isArray(data.staffMembers) ? data.staffMembers : [])
-      setSalesBills(Array.isArray(data.salesBills) ? data.salesBills : [])
-      setGodownEntries(Array.isArray(data.godownEntries) ? data.godownEntries : [])
-      setCashWallet(Number(data.cashWallet ?? 120))
-      setCashWalletEntries(Array.isArray(data.cashWalletEntries) ? data.cashWalletEntries : [])
-      setDeletedItems(Array.isArray(data.deletedItems) ? data.deletedItems : [])
-      setCategories(mergeCategories(data.categories))
-      setExpenseCategories(Array.isArray(data.expenseCategories) && data.expenseCategories.length ? data.expenseCategories : defaultExpenseCategories)
-      setBaseCurrency(data.baseCurrency ?? 'AFN')
-      setBusinessCurrencyFilter(data.businessCurrencyFilter ?? 'all')
-      setExchangeCurrency(data.exchangeCurrency ?? 'original')
-      setExchangeRates(data.exchangeRates ?? {})
-      setPrintSettings({ ...defaultPrintSettings, ...(data.printSettings ?? {}) })
-      setCompanyInfo({ ...defaultCompanyInfo, ...(data.companyInfo ?? {}) })
+      const normalizedData = normalizeBackupData(data) ?? {}
+      setTheme(normalizedData.theme ?? 'light')
+      setLanguage(normalizedData.language ?? 'en')
+      setActiveColorTheme(normalizedData.activeColorTheme ?? 'default')
+      setSuppliers(normalizedData.suppliers ?? [])
+      setBundles(normalizedData.bundles ?? [])
+      setProducts(normalizedData.products ?? [])
+      setCustomers(normalizedData.customers ?? [])
+      setExpenses(normalizedData.expenses ?? [])
+      setStaffMembers(normalizedData.staffMembers ?? [])
+      setSalesBills(normalizedData.salesBills ?? [])
+      setGodownEntries(normalizedData.godownEntries ?? [])
+      setCashWallet(Number(normalizedData.cashWallet ?? 120))
+      setCashWalletEntries(normalizedData.cashWalletEntries ?? [])
+      setDeletedItems(normalizedData.deletedItems ?? [])
+      setCategories(mergeCategories(normalizedData.categories))
+      setExpenseCategories(Array.isArray(normalizedData.expenseCategories) && normalizedData.expenseCategories.length ? normalizedData.expenseCategories : defaultExpenseCategories)
+      setBaseCurrency(normalizedData.baseCurrency ?? 'AFN')
+      setBusinessCurrencyFilter(normalizedData.businessCurrencyFilter ?? 'all')
+      setExchangeCurrency(normalizedData.exchangeCurrency ?? 'original')
+      setExchangeRates(normalizedData.exchangeRates ?? {})
+      setPrintSettings({ ...defaultPrintSettings, ...(normalizedData.printSettings ?? {}) })
+      setCompanyInfo({ ...defaultCompanyInfo, ...(normalizedData.companyInfo ?? {}) })
     }
     const legacySnapshot = () => {
       const storedExpenseCategories = readStorage('retail-expense-categories', [])
@@ -1244,13 +1451,8 @@ function App() {
           }}
         />
       )}
-      {!storageLoaded && (
-        <div className="app-loader" role="status" aria-live="polite">
-          <div className="app-loader-card">
-            <span />
-            <strong>{t.loadingData ?? 'Loading data...'}</strong>
-          </div>
-        </div>
+      {(!storageLoaded || !splashReady) && (
+        <AppSplash />
       )}
       {isLicenseExpired ? (
         <LockScreen
