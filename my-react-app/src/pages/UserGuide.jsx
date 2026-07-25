@@ -43,6 +43,11 @@ const guideSections = [
     text: 'Traditional supplier ledger system. Create supplier accounts, opening balances, deposits, withdrawals, goods records, settlements, and supplier profit reports.',
   },
   {
+    key: 'bundles',
+    title: 'Bundles',
+    text: 'Create and manage product bundles by combining multiple items into one sellable package. Set bundle quantities, track included products, manage bundle costs, and sell grouped products more easily from one module.',
+  },
+  {
     key: 'expenses',
     title: 'Expenses',
     text: 'Track all business expenses with amount, category, date, notes, payment method, filters, print options, and expense reports.',

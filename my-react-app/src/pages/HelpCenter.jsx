@@ -49,7 +49,9 @@ function HelpCenter({ t, onNavigate }) {
               key={title}
               type="button"
               onClick={() => {
+                if (title === 'Workflows') onNavigate?.('workflows')
                 if (title === 'User Guide') onNavigate?.('userGuide')
+                if (title === 'FAQ') onNavigate?.('faq')
               }}
             >
               <span>{icon}</span>
@@ -67,17 +69,17 @@ function HelpCenter({ t, onNavigate }) {
           <div className="help-support-list">
             <p>
               <span>✉</span>
-              support@nexora.dev
+              www.afghanpower.com
             </p>
 
             <p>
               <span>☏</span>
-              +93 700 000 000
+              +93 79 494 8698
             </p>
 
             <p>
               <span>🌐</span>
-              www.nexora.dev
+              info@afghanpower.com
             </p>
           </div>
         </section>

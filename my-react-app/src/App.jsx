@@ -23,6 +23,9 @@ import Header from './components/Header.jsx'
 import Sidebar from './components/Sidebar.jsx'
 import UserGuide from './pages/UserGuide.jsx'
 import HelpCenter from './pages/HelpCenter.jsx'
+import About from './pages/About.jsx'
+import FAQ from './pages/FAQ.jsx'
+import Workflows from './pages/Workflows.jsx'
 import { colorThemes, productCategories } from './data/dashboardData.js'
 import { translations } from './data/translations.js'
 import { getCurrencyMeta } from './utils/currencyExchange.js'
@@ -36,6 +39,9 @@ const getPageFromPath = () => {
   if (window.location.pathname.startsWith('/customers/')) return `customerProfile:${window.location.pathname.split('/').pop() || ''}`
   if (window.location.pathname === '/user-guide') return 'userGuide'
   if (window.location.pathname === '/help-center') return 'helpCenter'
+  if (window.location.pathname === '/about') return 'about'
+  if (window.location.pathname === '/faq') return 'faq'
+  if (window.location.pathname === '/workflows') return 'workflows'
   if (window.location.pathname === '/profile') return 'profile'
   if (window.location.pathname === '/settings') return 'settings'
   if (window.location.pathname === '/terms') return 'terms'
@@ -231,6 +237,12 @@ function App() {
             ? '/terms'
             : nextPage === 'helpCenter'
               ? '/help-center'
+              : nextPage === 'about'
+                ? '/about'
+              : nextPage === 'faq'
+                ? '/faq'
+              : nextPage === 'workflows'
+                ? '/workflows'
               : nextPage === 'userGuide'
                 ? '/user-guide'
             : nextPage === 'products'
@@ -697,8 +709,14 @@ function App() {
   <TermsPrivacy companyInfo={companyInfo} t={t} />
 ) : page === 'userGuide' ? (
   <UserGuide t={t} />
-  ) : page === 'helpCenter' ? (
+) : page === 'helpCenter' ? (
   <HelpCenter t={t} onNavigate={navigate} />
+) : page === 'about' ? (
+  <About companyInfo={companyInfo} />
+) : page === 'faq' ? (
+  <FAQ />
+) : page === 'workflows' ? (
+  <Workflows />
 ) : page === 'settings' ? (
   
             <SettingsPage
