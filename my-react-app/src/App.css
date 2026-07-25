@@ -132,3 +132,691 @@
   border-color: hsl(222 47% 20%);
   color: #ffffff;
 }
+
+.app-lock-screen {
+  background: #020304;
+  display: grid;
+  inset: 0;
+  min-height: 100vh;
+  overflow: hidden;
+  place-items: center;
+  position: fixed;
+  z-index: 5000;
+}
+
+.app-lock-wallpaper {
+  animation: lockWallpaperMove 24s linear infinite;
+  background-position: center;
+  background-repeat: repeat-x;
+  background-size: auto 100%;
+  filter: saturate(0.92) contrast(1.06);
+  inset: 0;
+  min-width: 200%;
+  opacity: 0.9;
+  position: absolute;
+  transform: translateX(0);
+}
+
+.app-lock-wallpaper.second {
+  animation-delay: -12s;
+  opacity: 0.55;
+}
+
+.app-lock-screen::after {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08), transparent 30%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.42));
+  content: "";
+  inset: 0;
+  position: absolute;
+}
+
+@keyframes lockWallpaperMove {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.app-lock-card {
+  background: rgba(255, 255, 255, 0.34);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 12px;
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.45);
+  color: #ffffff;
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  padding: 30px 28px;
+  position: relative;
+  width: min(404px, calc(100vw - 36px));
+  z-index: 1;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.app-lock-logo {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  display: flex;
+  height: 58px;
+  justify-content: center;
+  overflow: hidden;
+  width: 58px;
+}
+
+.app-lock-logo img {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.app-lock-card h1 {
+  font-size: 25px;
+  font-weight: 900;
+  line-height: 1;
+  margin: 8px 0 0;
+}
+
+.app-lock-card p {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 13px;
+  margin: 0 0 14px;
+}
+
+.app-lock-input {
+  position: relative;
+  width: 100%;
+}
+
+.app-lock-input input {
+  background: #eaf2ff;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  color: #081226;
+  font: inherit;
+  min-height: 42px;
+  padding: 0 44px 0 12px;
+  width: 100%;
+}
+
+.app-lock-input input:focus {
+  border-color: #b7cffd;
+  box-shadow: 0 0 0 3px rgba(183, 207, 253, 0.35);
+  outline: none;
+}
+
+.app-lock-input button {
+  background: transparent;
+  border: 0;
+  color: rgba(255, 255, 255, 0.82);
+  cursor: pointer;
+  display: grid;
+  height: 100%;
+  place-items: center;
+  position: absolute;
+  right: 8px;
+  top: 0;
+  width: 30px;
+}
+
+.app-lock-submit {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 7px;
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-weight: 850;
+  gap: 8px;
+  justify-content: center;
+  min-height: 38px;
+  width: 100%;
+}
+
+.app-lock-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.app-lock-card small {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 11px;
+  margin-top: 8px;
+  text-align: center;
+}
+
+.app-lock-error {
+  color: #fecaca;
+  font-size: 12px;
+  font-weight: 750;
+  justify-self: start;
+}
+
+@media (max-width: 520px) {
+  .app-lock-card {
+    padding: 24px 18px;
+  }
+}
+
+/* =====================================================
+   LOCK SCREEN
+===================================================== */
+
+.app-lock-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+
+  min-height: 100vh;
+  min-height: 100dvh;
+
+  display: grid;
+  place-items: center;
+
+  padding: 24px;
+  overflow: hidden;
+
+  background: #020407;
+  isolation: isolate;
+}
+
+/* =====================================================
+   MOVING BACKGROUND
+===================================================== */
+
+.app-lock-wallpaper {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+
+  width: 200%;
+  min-width: 200%;
+  height: 100%;
+
+  background-position: center;
+  background-repeat: repeat-x;
+  background-size: auto 100%;
+
+  opacity: 0.82;
+  filter:
+    saturate(0.78)
+    contrast(1.06)
+    brightness(0.72);
+
+  animation: lockWallpaperMove 28s linear infinite;
+  will-change: transform;
+}
+
+.app-lock-wallpaper.second {
+  z-index: -2;
+  opacity: 0.32;
+  animation-delay: -14s;
+  animation-duration: 34s;
+}
+
+/* Dark overlay */
+.app-lock-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+
+  background:
+    radial-gradient(
+      circle at 50% 46%,
+      rgba(56, 89, 135, 0.18),
+      transparent 38%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.3),
+      rgba(0, 0, 0, 0.58)
+    );
+}
+
+/* Soft center glow */
+.app-lock-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 0.05),
+      transparent 32%
+    );
+
+  pointer-events: none;
+}
+
+@keyframes lockWallpaperMove {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* =====================================================
+   GLASS CARD
+===================================================== */
+
+.app-lock-card {
+  position: relative;
+  z-index: 2;
+
+  width: min(390px, calc(100vw - 32px));
+
+  display: grid;
+  justify-items: center;
+  gap: 0;
+
+  padding: 30px 28px 26px;
+
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.18),
+      rgba(255, 255, 255, 0.08)
+    );
+
+  color: #ffffff;
+
+  box-shadow:
+    0 30px 90px rgba(0, 0, 0, 0.48),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+
+  backdrop-filter: blur(22px) saturate(1.15);
+  -webkit-backdrop-filter: blur(22px) saturate(1.15);
+}
+
+/* =====================================================
+   LOGO
+===================================================== */
+
+.app-lock-logo {
+  width: 58px;
+  height: 58px;
+
+  display: grid;
+  place-items: center;
+
+  margin-bottom: 14px;
+
+  overflow: hidden;
+
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.92);
+  color: #172554;
+
+  box-shadow:
+    0 10px 26px rgba(0, 0, 0, 0.22),
+    0 0 0 5px rgba(255, 255, 255, 0.06);
+}
+
+.app-lock-logo img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  border-radius: inherit;
+}
+
+.app-lock-logo svg {
+  width: 25px;
+  height: 25px;
+  color: #172554;
+  stroke: currentColor;
+}
+
+/* =====================================================
+   TEXT
+===================================================== */
+
+.app-lock-card h1 {
+  margin: 0 0 8px;
+
+  color: #ffffff;
+
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.app-lock-card > p {
+  margin: 0 0 22px;
+
+  color: rgba(255, 255, 255, 0.74);
+
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.45;
+  text-align: center;
+
+  user-select: none;
+}
+
+/* =====================================================
+   PASSWORD FIELD
+===================================================== */
+
+.app-lock-input {
+  position: relative;
+
+  width: 100%;
+  display: block;
+
+  margin: 0 0 14px;
+}
+
+.app-lock-input input {
+  width: 100%;
+  height: 46px;
+  min-height: 46px;
+
+  padding: 0 48px 0 14px;
+
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.9);
+  color: #0f172a;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+
+  outline: none;
+
+  box-shadow:
+    inset 0 1px 2px rgba(15, 23, 42, 0.06),
+    0 8px 20px rgba(0, 0, 0, 0.08);
+
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.app-lock-input input:hover {
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.app-lock-input input:focus {
+  border-color: rgba(191, 219, 254, 0.95);
+  background: #ffffff;
+
+  box-shadow:
+    0 0 0 4px rgba(147, 197, 253, 0.18),
+    0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Eye icon button — protected from global button styles */
+#root#root#root .retail-shell .app-lock-input > button {
+  position: absolute !important;
+  top: 50% !important;
+  right: 8px !important;
+  left: auto !important;
+
+  width: 34px !important;
+  min-width: 34px !important;
+  max-width: 34px !important;
+
+  height: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 0 !important;
+  border-radius: 8px !important;
+
+  background: transparent !important;
+  background-image: none !important;
+
+  color: #52647f !important;
+
+  box-shadow: none !important;
+  outline: none !important;
+
+  opacity: 1 !important;
+  visibility: visible !important;
+
+  transform: translateY(-50%) !important;
+
+  cursor: pointer;
+  z-index: 5;
+
+  transition:
+    background-color 150ms ease,
+    color 150ms ease !important;
+}
+
+#root#root#root .retail-shell .app-lock-input > button:hover {
+  border: 0 !important;
+  background: #eef2f7 !important;
+  color: #172554 !important;
+  box-shadow: none !important;
+  transform: translateY(-50%) !important;
+}
+
+#root#root#root .retail-shell .app-lock-input > button:active,
+#root#root#root .retail-shell .app-lock-input > button:focus,
+#root#root#root .retail-shell .app-lock-input > button:focus-visible {
+  border: 0 !important;
+  background: #e5eaf1 !important;
+  color: #172554 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transform: translateY(-50%) !important;
+}
+
+#root#root#root .retail-shell .app-lock-input > button::before,
+#root#root#root .retail-shell .app-lock-input > button::after {
+  display: none !important;
+  content: none !important;
+}
+
+#root#root#root .retail-shell .app-lock-input > button svg {
+  position: static !important;
+
+  width: 17px !important;
+  height: 17px !important;
+
+  color: currentColor !important;
+  stroke: currentColor !important;
+
+  transform: none !important;
+  pointer-events: none;
+}
+
+/* RTL */
+[dir="rtl"] .app-lock-input input {
+  padding: 0 14px 0 48px;
+}
+
+[dir="rtl"] #root#root#root .retail-shell .app-lock-input > button,
+#root#root#root .retail-shell[dir="rtl"] .app-lock-input > button {
+  right: auto !important;
+  left: 8px !important;
+}
+
+/* =====================================================
+   ERROR
+===================================================== */
+
+.app-lock-error {
+  width: 100%;
+  display: block;
+
+  margin: -4px 0 12px;
+
+  color: #fecaca;
+
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: start;
+}
+
+/* =====================================================
+   UNLOCK BUTTON
+===================================================== */
+
+#root#root#root .retail-shell .app-lock-submit {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 44px !important;
+  min-height: 44px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+
+  margin: 0 !important;
+  padding: 0 16px !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border-radius: 10px !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(25, 45, 84, 0.94),
+      rgba(18, 35, 70, 0.94)
+    ) !important;
+
+  color: #ffffff !important;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.22) !important;
+
+  transform: none !important;
+  cursor: pointer;
+
+  transition:
+    background-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease !important;
+}
+
+#root#root#root .retail-shell .app-lock-submit:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.32) !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(31, 55, 101, 0.98),
+      rgba(22, 43, 83, 0.98)
+    ) !important;
+
+  color: #ffffff !important;
+
+  box-shadow:
+    0 15px 34px rgba(0, 0, 0, 0.28) !important;
+
+  transform: translateY(-1px) !important;
+}
+
+#root#root#root .retail-shell .app-lock-submit:active:not(:disabled) {
+  transform: translateY(0) !important;
+}
+
+#root#root#root .retail-shell .app-lock-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+  box-shadow: none !important;
+}
+
+#root#root#root .retail-shell .app-lock-submit::before,
+#root#root#root .retail-shell .app-lock-submit::after {
+  display: none !important;
+  content: none !important;
+}
+
+#root#root#root .retail-shell .app-lock-submit svg {
+  width: 16px !important;
+  height: 16px !important;
+  color: currentColor !important;
+  stroke: currentColor !important;
+}
+
+/* =====================================================
+   HELP TEXT
+===================================================== */
+
+.app-lock-card small {
+  display: block;
+
+  margin-top: 16px;
+
+  color: rgba(255, 255, 255, 0.6);
+
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 520px) {
+  .app-lock-screen {
+    padding: 16px;
+  }
+
+  .app-lock-card {
+    width: 100%;
+    padding: 26px 18px 22px;
+    border-radius: 15px;
+  }
+
+  .app-lock-logo {
+    width: 54px;
+    height: 54px;
+  }
+
+  .app-lock-card h1 {
+    font-size: 22px;
+  }
+
+  .app-lock-input input {
+    height: 44px;
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-lock-wallpaper,
+  .app-lock-wallpaper.second {
+    animation: none;
+  }
+}

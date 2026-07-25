@@ -23,6 +23,7 @@ import Header from './components/Header.jsx'
 import Sidebar from './components/Sidebar.jsx'
 import UserGuide from './pages/UserGuide.jsx'
 import HelpCenter from './pages/HelpCenter.jsx'
+import { Eye, Lock, Shield } from './components/Icons.jsx'
 import About from './pages/About.jsx'
 import FAQ from './pages/FAQ.jsx'
 import Workflows from './pages/Workflows.jsx'
@@ -31,6 +32,8 @@ import { translations } from './data/translations.js'
 import { getCurrencyMeta } from './utils/currencyExchange.js'
 import { clearLegacyJsonStorage, hasLegacyJsonStorage, loadJsonStorage, readLegacyJson, saveJsonStorage } from './utils/jsonStorage.js'
 import { playNotificationSound } from './utils/notificationSounds.js'
+import { hashPassword } from './utils/security.js'
+import lockWallpaper from './assets/Black Blue and White Abstract Wave Desktop Wallpaper.png'
 import './App.css'
 import './pages/PageShared.css'
 
@@ -126,6 +129,12 @@ const defaultCompanyInfo = {
   website: '',
   currency: 'AFN',
   logo: '',
+  securitySettings: {
+    passwordHash: '',
+    passwordHashes: {},
+    lockOnStart: false,
+    passwordUpdatedAt: '',
+  },
 }
 
 const alertBeforeDays = {
@@ -173,6 +182,65 @@ function ConfirmActionModal({ confirmText, message, onCancel, onConfirm, title, 
   )
 }
 
+function LockScreen({ companyInfo, onUnlock, t }) {
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState('')
+  const [checking, setChecking] = useState(false)
+
+  const unlock = async (event) => {
+    event.preventDefault()
+    setChecking(true)
+    const passwordHash = await hashPassword(password)
+    const allowedHashes = [
+      companyInfo.securitySettings?.passwordHashes?.primary || companyInfo.securitySettings?.passwordHash,
+      companyInfo.securitySettings?.passwordHashes?.secondary,
+    ].filter(Boolean)
+    if (allowedHashes.includes(passwordHash)) {
+      setPassword('')
+      setError('')
+      onUnlock()
+    } else {
+      setError(t.currentPasswordIncorrect ?? 'Current password is incorrect')
+    }
+    setChecking(false)
+  }
+
+  return (
+    <div className="app-lock-screen">
+      <div className="app-lock-wallpaper" style={{ backgroundImage: `url("${lockWallpaper}")` }} />
+      <div className="app-lock-wallpaper second" style={{ backgroundImage: `url("${lockWallpaper}")` }} />
+      <form className="app-lock-card" onSubmit={unlock}>
+        <div className="app-lock-logo">
+          {companyInfo.logo ? <img alt="" src={companyInfo.logo} /> : <Lock size={28} />}
+        </div>
+        <h1>{companyInfo.name || 'RetailPro'}</h1>
+        <p>{t.welcomeBackAdministrator ?? 'Welcome back, Administrator'}</p>
+        <label className="app-lock-input">
+          <input
+            autoFocus
+            type={showPassword ? 'text' : 'password'}
+            value={password}
+            onChange={(event) => {
+              setPassword(event.target.value)
+              setError('')
+            }}
+          />
+          <button type="button" aria-label={t.showPassword ?? 'Show password'} onClick={() => setShowPassword((current) => !current)}>
+            <Eye size={16} />
+          </button>
+        </label>
+        {error && <span className="app-lock-error">{error}</span>}
+        <button className="app-lock-submit" type="submit" disabled={checking || !password}>
+          <Shield size={15} />
+          <span>{checking ? (t.checking ?? 'Checking...') : (t.unlock ?? 'Unlock')}</span>
+        </button>
+        <small>{t.lockScreenHelp ?? 'Screen is locked for security. Enter your password to continue.'}</small>
+      </form>
+    </div>
+  )
+}
+
 function App() {
   const [storageLoaded, setStorageLoaded] = useState(false)
   const [theme, setTheme] = useState(() => readStorage('retail-theme-mode', 'light'))
@@ -210,9 +278,17 @@ function App() {
   const alertSoundTimerRef = useRef(null)
   const [printSettings, setPrintSettings] = useState(() => readStorage('retail-print-settings', defaultPrintSettings))
   const [companyInfo, setCompanyInfo] = useState(() => readStorage('retail-company-info', defaultCompanyInfo))
+  const [isLocked, setIsLocked] = useState(false)
+  const initialLockAppliedRef = useRef(false)
   const t = useMemo(() => translations[language], [language])
   const isRtl = language === 'fa' || language === 'ps'
   const selectedColorTheme = colorThemes.find((item) => item.id === activeColorTheme) ?? colorThemes[0]
+  const securitySettings = companyInfo.securitySettings ?? defaultCompanyInfo.securitySettings
+  const hasSecurityPassword = Boolean(
+    securitySettings.passwordHash ||
+    securitySettings.passwordHashes?.primary ||
+    securitySettings.passwordHashes?.secondary,
+  )
   window.__retailCurrencyView = {
     baseCurrency,
     businessCurrencyFilter,
@@ -284,6 +360,18 @@ function App() {
     window.clearTimeout(toastTimerRef.current)
     setToast(message)
     toastTimerRef.current = window.setTimeout(() => setToast(''), 2400)
+  }
+
+  const appendLiveActivity = (message, level = 'info') => {
+    setCompanyInfo((current) => ({
+      ...current,
+      liveActivity: [{
+        id: crypto.randomUUID(),
+        level,
+        message,
+        time: new Date().toISOString(),
+      }, ...(current.liveActivity ?? [])].slice(0, 120),
+    }))
   }
 
   const appBackupData = useMemo(() => ({
@@ -549,6 +637,16 @@ function App() {
     return () => window.clearTimeout(alertSoundTimerRef.current)
   }, [companyInfo.notificationSettings?.sound, godownEntries, products, storageLoaded, t.alertsOptional])
 
+  useEffect(() => {
+    if (!storageLoaded || initialLockAppliedRef.current) return
+    initialLockAppliedRef.current = true
+    if (hasSecurityPassword && securitySettings.lockOnStart) setIsLocked(true)
+  }, [hasSecurityPassword, securitySettings.lockOnStart, storageLoaded])
+
+  useEffect(() => {
+    if (!hasSecurityPassword && isLocked) setIsLocked(false)
+  }, [hasSecurityPassword, isLocked])
+
   const notifications = useMemo(() => {
     const items = []
     products.forEach((product) => {
@@ -596,6 +694,27 @@ function App() {
   }, [dismissedNotificationIds, products, t.expiringSoon, t.lowStockAlert, t.notificationLowStockDemo, t.outOfStock, t.product])
 
   useEffect(() => () => window.clearTimeout(toastTimerRef.current), [])
+
+  useEffect(() => {
+    const originalConsoleError = console.error
+    const captureError = (event) => {
+      appendLiveActivity(event.message || 'Runtime error', 'error')
+    }
+    const captureRejection = (event) => {
+      appendLiveActivity(event.reason?.message || String(event.reason || 'Unhandled promise rejection'), 'error')
+    }
+    console.error = (...args) => {
+      appendLiveActivity(args.map((item) => item?.message || String(item)).join(' '), 'error')
+      originalConsoleError(...args)
+    }
+    window.addEventListener('error', captureError)
+    window.addEventListener('unhandledrejection', captureRejection)
+    return () => {
+      console.error = originalConsoleError
+      window.removeEventListener('error', captureError)
+      window.removeEventListener('unhandledrejection', captureRejection)
+    }
+  }, [])
 
   const addCategory = (category) => {
     setCategories((current) => current.some((item) => item.toLowerCase() === category.toLowerCase()) ? current : [...current, category])
@@ -702,6 +821,14 @@ function App() {
             onExchangeCurrencyChange={setExchangeCurrency}
             onWalletEntriesChange={setCashWalletEntries}
             onLanguageChange={setLanguage}
+            onLockScreen={() => {
+              if (hasSecurityPassword) {
+                setIsLocked(true)
+              } else {
+                navigate('settings')
+                showToast(t.noPasswordSet ?? 'No password set')
+              }
+            }}
             onMissingCurrencyRate={setCurrencyRateWarning}
             onNavigate={navigate}
             onNotificationsChange={(updater) => {
@@ -753,7 +880,7 @@ function App() {
               t={t}
             />
           ) : page === 'profile' ? (
-            <Profile onNotify={showToast} t={t} />
+            <Profile companyInfo={companyInfo} onCompanyInfoChange={setCompanyInfo} onNotify={showToast} t={t} />
           ) : page === 'products' ? (
             <ProductsPage
               categories={categories}
@@ -1006,6 +1133,13 @@ function App() {
             <strong>{t.loadingData ?? 'Loading data...'}</strong>
           </div>
         </div>
+      )}
+      {storageLoaded && isLocked && (
+        <LockScreen
+          companyInfo={{ ...defaultCompanyInfo, ...companyInfo, securitySettings }}
+          onUnlock={() => setIsLocked(false)}
+          t={t}
+        />
       )}
       {toast && <div className="app-toast" role="status">{toast}</div>}
     </div>
