@@ -951,10 +951,10 @@
 #root#root#root .retail-shell {
   --app-primary-button-bg: hsl(222 47% 20%);
   --app-primary-button-bg-hover: hsl(222 47% 16%);
-  --app-secondary-button-bg: #ffffff;
-  --app-secondary-button-bg-hover: #f8fafc;
-  --app-secondary-button-text: #020617;
-  --app-button-border: #dbe3ef;
+  --app-secondary-button-bg: hsl(222 47% 20%);
+  --app-secondary-button-bg-hover: hsl(222 47% 16%);
+  --app-secondary-button-text: #ffffff;
+  --app-button-border: hsl(222 47% 20%);
 }
 
 #root#root#root .retail-shell .main-area :is(
@@ -991,7 +991,7 @@
   .print-preview-top .print-top-link:not(.primary-btn):not(.print-confirm-btn),
   .invoice-preview-top .print-top-link:not(.primary-btn):not(.print-confirm-btn)
 ):not(.date-range-btn):not(.smooth-select-btn):not(.modal-close):not(.icon-only):not(:disabled):hover {
-  border-color: #cbd5e1 !important;
+  border-color: var(--app-primary-button-bg-hover) !important;
   background: var(--app-secondary-button-bg-hover) !important;
   color: var(--app-secondary-button-text) !important;
   transform: translateY(-1px);
