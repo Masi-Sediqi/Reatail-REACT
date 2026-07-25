@@ -685,6 +685,18 @@ function App() {
             exchangeRates={exchangeRates}
             language={language}
             notifications={notifications}
+            searchData={{
+              bundles,
+              cashWalletEntries,
+              customers,
+              deletedItems,
+              expenses,
+              godownEntries,
+              products,
+              sales: salesBills,
+              staffMembers,
+              suppliers,
+            }}
             onBusinessCurrencyFilterChange={setBusinessCurrencyFilter}
             onCashWalletChange={setCashWallet}
             onExchangeCurrencyChange={setExchangeCurrency}

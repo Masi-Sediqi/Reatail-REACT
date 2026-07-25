@@ -420,7 +420,7 @@
 }
 
 #root#root#root .retail-shell[dir="rtl"] .collapse-btn svg {
-  transform: rotate(180deg);
+  transform: none !important;
 }
 
 /* RTL sidebar alignment: keep icons, labels, and lower menu items stable. */
@@ -429,21 +429,43 @@
 }
 
 #root#root#root .retail-shell[dir="rtl"] .brand-block {
-  grid-template-columns: 28px minmax(0, 1fr) 34px;
+  direction: ltr;
+  grid-template-columns: 34px minmax(0, 1fr) 28px !important;
+  justify-items: stretch;
 }
 
 #root#root#root .retail-shell[dir="rtl"] .brand-mark {
-  grid-column: 3;
+  grid-column: 1 !important;
+  justify-self: start;
 }
 
 #root#root#root .retail-shell[dir="rtl"] .brand-name {
-  grid-column: 2;
+  grid-column: 2 !important;
   min-width: 0;
-  text-align: right;
+  overflow: hidden;
+  text-align: left !important;
+}
+
+#root#root#root .retail-shell .brand-name strong,
+#root#root#root .retail-shell .brand-name small {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#root#root#root .retail-shell .brand-name strong {
+  white-space: nowrap;
+}
+
+#root#root#root .retail-shell[dir="rtl"] .brand-name strong,
+#root#root#root .retail-shell[dir="rtl"] .brand-name small {
+  direction: ltr;
+  text-align: left !important;
 }
 
 #root#root#root .retail-shell[dir="rtl"] .collapse-btn {
-  grid-column: 1;
+  grid-column: 3 !important;
+  justify-self: end;
 }
 
 #root#root#root .retail-shell[dir="rtl"] .side-nav button,

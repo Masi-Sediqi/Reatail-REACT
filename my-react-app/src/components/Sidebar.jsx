@@ -59,7 +59,7 @@ function Sidebar({ activePage, companyInfo, onNavigate, onToggle, t }) {
           {companyInfo.logo ? <img src={companyInfo.logo} alt="" /> : <span>□</span>}
         </div>
 
-        <div>
+        <div className="brand-name">
           <strong>{companyInfo.name || 'RetailPro'}</strong>
           <small>{companyInfo.tagline || t.retailManagement}</small>
         </div>

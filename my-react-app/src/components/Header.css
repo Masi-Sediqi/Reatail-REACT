@@ -2932,6 +2932,7 @@
   display: flex !important;
   align-items: center !important;
   justify-content: flex-start !important;
+  gap: 12px !important;
 
   margin: 0 !important;
   padding: 0 !important;
@@ -2951,6 +2952,35 @@
   transform: none !important;
 
   overflow: visible !important;
+}
+
+#root#root#root
+.retail-shell
+.app-header
+.search-shell input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+}
+
+#root#root#root
+.retail-shell
+.app-header
+.search-shell input::placeholder {
+  color: color-mix(in srgb, var(--muted) 72%, transparent);
+}
+
+#root#root#root
+.retail-shell[dir="rtl"]
+.app-header
+.search-shell {
+  direction: rtl;
+  text-align: right !important;
 }
 
 /* حذف هر نوع لایه اضافی */
@@ -3057,6 +3087,164 @@
   color: var(--text) !important;
 
   box-shadow: 0 24px 70px rgba(15, 23, 42, 0.26) !important;
+}
+
+#root#root#root
+.retail-shell
+.header-shared-modal:has(.search-modal-body) {
+  width: min(720px, calc(100vw - 28px)) !important;
+}
+
+#root#root#root
+.retail-shell
+.search-modal-body {
+  display: grid;
+  gap: 14px;
+}
+
+#root#root#root
+.retail-shell
+.global-search-input {
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-soft);
+}
+
+#root#root#root
+.retail-shell
+.global-search-input input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+}
+
+#root#root#root
+.retail-shell
+.global-search-results {
+  max-height: min(430px, calc(100dvh - 260px));
+  display: grid;
+  gap: 8px;
+  overflow-y: auto;
+  padding-inline-end: 4px;
+}
+
+#root#root#root
+.retail-shell
+.global-search-results button {
+  width: 100%;
+  min-height: 76px;
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  align-items: start;
+  gap: 3px 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-bg);
+  color: var(--text);
+  text-align: start;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.045);
+}
+
+#root#root#root
+.retail-shell
+.global-search-results button:hover {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+  background: color-mix(in srgb, var(--accent-soft) 36%, var(--panel-bg));
+}
+
+#root#root#root
+.retail-shell
+.global-result-module {
+  grid-row: 1 / span 3;
+  align-self: start;
+  width: fit-content;
+  max-width: 112px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+#root#root#root
+.retail-shell
+.global-search-results strong,
+#root#root#root
+.retail-shell
+.global-search-results small,
+#root#root#root
+.retail-shell
+.global-search-results p {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#root#root#root
+.retail-shell
+.global-search-results strong {
+  font-size: 14px;
+  font-weight: 850;
+}
+
+#root#root#root
+.retail-shell
+.global-search-results small,
+#root#root#root
+.retail-shell
+.global-search-results p {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+#root#root#root
+.retail-shell
+.global-search-empty {
+  min-height: 120px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 6px;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  color: var(--muted);
+  text-align: center;
+}
+
+#root#root#root
+.retail-shell
+.global-search-empty strong {
+  color: var(--text);
+}
+
+#root#root#root
+.retail-shell[dir="rtl"]
+.global-search-results button {
+  direction: rtl;
+  grid-template-columns: minmax(0, 1fr) 112px;
+  text-align: right;
+}
+
+#root#root#root
+.retail-shell[dir="rtl"]
+.global-result-module {
+  grid-column: 2;
 }
 
 /* Header Modal */

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import CustomSelect from './CustomSelect.jsx'
 import {
@@ -233,35 +233,190 @@ function WalletModal({ onClose, onSave, t }) {
   )
 }
 
-function SearchModal({ onClose, t }) {
+const normalizeSearchText = (value) =>
+  String(value ?? '')
+    .toLowerCase()
+    .replace(/[ي]/g, 'ی')
+    .replace(/[ك]/g, 'ک')
+    .trim()
+
+const compactText = (...values) => values.filter(Boolean).map((value) => String(value).trim()).filter(Boolean).join(' · ')
+
+function SearchModal({ initialQuery = '', onClose, onNavigate, searchData = {}, t }) {
+  const [query, setQuery] = useState(initialQuery)
+  const searchTerm = normalizeSearchText(query)
+
+  const sections = useMemo(() => [
+    {
+      key: 'products',
+      label: t.products,
+      page: 'products',
+      items: searchData.products ?? [],
+      map: (item) => ({
+        title: item.name || item.code || item.barcode || t.product,
+        meta: compactText(item.code, item.barcode, item.category, item.supplierName),
+        body: compactText(item.quantity && `${item.quantity} ${item.unit || ''}`, item.sellingPrice, item.status),
+      }),
+    },
+    {
+      key: 'customers',
+      label: t.customers,
+      page: 'customers',
+      items: searchData.customers ?? [],
+      map: (item) => ({
+        title: item.name || item.phone || t.customers,
+        meta: compactText(item.phone, item.email, item.address),
+        body: compactText(item.balance, item.totalPurchases),
+      }),
+    },
+    {
+      key: 'sales',
+      label: t.salesBills,
+      page: 'salesBills',
+      items: searchData.sales ?? [],
+      map: (item) => ({
+        title: item.invoiceNumber || item.customerName || t.salesBills,
+        meta: compactText(item.customerName, item.customerPhone, item.date),
+        body: compactText(item.total, item.paidAmount, item.paymentStatus),
+      }),
+    },
+    {
+      key: 'suppliers',
+      label: t.suppliers,
+      page: 'suppliers',
+      items: searchData.suppliers ?? [],
+      map: (item) => ({
+        title: item.name || item.phone || t.suppliers,
+        meta: compactText(item.phone, item.email, item.address),
+        body: compactText(item.currency, item.balance),
+      }),
+    },
+    {
+      key: 'bundles',
+      label: t.bundlesManagement ?? 'Bundles',
+      page: 'bundles',
+      items: searchData.bundles ?? [],
+      map: (item) => ({
+        title: item.name || item.code || (t.bundlesManagement ?? 'Bundles'),
+        meta: compactText(item.code, item.parentGroup, item.arrivalDate),
+        body: compactText(item.currency, item.status, item.rows?.length && `${item.rows.length} ${t.bags ?? 'bags'}`),
+      }),
+    },
+    {
+      key: 'godown',
+      label: t.godown,
+      page: 'godown',
+      items: searchData.godownEntries ?? [],
+      map: (item) => ({
+        title: item.name || item.code || t.godown,
+        meta: compactText(item.code, item.supplierName, item.date),
+        body: compactText(item.quantity, item.unit, item.total),
+      }),
+    },
+    {
+      key: 'staff',
+      label: t.staffMembers ?? t.staff,
+      page: 'staff',
+      items: searchData.staffMembers ?? [],
+      map: (item) => ({
+        title: item.name || item.phone || (t.staffMembers ?? t.staff),
+        meta: compactText(item.role, item.phone, item.email),
+        body: compactText(item.salary, item.currency, item.status),
+      }),
+    },
+    {
+      key: 'expenses',
+      label: t.expenses,
+      page: 'expenses',
+      items: searchData.expenses ?? [],
+      map: (item) => ({
+        title: item.title || item.category || item.description || t.expenses,
+        meta: compactText(item.category, item.date, item.paymentMethod),
+        body: compactText(item.amount, item.currency, item.notes),
+      }),
+    },
+    {
+      key: 'cashWallet',
+      label: t.cashWallet ?? 'Cash Wallet',
+      page: 'dashboardMetric:currentCashWallet',
+      items: searchData.cashWalletEntries ?? [],
+      map: (item) => ({
+        title: item.note || item.type || (t.cashWallet ?? 'Cash Wallet'),
+        meta: compactText(item.date, item.currency, item.group || item.type),
+        body: compactText(item.amount, item.direction, item.delta),
+      }),
+    },
+    {
+      key: 'recycleBin',
+      label: t.recycleBin,
+      page: 'recycleBin',
+      items: searchData.deletedItems ?? [],
+      map: (item) => ({
+        title: item.name || item.module || t.recycleBin,
+        meta: compactText(item.module, item.deletedAt),
+        body: compactText(item.daysLeft && `${item.daysLeft} ${t.daysLeft ?? 'days left'}`),
+      }),
+    },
+  ], [searchData, t])
+
+  const results = useMemo(() => {
+    if (!searchTerm) return []
+
+    return sections.flatMap((section) =>
+      section.items.map((item) => {
+        const mapped = section.map(item)
+        const haystack = normalizeSearchText(compactText(mapped.title, mapped.meta, mapped.body, JSON.stringify(item)))
+        return haystack.includes(searchTerm)
+          ? {
+            id: `${section.key}-${item.id || item.code || item.invoiceNumber || mapped.title}`,
+            ...mapped,
+            label: section.label,
+            page: section.page,
+          }
+          : null
+      }).filter(Boolean),
+    ).slice(0, 24)
+  }, [searchTerm, sections])
+
+  const openResult = (page) => {
+    onNavigate?.(page)
+    onClose()
+  }
+
   return (
     <HeaderModalFrame icon={<Search size={20} />} onClose={onClose} subtitle={t.searchModalHint} title={t.search}>
       <div className="search-modal-body">
         <div className="global-search-input">
           <Search size={18} />
-          <input autoFocus placeholder={t.searchEverythingPlaceholder} />
+          <input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t.searchEverythingPlaceholder} />
         </div>
-        <div className="search-suggestion-grid">
-  <button type="button">
-    <span>{t.products}</span>
-    <small>{t.searchProductsHint ?? 'Search inventory items'}</small>
-  </button>
 
-  <button type="button">
-    <span>{t.customers}</span>
-    <small>{t.searchCustomersHint ?? 'Find customer records'}</small>
-  </button>
-
-  <button type="button">
-    <span>{t.suppliers}</span>
-    <small>{t.searchSuppliersHint ?? 'Browse suppliers'}</small>
-  </button>
-
-  <button type="button">
-    <span>{t.salesBills}</span>
-    <small>{t.searchSalesHint ?? 'Search invoices and bills'}</small>
-  </button>
-</div>
+        {!searchTerm ? (
+          <div className="search-suggestion-grid">
+            {sections.slice(0, 8).map((section) => (
+              <button key={section.key} type="button" onClick={() => openResult(section.page)}>
+                <span>{section.label}</span>
+                <small>{section.items.length} {t.records ?? 'records'}</small>
+              </button>
+            ))}
+          </div>
+        ) : results.length ? (
+          <div className="global-search-results">
+            {results.map((result) => (
+              <button key={result.id} type="button" onClick={() => openResult(result.page)}>
+                <span className="global-result-module">{result.label}</span>
+                <strong>{result.title}</strong>
+                {result.meta && <small>{result.meta}</small>}
+                {result.body && <p>{result.body}</p>}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="global-search-empty">
+            <strong>{t.noRecordsFound ?? 'No records found'}</strong>
+            <span>{t.searchEverythingPlaceholder}</span>
+          </div>
+        )}
       </div>
     </HeaderModalFrame>
   )
@@ -406,6 +561,7 @@ function Header({
   onNotificationsChange,
   onThemeToggle,
   onWalletEntriesChange,
+  searchData = {},
   t,
   theme,
 }) {
@@ -416,6 +572,7 @@ function Header({
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [walletOpen, setWalletOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
+  const [headerSearchQuery, setHeaderSearchQuery] = useState('')
   const businessCurrencyButtonRef = useRef(null)
   const exchangeCurrencyButtonRef = useRef(null)
   const languageButtonRef = useRef(null)
@@ -563,9 +720,18 @@ useEffect(() => {
 
   return (
     <header className="app-header">
-      <button className="search-shell" type="button" onClick={() => setSearchOpen(true)} aria-label={t.search}>
+      <label className="search-shell" aria-label={t.search}>
         <SearchIcon size={22} />
-      </button>
+        <input
+          value={headerSearchQuery}
+          onFocus={() => setSearchOpen(true)}
+          onChange={(event) => {
+            setHeaderSearchQuery(event.target.value)
+            setSearchOpen(true)
+          }}
+          placeholder={t.searchEverythingPlaceholder ?? t.search}
+        />
+      </label>
 
       <div className="header-tools">
       {headerActions.map((action) => {
@@ -853,7 +1019,7 @@ useEffect(() => {
     t={t}
   />
 )}
-      {searchOpen && <SearchModal onClose={() => setSearchOpen(false)} t={t} />}
+      {searchOpen && <SearchModal initialQuery={headerSearchQuery} onClose={() => setSearchOpen(false)} onNavigate={onNavigate} searchData={searchData} t={t} />}
     </header>
   )
 }
