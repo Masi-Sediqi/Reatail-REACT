@@ -3675,6 +3675,10 @@
     max-width: 32px !important;
   }
 
+  #root#root#root .retail-shell .app-header .account-wrap {
+    margin-inline-start: auto !important;
+  }
+
   #root#root#root .retail-shell .app-header :is(.icon-btn, .avatar-btn) {
     flex: 0 0 32px !important;
     width: 32px !important;
