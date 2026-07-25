@@ -3440,13 +3440,19 @@
 .retail-shell
 .header-shared-modal:has(.search-modal-body) {
   width: min(720px, calc(100vw - 28px)) !important;
+  max-height: min(620px, calc(100dvh - 28px)) !important;
+  overflow: hidden !important;
 }
 
 #root#root#root
 .retail-shell
 .search-modal-body {
   display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   gap: 14px;
+  min-height: 0;
+  max-height: calc(100dvh - 150px);
+  overflow: hidden;
 }
 
 #root#root#root
@@ -3479,10 +3485,13 @@
 #root#root#root
 .retail-shell
 .global-search-results {
-  max-height: min(430px, calc(100dvh - 260px));
+  min-height: 0;
+  max-height: min(430px, calc(100dvh - 250px));
   display: grid;
+  align-content: start;
   gap: 8px;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding-inline-end: 4px;
 }
 
@@ -3563,7 +3572,7 @@
 #root#root#root
 .retail-shell
 .global-search-empty {
-  min-height: 120px;
+  min-height: 112px;
   display: grid;
   place-items: center;
   align-content: center;
@@ -3572,6 +3581,12 @@
   border-radius: 10px;
   color: var(--muted);
   text-align: center;
+}
+
+#root#root#root
+.retail-shell
+.global-search-empty.is-ready {
+  min-height: 96px;
 }
 
 #root#root#root
@@ -3592,6 +3607,117 @@
 .retail-shell[dir="rtl"]
 .global-result-module {
   grid-column: 2;
+}
+
+@media (max-width: 760px) {
+  #root#root#root .retail-shell .app-header {
+    height: 44px !important;
+    min-height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    margin: 8px 8px 0 !important;
+    padding: 5px 6px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  #root#root#root .retail-shell .app-header .search-shell {
+    flex: 0 0 32px !important;
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
+    display: inline-grid !important;
+    place-items: center !important;
+    padding: 0 !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 10px !important;
+    background: var(--panel-soft) !important;
+  }
+
+  #root#root#root .retail-shell .app-header .search-shell input {
+    position: absolute !important;
+    width: 1px !important;
+    min-width: 1px !important;
+    height: 1px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  #root#root#root .retail-shell .app-header .search-shell svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  #root#root#root .retail-shell .app-header .header-tools {
+    flex: 1 1 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 4px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  #root#root#root .retail-shell .app-header :is(.tool-wrap, .account-wrap) {
+    flex: 0 0 32px !important;
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+  }
+
+  #root#root#root .retail-shell .app-header :is(.icon-btn, .avatar-btn) {
+    flex: 0 0 32px !important;
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
+  }
+
+  #root#root#root .retail-shell .app-header :is(.pill-mini, .theme-state) {
+    display: none !important;
+  }
+
+  #root#root#root .retail-shell .app-header::-webkit-scrollbar,
+  #root#root#root .retail-shell .app-header .header-tools::-webkit-scrollbar {
+    display: none;
+  }
+
+  #root#root#root .retail-shell .header-shared-modal:has(.search-modal-body) {
+    width: calc(100vw - 20px) !important;
+    max-height: calc(100dvh - 20px) !important;
+    padding: 16px !important;
+  }
+
+  #root#root#root .retail-shell .search-modal-body {
+    max-height: calc(100dvh - 128px);
+  }
+
+  #root#root#root .retail-shell .global-search-results button {
+    min-height: 72px;
+    grid-template-columns: 1fr;
+  }
+
+  #root#root#root .retail-shell[dir="rtl"] .global-search-results button {
+    grid-template-columns: 1fr;
+  }
+
+  #root#root#root .retail-shell .global-result-module,
+  #root#root#root .retail-shell[dir="rtl"] .global-result-module {
+    grid-column: 1;
+    grid-row: auto;
+  }
 }
 
 /* Header Modal */

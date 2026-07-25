@@ -389,13 +389,9 @@ function SearchModal({ initialQuery = '', onClose, onNavigate, searchData = {}, 
           <input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t.searchEverythingPlaceholder} />
         </div>
         {!searchTerm ? (
-          <div className="search-suggestion-grid">
-            {sections.slice(0, 8).map((section) => (
-              <button key={section.key} type="button" onClick={() => openResult(section.page)}>
-                <span>{section.label}</span>
-                <small>{section.items.length} {t.records ?? 'records'}</small>
-              </button>
-            ))}
+          <div className="global-search-empty is-ready">
+            <strong>{t.searchReady ?? 'Start typing to search'}</strong>
+            <span>{t.searchEverythingPlaceholder}</span>
           </div>
         ) : results.length ? (
           <div className="global-search-results">
@@ -787,10 +783,11 @@ function Header({
 
   return (
     <header className="app-header">
-      <label className="search-shell" aria-label={t.search}>
+      <label className="search-shell" aria-label={t.search} onClick={() => setSearchOpen(true)}>
         <SearchIcon size={22} />
         <input
           value={headerSearchQuery}
+          onClick={() => setSearchOpen(true)}
           onFocus={() => setSearchOpen(true)}
           onChange={(event) => {
             setHeaderSearchQuery(event.target.value)

@@ -3017,4 +3017,25 @@ Object.assign(ps, {
   upcomingArrivals: 'راتلونکې رسېدنې',
 })
 
+Object.assign(en, {
+  searchReady: 'Start typing to search',
+  searchModalHint: 'Search across your whole retail system without leaving this page.',
+  stockAlertSummary: '{count} products are running low on stock',
+  viewDetails: 'View Details',
+})
+
+Object.assign(fa, {
+  searchReady: 'برای جستجو تایپ کنید',
+  searchModalHint: 'بدون ترک این صفحه، در تمام سیستم فروشگاه جستجو کنید.',
+  stockAlertSummary: '{count} محصول موجودی کم دارد',
+  viewDetails: 'دیدن جزئیات',
+})
+
+Object.assign(ps, {
+  searchReady: 'د لټون لپاره ولیکئ',
+  searchModalHint: 'له دې پاڼې وتلو پرته په ټول سیستم کې لټون وکړئ.',
+  stockAlertSummary: '{count} محصولات کم موجودي لري',
+  viewDetails: 'جزئیات وګورئ',
+})
+
 export const translations = { en, fa, ps }

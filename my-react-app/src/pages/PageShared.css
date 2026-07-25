@@ -2024,6 +2024,117 @@
   text-align: right !important;
 }
 
+/* Help/about/documentation pages should follow the active app theme. */
+#root#root#root .retail-shell.theme-dark .main-area :is(
+  .help-center-page,
+  .about-page,
+  .faq-page,
+  .user-guide-page,
+  .workflows-page,
+  .terms-page,
+  .terms-privacy-page
+) {
+  background: var(--app-bg) !important;
+  color: var(--text) !important;
+}
+
+#root#root#root .retail-shell.theme-dark .main-area :is(
+  .help-card,
+  .help-quick-card,
+  .help-support-card,
+  .about-card,
+  .about-feature,
+  .about-partners article,
+  .faq-item,
+  .faq-question,
+  .guide-hero-card,
+  .guide-tabs,
+  .guide-card,
+  .workflows-hero,
+  .workflow-tabs,
+  .workflow-panel,
+  .terms-top-card,
+  .terms-tabs,
+  .terms-card,
+  .terms-list li,
+  .terms-contact
+) {
+  border-color: var(--border) !important;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+#root#root#root .retail-shell.theme-dark .main-area :is(
+  .help-center-hero h1,
+  .help-card h3,
+  .help-quick-card h3,
+  .help-support-card h2,
+  .about-hero h1,
+  .about-section-title,
+  .about-business strong,
+  .about-feature h3,
+  .about-partners h3,
+  .about-developer h3,
+  .faq-hero h1,
+  .faq-question,
+  .guide-hero-text h1,
+  .guide-card h2,
+  .terms-title-area h1,
+  .terms-card h2,
+  .terms-card-head span,
+  .terms-list li
+) {
+  color: var(--text) !important;
+}
+
+#root#root#root .retail-shell.theme-dark .main-area :is(
+  .help-center-hero p,
+  .help-card p,
+  .help-quick-card p,
+  .help-support-list p,
+  .about-hero p,
+  .about-hero span,
+  .about-business p,
+  .about-feature p,
+  .about-location,
+  .about-bio,
+  .about-partners p,
+  .about-card footer,
+  .faq-hero p,
+  .faq-answer,
+  .guide-hero-text p,
+  .guide-main-text,
+  .terms-title-area p,
+  .terms-card p,
+  .terms-card li,
+  .terms-card-head p
+) {
+  color: var(--muted) !important;
+}
+
+#root#root#root .retail-shell.theme-dark .main-area :is(
+  .help-center-logo img,
+  .about-logo img,
+  .faq-logo img
+) {
+  mix-blend-mode: normal !important;
+}
+
+#root#root#root .retail-shell.theme-dark .main-area :is(
+  .guide-logo-box,
+  .terms-logo-box,
+  .about-avatar,
+  .about-tags span,
+  .guide-hero-text span,
+  .guide-card-header span,
+  .terms-title-area span,
+  .terms-list li::before
+) {
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+}
+
 .retail-shell {
   --control-height: 42px;
   --control-radius: 10px;
