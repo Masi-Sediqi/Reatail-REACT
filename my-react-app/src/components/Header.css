@@ -64,6 +64,36 @@
   gap: 12px;
 }
 
+.license-countdown-pill {
+  min-width: 92px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 11px;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, #22c55e);
+  border-radius: 999px;
+  background: color-mix(in srgb, #dcfce7 64%, var(--panel-bg));
+  color: #166534;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.license-countdown-pill svg {
+  flex: 0 0 auto;
+  color: currentColor;
+}
+
+.license-countdown-pill.expired {
+  border-color: color-mix(in srgb, var(--border) 55%, #ef4444);
+  background: color-mix(in srgb, #fee2e2 70%, var(--panel-bg));
+  color: #b91c1c;
+}
+
 .tool-wrap,
 .account-wrap {
   position: relative;
@@ -1013,6 +1043,13 @@
 
   .header-tools {
     gap: 6px;
+  }
+
+  .license-countdown-pill {
+    min-width: 78px;
+    height: 32px;
+    padding: 0 9px;
+    font-size: 11px;
   }
 
   .metric-grid.financial,
@@ -4401,4 +4438,277 @@ label.wide {
   opacity: 1;
   pointer-events: auto !important;
   overflow: hidden;
+}
+/* =====================================================
+   ACCOUNT LICENSE COUNTDOWN
+===================================================== */
+
+.account-menu-item-group {
+  display: grid;
+  min-width: 0;
+}
+
+/* Small timeout under Lock Screen */
+
+.account-menu-item-group {
+  display: block;
+  min-width: 0;
+}
+
+.account-timeout-mini {
+  width: calc(100% - 14px);
+  min-width: 0;
+  min-height: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  margin: 2px 7px 7px;
+  padding: 5px 9px;
+
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--border) 75%,
+      #22c55e
+    );
+  border-radius: 7px;
+
+  background:
+    color-mix(
+      in srgb,
+      #dcfce7 55%,
+      var(--panel-bg)
+    );
+
+  overflow: hidden;
+}
+
+.account-timeout-mini span {
+  flex: 0 0 auto;
+
+  color: #15803d;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.account-timeout-mini strong {
+  min-width: 0;
+  flex: 1;
+
+  color: #166534;
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+  text-align: end;
+  white-space: nowrap;
+}
+
+/* Expired */
+
+.account-timeout-mini.expired {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--border) 65%,
+      #ef4444
+    );
+
+  background:
+    color-mix(
+      in srgb,
+      #fee2e2 65%,
+      var(--panel-bg)
+    );
+}
+
+.account-timeout-mini.expired span,
+.account-timeout-mini.expired strong {
+  color: #dc2626;
+}
+
+/* Dark mode */
+
+.theme-dark .account-timeout-mini {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--border) 70%,
+      #22c55e
+    );
+
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.theme-dark .account-timeout-mini span {
+  color: #86efac;
+}
+
+.theme-dark .account-timeout-mini strong {
+  color: #dcfce7;
+}
+
+.theme-dark .account-timeout-mini.expired {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.theme-dark .account-timeout-mini.expired span,
+.theme-dark .account-timeout-mini.expired strong {
+  color: #fca5a5;
+}
+
+@keyframes accountLicensePulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(0.78);
+    opacity: 0.55;
+  }
+}
+
+/* Expired state */
+
+.account-license-status.expired {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--border) 55%,
+      #ef4444
+    );
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(
+        in srgb,
+        #fee2e2 76%,
+        var(--panel-bg)
+      ),
+      color-mix(
+        in srgb,
+        #fff1f2 64%,
+        var(--panel-bg)
+      )
+    );
+  color: #b91c1c;
+}
+
+.account-license-status.expired::before {
+  background: #ef4444;
+}
+
+.account-license-status.expired
+  .account-license-status-icon {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+.account-license-status.expired
+  .account-license-status-copy span {
+  color: #dc2626;
+}
+
+.account-license-status.expired
+  .account-license-status-copy strong {
+  color: #991b1b;
+}
+
+.account-license-status-dot.expired {
+  background: #ef4444;
+  box-shadow: 0 0 0 4px
+    rgba(239, 68, 68, 0.12);
+}
+
+/* Dark mode */
+
+.theme-dark .account-license-status {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--border) 72%,
+      #22c55e
+    );
+  background:
+    linear-gradient(
+      135deg,
+      rgba(20, 83, 45, 0.3),
+      rgba(15, 23, 42, 0.86)
+    );
+}
+
+.theme-dark
+  .account-license-status-icon {
+  background: rgba(34, 197, 94, 0.14);
+  color: #4ade80;
+}
+
+.theme-dark
+  .account-license-status-copy span {
+  color: #86efac;
+}
+
+.theme-dark
+  .account-license-status-copy strong {
+  color: #dcfce7;
+}
+
+.theme-dark
+  .account-license-status.expired {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--border) 65%,
+      #ef4444
+    );
+  background:
+    linear-gradient(
+      135deg,
+      rgba(127, 29, 29, 0.34),
+      rgba(15, 23, 42, 0.88)
+    );
+}
+
+.theme-dark
+  .account-license-status.expired
+  .account-license-status-copy span {
+  color: #fca5a5;
+}
+
+.theme-dark
+  .account-license-status.expired
+  .account-license-status-copy strong {
+  color: #fee2e2;
+}
+
+/* Mobile */
+
+@media (max-width: 520px) {
+  .account-license-status {
+    grid-template-columns:
+      34px minmax(0, 1fr) 8px;
+    padding: 10px;
+  }
+
+  .account-license-status-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .account-license-status-copy strong {
+    font-size: 12px;
+  }
 }

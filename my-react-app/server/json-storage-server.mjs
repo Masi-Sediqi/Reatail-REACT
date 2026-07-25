@@ -1,9 +1,15 @@
 import { createServer } from 'node:http'
+import { execFile } from 'node:child_process'
+import { createHash } from 'node:crypto'
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises'
+import { hostname } from 'node:os'
 import { join } from 'node:path'
+import { promisify } from 'node:util'
 
 const PORT = Number(process.env.RETAIL_JSON_STORAGE_PORT || 4178)
 const DATA_DIR = process.env.RETAIL_JSON_STORAGE_DIR || 'C:\\RetailProData'
+const execFileAsync = promisify(execFile)
+let cachedDeviceIdentity = null
 
 const files = {
   settings: 'settings.json',
@@ -57,6 +63,73 @@ const writeJsonFile = async (name, data) => {
   await rename(tempPath, finalPath)
 }
 
+const normalizeIdentifier = (value) =>
+  String(value || '')
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '')
+
+const hashDeviceSource = (value) =>
+  createHash('sha256')
+    .update(String(value || ''))
+    .digest('hex')
+    .toUpperCase()
+    .match(/.{1,4}/g)
+    .slice(0, 5)
+    .join('-')
+
+const loadWindowsDeviceComponents = async () => {
+  const script = `
+$ErrorActionPreference = 'SilentlyContinue'
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$motherboardId = (Get-CimInstance Win32_BaseBoard | Select-Object -First 1 -ExpandProperty SerialNumber)
+$cpuId = (Get-CimInstance Win32_Processor | Select-Object -First 1 -ExpandProperty ProcessorId)
+$diskSerial = (Get-CimInstance Win32_DiskDrive | Where-Object { $_.SerialNumber } | Select-Object -First 1 -ExpandProperty SerialNumber)
+$machineGuid = (Get-ItemProperty 'HKLM:\\SOFTWARE\\Microsoft\\Cryptography').MachineGuid
+@{
+  motherboardId = $motherboardId
+  cpuId = $cpuId
+  diskSerial = $diskSerial
+  machineGuid = $machineGuid
+} | ConvertTo-Json -Compress
+`
+
+  const { stdout } = await execFileAsync(
+    'powershell.exe',
+    ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', script],
+    { timeout: 6000, windowsHide: true },
+  )
+
+  return JSON.parse(stdout || '{}')
+}
+
+const loadDeviceIdentity = async () => {
+  if (cachedDeviceIdentity) return cachedDeviceIdentity
+
+  let components = {}
+
+  try {
+    components = await loadWindowsDeviceComponents()
+  } catch {
+    components = {}
+  }
+
+  const source = [
+    components.motherboardId,
+    components.cpuId,
+    components.diskSerial,
+    components.machineGuid,
+    hostname(),
+  ].map(normalizeIdentifier).filter(Boolean).join('|')
+
+  cachedDeviceIdentity = {
+    components,
+    deviceId: hashDeviceSource(source || hostname()),
+  }
+
+  return cachedDeviceIdentity
+}
+
 const loadState = async () => {
   const entries = await Promise.all(
     Object.entries(files).map(async ([key, fileName]) => [key, await readJsonFile(fileName, emptyState[key])]),
@@ -108,6 +181,11 @@ const saveState = async (state) => {
 
 createServer(async (request, response) => {
   if (request.method === 'OPTIONS') return sendJson(response, 204, {})
+  if (request.url?.startsWith('/api/device-id')) {
+    if (request.method !== 'GET') return sendJson(response, 405, { error: 'Method not allowed' })
+    return sendJson(response, 200, await loadDeviceIdentity())
+  }
+
   if (!request.url?.startsWith('/api/storage')) return sendJson(response, 404, { error: 'Not found' })
 
   try {

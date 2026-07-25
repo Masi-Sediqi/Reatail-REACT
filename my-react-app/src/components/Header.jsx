@@ -4,6 +4,7 @@ import CustomSelect from './CustomSelect.jsx'
 import {
   Archive,
   Download,
+  History,
   Moon,
   Search,
   Sun,
@@ -239,6 +240,19 @@ const normalizeSearchText = (value) =>
     .trim()
 
 const compactText = (...values) => values.filter(Boolean).map((value) => String(value).trim()).filter(Boolean).join(' · ')
+
+const formatLicenseCountdown = (remainingMs = 0) => {
+  const totalSeconds = Math.max(0, Math.floor(remainingMs / 1000))
+  const days = Math.floor(totalSeconds / 86400)
+  const hours = Math.floor((totalSeconds % 86400) / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const seconds = totalSeconds % 60
+  const pad = (value) => String(value).padStart(2, '0')
+
+  if (days > 0) return `${days}d ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
+  if (hours > 0) return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
+  return `${pad(minutes)}:${pad(seconds)}`
+}
 
 function SearchModal({ initialQuery = '', onClose, onNavigate, searchData = {}, t }) {
   const [query, setQuery] = useState(initialQuery)
@@ -543,6 +557,7 @@ function Header({
   exchangeCurrency = 'original',
   exchangeRates = {},
   language,
+  licenseStatus,
   notifications = [],
   onBusinessCurrencyFilterChange,
   onCashWalletChange,
@@ -573,6 +588,7 @@ function Header({
   const SearchIcon = toolbarSearchIcon
   const isDarkMode = theme === 'dark'
   const portalRoot = document.querySelector('.retail-shell') ?? document.body
+  const licenseCountdown = formatLicenseCountdown(licenseStatus?.remainingMs)
 
   const menuPosition = (anchor, width = 224) => {
     const rect = anchor?.getBoundingClientRect()
@@ -1048,43 +1064,81 @@ function Header({
                 </div>
 
                 <div className="header-language-options">
-                  {accountMenuItems
-                    .filter((item) => item.key !== 'exportBackup' && item.key !== 'importBackup')
-                    .map((item) => {
+  {accountMenuItems
+    .filter(
+      (item) =>
+        item.key !== 'exportBackup' &&
+        item.key !== 'importBackup',
+    )
+    .map((item) => {
+      const isLockScreen =
+        item.key === 'lockScreen'
 
-                    return (
-                      <button
-                        key={item.key}
-                        className={`header-language-option account-language-option ${item.danger ? 'account-lock-option' : ''
-                          }`}
-                        type="button"
-                        role="menuitem"
-                        onClick={(event) => {
-                          event.stopPropagation()
+      return (
+        <div
+          key={item.key}
+          className="account-menu-item-group"
+        >
+          <button
+            className={`header-language-option account-language-option ${
+              item.danger
+                ? 'account-lock-option'
+                : ''
+            }`}
+            type="button"
+            role="menuitem"
+            onClick={(event) => {
+              event.stopPropagation()
 
-                          if (item.page) {
-                            onNavigate?.(item.page)
-                          }
+              if (item.page) {
+                onNavigate?.(item.page)
+              }
 
-                          if (item.key === 'lockScreen') {
-                            onLockScreen?.()
-                          }
+              if (isLockScreen) {
+                onLockScreen?.()
+              }
 
-                          closeMenus()
-                        }}
-                      >
-                          <span>
-                            {t[item.key] ?? item.label ?? item.key}
-                          </span>
+              closeMenus()
+            }}
+          >
+            <span>
+              {t[item.key] ??
+                item.label ??
+                item.key}
+            </span>
 
-                        <span
-                          className="header-language-check"
-                          aria-hidden="true"
-                        />
-                      </button>
-                    )
-                  })}
-                </div>
+            <span
+              className="header-language-check"
+              aria-hidden="true"
+            />
+          </button>
+
+          {isLockScreen && (
+            <div
+              className={`account-timeout-mini ${
+                licenseStatus?.expired
+                  ? 'expired'
+                  : ''
+              }`}
+              title={
+                licenseStatus?.expired
+                  ? 'License expired'
+                  : `Time remaining: ${licenseCountdown}`
+              }
+            >
+              <span>Time Out</span>
+
+              <strong>
+                {licenseStatus?.expired
+                  ? 'Expired'
+                  : licenseCountdown}
+              </strong>
+            </div>
+          )}
+        </div>
+      )
+    })}
+</div>
               </div>,
               portalRoot,
             )}

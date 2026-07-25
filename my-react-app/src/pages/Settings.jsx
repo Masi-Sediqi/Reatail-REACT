@@ -1,7 +1,30 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import CustomSelect from '../components/CustomSelect.jsx'
-import { Archive, Bell, Box, Download, Eye, Factory, Lock, Mail, Play, Plus, Printer, Shield, Shuffle, Trash2, Truck, Upload, UserPlus, Users, Volume2, WalletCards, X } from '../components/Icons.jsx'
+import {
+  Archive,
+  Bell,
+  Box,
+  Download,
+  Eye,
+  Factory,
+  Key,
+  Lock,
+  Mail,
+  Play,
+  Plus,
+  Printer,
+  Shield,
+  Shuffle,
+  Trash2,
+  Truck,
+  Upload,
+  UserPlus,
+  Users,
+  Volume2,
+  WalletCards,
+  X,
+} from '../components/Icons.jsx'
 import { colorThemes, currencies, printTemplates, profileIcons, settingsTabs, sidebarItems } from '../data/dashboardData.js'
 import { playNotificationSound, soundOptions } from '../utils/notificationSounds.js'
 import { getPasswordStrength, hashPassword } from '../utils/security.js'
@@ -113,8 +136,10 @@ function SettingsPage({
   appBackupData,
   baseCurrency,
   companyInfo,
+  deviceId,
   exchangeRates,
   language,
+  licenseStatus,
   onColorThemeChange,
   onBaseCurrencyChange,
   onClearBusinessData,
@@ -127,7 +152,29 @@ function SettingsPage({
   printSettings,
   t,
 }) {
+
   const [activeTab, setActiveTab] = useState('general')
+  const visibleSettingsTabs = useMemo(() => {
+    const licenseTab = {
+      key: 'license',
+      label: 'Your License Key',
+      icon: Shield,
+    }
+
+    const formsIndex = settingsTabs.findIndex(
+      (tab) => tab.key === 'forms',
+    )
+
+    if (formsIndex === -1) {
+      return [...settingsTabs, licenseTab]
+    }
+
+    return [
+      ...settingsTabs.slice(0, formsIndex + 1),
+      licenseTab,
+      ...settingsTabs.slice(formsIndex + 1),
+    ]
+  }, [])
   const [editingUserId, setEditingUserId] = useState(null)
   const [userForm, setUserForm] = useState(emptyUserForm)
   const [userModalOpen, setUserModalOpen] = useState(false)
@@ -177,6 +224,68 @@ function SettingsPage({
   const customFormFields = companyInfo.customFormFields ?? {}
   const activeCustomFields = customFormFields[activeCustomFieldModule] ?? []
   const securitySettings = companyInfo.securitySettings ?? { passwordHash: '', passwordHashes: {}, lockOnStart: false, passwordUpdatedAt: '' }
+  const currentLicense =
+  companyInfo.licenseSettings ?? {
+    installedAt: '',
+    licenseKey: '',
+    activatedAt: '',
+    expiresAt: '',
+  }
+
+const licenseExpiresAt = currentLicense.expiresAt
+  ? new Date(currentLicense.expiresAt)
+  : null
+
+const licenseInstalledAt = currentLicense.installedAt
+  ? new Date(currentLicense.installedAt)
+  : null
+
+const licenseActivatedAt = currentLicense.activatedAt
+  ? new Date(currentLicense.activatedAt)
+  : null
+
+const licenseIsExpired =
+  !licenseExpiresAt ||
+  licenseExpiresAt.getTime() <= Date.now()
+
+const formatLicenseDate = (date) => {
+  if (!date || Number.isNaN(date.getTime())) {
+    return 'Not available'
+  }
+
+  return date.toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+const formatRemainingLicenseTime = (milliseconds = 0) => {
+  const totalSeconds = Math.max(
+    0,
+    Math.floor(milliseconds / 1000),
+  )
+
+  const days = Math.floor(totalSeconds / 86400)
+
+  const hours = Math.floor(
+    (totalSeconds % 86400) / 3600,
+  )
+
+  const minutes = Math.floor(
+    (totalSeconds % 3600) / 60,
+  )
+
+  return `${days} days, ${String(hours).padStart(
+    2,
+    '0',
+  )} hours, ${String(minutes).padStart(
+    2,
+    '0',
+  )} minutes`
+}
   const passwordHashes = {
     primary: securitySettings.passwordHashes?.primary || securitySettings.passwordHash || '',
     secondary: securitySettings.passwordHashes?.secondary || '',
@@ -363,11 +472,11 @@ function SettingsPage({
           [slot]: '',
         }
         return {
-        ...(current.securitySettings ?? {}),
-        passwordHash: nextHashes.primary,
-        passwordHashes: nextHashes,
-        lockOnStart: Boolean(nextHashes.primary || nextHashes.secondary) && Boolean(current.securitySettings?.lockOnStart),
-        passwordUpdatedAt: new Date().toISOString(),
+          ...(current.securitySettings ?? {}),
+          passwordHash: nextHashes.primary,
+          passwordHashes: nextHashes,
+          lockOnStart: Boolean(nextHashes.primary || nextHashes.secondary) && Boolean(current.securitySettings?.lockOnStart),
+          passwordUpdatedAt: new Date().toISOString(),
         }
       })(),
     }))
@@ -744,27 +853,36 @@ function SettingsPage({
         </button>
       </div>
 
-      <div className="settings-tabs" role="tablist" aria-label={t.settings}>
-  {settingsTabs.map((tab) => {
-    const TabIcon = tab.icon
-    const isActive = activeTab === tab.key
-
-    return (
-      <button
-        className={isActive ? 'active' : ''}
-        type="button"
-        role="tab"
-        aria-selected={isActive}
-        tabIndex={isActive ? 0 : -1}
-        key={tab.key}
-        onClick={() => setActiveTab(tab.key)}
+      <div
+        className="settings-tabs"
+        role="tablist"
+        aria-label={t.settings}
       >
-        <TabIcon size={17} />
-        <span>{t[tab.key]}</span>
-      </button>
-    )
-  })}
-</div>
+        {visibleSettingsTabs.map((tab) => {
+          const TabIcon = tab.icon
+          const isActive = activeTab === tab.key
+
+          return (
+            <button
+              className={isActive ? 'active' : ''}
+              type="button"
+              role="tab"
+              aria-selected={isActive}
+              tabIndex={isActive ? 0 : -1}
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+            >
+              <TabIcon size={17} />
+
+              <span>
+                {tab.key === 'license'
+                  ? 'Your License Key'
+                  : t[tab.key] ?? tab.label}
+              </span>
+            </button>
+          )
+        })}
+      </div>
 
       {activeTab === 'currency' ? (
         <section className="settings-card exchange-rates-card">
@@ -1149,7 +1267,7 @@ function SettingsPage({
         </section>
       ) : activeTab === 'users' ? (
         <section className="settings-card user-management-card">
-            <div className="settings-card-head">
+          <div className="settings-card-head">
             <div>
               <h2>{t.userManagement ?? 'User Management'}</h2>
               <p>{t.createUsersWithPermissions ?? 'Create users with specific module access and CRUD permissions'}</p>
@@ -1231,9 +1349,8 @@ function SettingsPage({
 
           <div className="security-overview-grid">
             <article
-              className={`security-overview-card ${
-                hasSecurityPassword ? 'is-secured' : 'is-warning'
-              }`}
+              className={`security-overview-card ${hasSecurityPassword ? 'is-secured' : 'is-warning'
+                }`}
             >
               <span className="security-overview-icon">
                 <Lock size={21} />
@@ -1252,7 +1369,7 @@ function SettingsPage({
                   {hasSecurityPassword
                     ? 'The system can be unlocked with any active password.'
                     : t.noPasswordSet ??
-                      'Create at least one password to prevent unauthorized access.'}
+                    'Create at least one password to prevent unauthorized access.'}
                 </p>
               </div>
 
@@ -1262,9 +1379,8 @@ function SettingsPage({
             </article>
 
             <article
-              className={`security-overview-card ${
-                securitySettings.lockOnStart ? 'is-secured' : ''
-              }`}
+              className={`security-overview-card ${securitySettings.lockOnStart ? 'is-secured' : ''
+                }`}
             >
               <span className="security-overview-icon">
                 <Shield size={21} />
@@ -1320,8 +1436,8 @@ function SettingsPage({
                 <strong>
                   {securitySettings.passwordUpdatedAt
                     ? new Date(
-                        securitySettings.passwordUpdatedAt,
-                      ).toLocaleDateString()
+                      securitySettings.passwordUpdatedAt,
+                    ).toLocaleDateString()
                     : 'Not available'}
                 </strong>
 
@@ -1536,7 +1652,7 @@ function SettingsPage({
             </aside>
           </div>
         </section>
-        ) : activeTab === 'forms' ? (
+      ) : activeTab === 'forms' ? (
         <section className="settings-card custom-fields-card">
           <div className="settings-card-head custom-fields-head">
             <div>
@@ -1592,6 +1708,142 @@ function SettingsPage({
                 <span>{t.addCustomFieldsHint ?? 'Add a field to show it at the end of this module form.'}</span>
               </div>
             )}
+          </div>
+                </section>
+      ) : activeTab === 'license' ? (
+        <section className="settings-card license-information-card">
+          <div className="settings-card-head license-information-head">
+            <div>
+              <h2>Your License Key</h2>
+
+              <p>
+                View the current device, license key and
+                validity period of this system.
+              </p>
+            </div>
+
+            <span
+              className={`license-main-status ${
+                licenseIsExpired ? 'expired' : 'active'
+              }`}
+            >
+              {licenseIsExpired ? 'Expired' : 'Active'}
+            </span>
+          </div>
+
+          <div className="license-overview-grid">
+            <article className="license-overview-item">
+              <span>Current Device ID</span>
+
+              <strong>
+                {deviceId || 'Device ID is loading...'}
+              </strong>
+            </article>
+
+            <article className="license-overview-item">
+              <span>License Status</span>
+
+              <strong
+                className={
+                  licenseIsExpired
+                    ? 'license-text-expired'
+                    : 'license-text-active'
+                }
+              >
+                {licenseIsExpired ? 'Expired' : 'Active'}
+              </strong>
+            </article>
+
+            <article className="license-overview-item">
+              <span>Installed At</span>
+
+              <strong>
+                {formatLicenseDate(licenseInstalledAt)}
+              </strong>
+            </article>
+
+            <article className="license-overview-item">
+              <span>Activated At</span>
+
+              <strong>
+                {currentLicense.licenseKey
+                  ? formatLicenseDate(
+                      licenseActivatedAt,
+                    )
+                  : 'Trial version'}
+              </strong>
+            </article>
+
+            <article className="license-overview-item">
+              <span>Valid Until</span>
+
+              <strong>
+                {formatLicenseDate(licenseExpiresAt)}
+              </strong>
+            </article>
+
+            <article className="license-overview-item">
+              <span>Remaining Time</span>
+
+              <strong>
+                {licenseStatus?.expired
+                  ? 'Expired'
+                  : formatRemainingLicenseTime(
+                      licenseStatus?.remainingMs,
+                    )}
+              </strong>
+            </article>
+          </div>
+
+          <div className="license-key-display">
+            <div>
+              <span>License Key</span>
+
+              <small>
+                This key belongs to the current device.
+              </small>
+            </div>
+
+            <code>
+              {currentLicense.licenseKey ||
+                'No license key has been activated'}
+            </code>
+
+            {currentLicense.licenseKey && (
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(
+                      currentLicense.licenseKey,
+                    )
+
+                    onNotify?.(
+                      'License key copied successfully',
+                    )
+                  } catch {
+                    onNotify?.(
+                      'Could not copy license key',
+                    )
+                  }
+                }}
+              >
+                Copy Key
+              </button>
+            )}
+          </div>
+
+          <div className="license-device-notice">
+            <Shield size={20} />
+
+            <div>
+              <strong>Device-bound license</strong>
+
+              <p>
+                This license is currently connected to
+                the Device ID shown above.
+              </p>
+            </div>
           </div>
         </section>
       ) : activeTab === 'notifications' ? (
@@ -1681,31 +1933,29 @@ function SettingsPage({
                 <p>{t.automaticBackupHint ?? 'Downloads a full JSON backup on the chosen cadence while the app is open.'}</p>
               </div>
               <button
-  className={`backup-auto-toggle ${
-    backupSettings.automatic ? 'active' : ''
-  }`}
-  type="button"
-  role="switch"
-  aria-checked={backupSettings.automatic}
-  aria-label={`Automatic backup: ${
-    backupSettings.automatic ? 'ON' : 'OFF'
-  }`}
-  onClick={() =>
-    updateNestedField(
-      'backupSettings',
-      'automatic',
-      !backupSettings.automatic,
-    )
-  }
->
-  <span className="backup-auto-toggle-track">
-    <i />
-  </span>
+                className={`backup-auto-toggle ${backupSettings.automatic ? 'active' : ''
+                  }`}
+                type="button"
+                role="switch"
+                aria-checked={backupSettings.automatic}
+                aria-label={`Automatic backup: ${backupSettings.automatic ? 'ON' : 'OFF'
+                  }`}
+                onClick={() =>
+                  updateNestedField(
+                    'backupSettings',
+                    'automatic',
+                    !backupSettings.automatic,
+                  )
+                }
+              >
+                <span className="backup-auto-toggle-track">
+                  <i />
+                </span>
 
-  <b>
-    {backupSettings.automatic ? 'ON' : 'OFF'}
-  </b>
-</button>
+                <b>
+                  {backupSettings.automatic ? 'ON' : 'OFF'}
+                </b>
+              </button>
             </div>
             <div className="settings-form two">
               <label>
@@ -1741,8 +1991,8 @@ function SettingsPage({
         </section>
       ) : activeTab === 'themes' ? (
         <section className="settings-card theme-selection-card">
-  <h2>{t.themeSelection}</h2>
-  <p>{t.themeSelectionHint}</p>
+          <h2>{t.themeSelection}</h2>
+          <p>{t.themeSelectionHint}</p>
           <div className="theme-grid">
             {colorThemes.map((item) => (
               <button
@@ -1761,150 +2011,147 @@ function SettingsPage({
         </section>
       ) : activeTab === 'general' ? (
         <div className="settings-general-stack">
-        <section className="settings-card">
-          <h2>{t.companyInformation}</h2>
-          <p>{t.updateBusinessDetails}</p>
+          <section className="settings-card">
+            <h2>{t.companyInformation}</h2>
+            <p>{t.updateBusinessDetails}</p>
 
-          <div className="company-logo-row">
-            <div>
-              <strong>{t.companyLogo}</strong>
-              <span>{t.companyLogoHint}</span>
-            </div>
-            <div className="logo-actions">
-              <div className="logo-preview">
-                {companyInfo.logo ? <img src={companyInfo.logo} alt="" /> : <span>▣</span>}
+            <div className="company-logo-row">
+              <div>
+                <strong>{t.companyLogo}</strong>
+                <span>{t.companyLogoHint}</span>
               </div>
-              <button type="button" onClick={() => fileInputRef.current?.click()}>
-                {t.uploadLogo}
-              </button>
-              <button className="danger-link" type="button" onClick={() => updateField('logo', '')}>
-                {t.remove}
-              </button>
-              <input ref={fileInputRef} type="file" accept="image/*" onChange={uploadLogo} />
+              <div className="logo-actions">
+                <div className="logo-preview">
+                  {companyInfo.logo ? <img src={companyInfo.logo} alt="" /> : <span>▣</span>}
+                </div>
+                <button type="button" onClick={() => fileInputRef.current?.click()}>
+                  {t.uploadLogo}
+                </button>
+                <button className="danger-link" type="button" onClick={() => updateField('logo', '')}>
+                  {t.remove}
+                </button>
+                <input ref={fileInputRef} type="file" accept="image/*" onChange={uploadLogo} />
+              </div>
             </div>
-          </div>
 
-          <form className="settings-form">
-            <label>
-              <span>{t.companyName}</span>
-              <input value={companyInfo.name} onChange={(event) => updateField('name', event.target.value)} />
-            </label>
-            <label>
-              <span>{t.subtitleTagline}</span>
-              <input value={companyInfo.tagline} onChange={(event) => updateField('tagline', event.target.value)} />
-            </label>
-            <label className="wide">
-              <span>{t.address}</span>
-              <input value={companyInfo.address} onChange={(event) => updateField('address', event.target.value)} />
-            </label>
-            <label>
-              <span>{t.phoneNumber}</span>
-              <input value={companyInfo.phone} onChange={(event) => updateField('phone', event.target.value)} />
-            </label>
-            <label>
-              <span>{t.emailAddress}</span>
-              <input value={companyInfo.email} onChange={(event) => updateField('email', event.target.value)} />
-            </label>
-            <label>
-              <span>{t.website}</span>
-              <input value={companyInfo.website} onChange={(event) => updateField('website', event.target.value)} />
-            </label>
-            <label>
-              <span>{t.defaultCurrency}</span>
-              <CustomSelect ariaLabel={t.defaultCurrency} options={companyCurrencyOptions} value={companyInfo.currency} onChange={(value) => updateField('currency', value)} />
-            </label>
-            <label>
-              <span>{t.language}</span>
-              <CustomSelect ariaLabel={t.language} options={languageOptions} value={language} onChange={onLanguageChange} />
-            </label>
-          </form>
-        </section>
+            <form className="settings-form">
+              <label>
+                <span>{t.companyName}</span>
+                <input value={companyInfo.name} onChange={(event) => updateField('name', event.target.value)} />
+              </label>
+              <label>
+                <span>{t.subtitleTagline}</span>
+                <input value={companyInfo.tagline} onChange={(event) => updateField('tagline', event.target.value)} />
+              </label>
+              <label className="wide">
+                <span>{t.address}</span>
+                <input value={companyInfo.address} onChange={(event) => updateField('address', event.target.value)} />
+              </label>
+              <label>
+                <span>{t.phoneNumber}</span>
+                <input value={companyInfo.phone} onChange={(event) => updateField('phone', event.target.value)} />
+              </label>
+              <label>
+                <span>{t.emailAddress}</span>
+                <input value={companyInfo.email} onChange={(event) => updateField('email', event.target.value)} />
+              </label>
+              <label>
+                <span>{t.website}</span>
+                <input value={companyInfo.website} onChange={(event) => updateField('website', event.target.value)} />
+              </label>
+              <label>
+                <span>{t.defaultCurrency}</span>
+                <CustomSelect ariaLabel={t.defaultCurrency} options={companyCurrencyOptions} value={companyInfo.currency} onChange={(value) => updateField('currency', value)} />
+              </label>
+              <label>
+                <span>{t.language}</span>
+                <CustomSelect ariaLabel={t.language} options={languageOptions} value={language} onChange={onLanguageChange} />
+              </label>
+            </form>
+          </section>
 
-        <section className="settings-card kpi-routing-card">
-          <h2>{t.cashWalletKpiRouting ?? 'Cash Wallet — KPI routing'}</h2>
-          <p>{t.cashWalletKpiRoutingHint ?? 'Choose which dashboard cards include cash-wallet deposits and withdrawals (supplier adjustments + manual entries).'}</p>
-          <div className="kpi-route-list">
-  {[
-    ['totalRevenue', t.totalRevenue],
-    ['pureProfit', t.pureProfit],
-    ['netProfit', t.netProfit],
-    ['currentCashWallet', t.currentCashWallet],
-  ].map(([key, label]) => {
-    const isEnabled = Boolean(kpiRouting[key])
+          <section className="settings-card kpi-routing-card">
+            <h2>{t.cashWalletKpiRouting ?? 'Cash Wallet — KPI routing'}</h2>
+            <p>{t.cashWalletKpiRoutingHint ?? 'Choose which dashboard cards include cash-wallet deposits and withdrawals (supplier adjustments + manual entries).'}</p>
+            <div className="kpi-route-list">
+              {[
+                ['totalRevenue', t.totalRevenue],
+                ['pureProfit', t.pureProfit],
+                ['netProfit', t.netProfit],
+                ['currentCashWallet', t.currentCashWallet],
+              ].map(([key, label]) => {
+                const isEnabled = Boolean(kpiRouting[key])
 
-    return (
-      <div
-        className={`kpi-route-row ${
-          isEnabled ? 'active' : ''
-        }`}
-        key={key}
-      >
-        <div className="kpi-route-content">
-          <strong>{label}</strong>
+                return (
+                  <div
+                    className={`kpi-route-row ${isEnabled ? 'active' : ''
+                      }`}
+                    key={key}
+                  >
+                    <div className="kpi-route-content">
+                      <strong>{label}</strong>
 
-          <span>
-            {isEnabled
-              ? (
-                  t.walletFlowsAffectKpi ??
-                  'Wallet deposits and withdrawals affect this KPI.'
+                      <span>
+                        {isEnabled
+                          ? (
+                            t.walletFlowsAffectKpi ??
+                            'Wallet deposits and withdrawals affect this KPI.'
+                          )
+                          : (
+                            t.walletFlowsIgnoredKpi ??
+                            'Wallet flows are ignored for this KPI.'
+                          )}
+                      </span>
+                    </div>
+
+                    <button
+                      className={`kpi-route-toggle ${isEnabled ? 'active' : ''
+                        }`}
+                      type="button"
+                      role="switch"
+                      aria-checked={isEnabled}
+                      aria-label={`${label}: ${isEnabled ? 'ON' : 'OFF'
+                        }`}
+                      onClick={() =>
+                        updateNestedField(
+                          'kpiRouting',
+                          key,
+                          !isEnabled,
+                        )
+                      }
+                    >
+                      <span className="kpi-route-toggle-track">
+                        <i />
+                      </span>
+
+                      <b>{isEnabled ? 'ON' : 'OFF'}</b>
+                    </button>
+                  </div>
                 )
-              : (
-                  t.walletFlowsIgnoredKpi ??
-                  'Wallet flows are ignored for this KPI.'
-                )}
-          </span>
-        </div>
+              })}
+            </div>
+          </section>
 
-       <button
-  className={`kpi-route-toggle ${
-    isEnabled ? 'active' : ''
-  }`}
-  type="button"
-  role="switch"
-  aria-checked={isEnabled}
-  aria-label={`${label}: ${
-    isEnabled ? 'ON' : 'OFF'
-  }`}
-  onClick={() =>
-    updateNestedField(
-      'kpiRouting',
-      key,
-      !isEnabled,
-    )
-  }
->
-  <span className="kpi-route-toggle-track">
-    <i />
-  </span>
+          <section className="settings-card tax-adjustment-card">
+            <h2>{t.taxAdjustments ?? 'Tax & Adjustments'}</h2>
+            <p>{t.taxAdjustmentsHint ?? 'Applied only to Net Profit. Tax is charged on positive results per currency; adjustments are subtracted as a signed value.'}</p>
+            <div className="print-config-grid three">
+              <label><span>{t.taxRate ?? 'Tax rate (%)'}</span><input inputMode="decimal" value={taxSettings.taxRate} onChange={(event) => updateNestedField('taxSettings', 'taxRate', event.target.value)} /></label>
+              <label><span>{t.otherAdjustments ?? 'Other adjustments (signed)'}</span><input inputMode="decimal" value={taxSettings.adjustments} onChange={(event) => updateNestedField('taxSettings', 'adjustments', event.target.value)} /></label>
+              <label><span>{t.adjustmentsCurrency ?? 'Adjustments currency'}</span><CustomSelect ariaLabel={t.adjustmentsCurrency ?? 'Adjustments currency'} options={companyCurrencyOptions} value={taxSettings.currency} onChange={(value) => updateNestedField('taxSettings', 'currency', value)} /></label>
+            </div>
+            <small>{t.taxAdjustmentsFootnote ?? 'Pure Profit ignores both. Set tax to 0 and adjustments to 0 to make Net Profit identical to (Gross Profit - Expenses).'}</small>
+          </section>
 
-  <b>{isEnabled ? 'ON' : 'OFF'}</b>
-</button>
-      </div>
-    )
-  })}
-</div>
-        </section>
-
-        <section className="settings-card tax-adjustment-card">
-          <h2>{t.taxAdjustments ?? 'Tax & Adjustments'}</h2>
-          <p>{t.taxAdjustmentsHint ?? 'Applied only to Net Profit. Tax is charged on positive results per currency; adjustments are subtracted as a signed value.'}</p>
-          <div className="print-config-grid three">
-            <label><span>{t.taxRate ?? 'Tax rate (%)'}</span><input inputMode="decimal" value={taxSettings.taxRate} onChange={(event) => updateNestedField('taxSettings', 'taxRate', event.target.value)} /></label>
-            <label><span>{t.otherAdjustments ?? 'Other adjustments (signed)'}</span><input inputMode="decimal" value={taxSettings.adjustments} onChange={(event) => updateNestedField('taxSettings', 'adjustments', event.target.value)} /></label>
-            <label><span>{t.adjustmentsCurrency ?? 'Adjustments currency'}</span><CustomSelect ariaLabel={t.adjustmentsCurrency ?? 'Adjustments currency'} options={companyCurrencyOptions} value={taxSettings.currency} onChange={(value) => updateNestedField('taxSettings', 'currency', value)} /></label>
-          </div>
-          <small>{t.taxAdjustmentsFootnote ?? 'Pure Profit ignores both. Set tax to 0 and adjustments to 0 to make Net Profit identical to (Gross Profit - Expenses).'}</small>
-        </section>
-
-        <section className="settings-card inventory-cost-card">
-          <h2><Archive size={22} /> {t.inventoryCostingMethod ?? 'Inventory costing method'}</h2>
-          <p>{t.inventoryCostingHint ?? 'Choose how new sales value their COGS. Historical sales keep the cost captured at the time of sale and are never rewritten.'}</p>
-          <label className="single-field">
-            <span>{t.costingMethod ?? 'Costing method'}</span>
-            <CustomSelect ariaLabel={t.costingMethod ?? 'Costing method'} options={costingOptions} value={inventorySettings.costingMethod} onChange={(value) => updateNestedField('inventorySettings', 'costingMethod', value)} />
-          </label>
-          <small>{t.inventoryCostingFootnote ?? 'Switching only affects sales made from now on. Past invoices, profits and refunds remain valued at their original lot cost.'}</small>
-        </section>
+          <section className="settings-card inventory-cost-card">
+            <h2><Archive size={22} /> {t.inventoryCostingMethod ?? 'Inventory costing method'}</h2>
+            <p>{t.inventoryCostingHint ?? 'Choose how new sales value their COGS. Historical sales keep the cost captured at the time of sale and are never rewritten.'}</p>
+            <label className="single-field">
+              <span>{t.costingMethod ?? 'Costing method'}</span>
+              <CustomSelect ariaLabel={t.costingMethod ?? 'Costing method'} options={costingOptions} value={inventorySettings.costingMethod} onChange={(value) => updateNestedField('inventorySettings', 'costingMethod', value)} />
+            </label>
+            <small>{t.inventoryCostingFootnote ?? 'Switching only affects sales made from now on. Past invoices, profits and refunds remain valued at their original lot cost.'}</small>
+          </section>
         </div>
       ) : (
         <section className="settings-card empty-settings-card">
@@ -1912,323 +2159,323 @@ function SettingsPage({
           <p>{t.settingsComingSoon}</p>
         </section>
       )}
-     {customFieldModalOpen &&
-  createPortal(
-    <div className="modal-backdrop custom-field-modal-backdrop" onClick={closeCustomFieldModal}>
-      <section className="custom-field-modal" onClick={(event) => event.stopPropagation()}>
-        <header className="custom-field-modal-head">
-          <h2>{t.addField ?? 'Add Field'} — {t[activeCustomFieldModule] ?? customFieldModules.find((module) => module.key === activeCustomFieldModule)?.label}</h2>
-          <button className="custom-field-modal-close" type="button" aria-label={t.close ?? 'Close'} onClick={closeCustomFieldModal}>
-            <X size={16} />
-          </button>
-        </header>
+      {customFieldModalOpen &&
+        createPortal(
+          <div className="modal-backdrop custom-field-modal-backdrop" onClick={closeCustomFieldModal}>
+            <section className="custom-field-modal" onClick={(event) => event.stopPropagation()}>
+              <header className="custom-field-modal-head">
+                <h2>{t.addField ?? 'Add Field'} — {t[activeCustomFieldModule] ?? customFieldModules.find((module) => module.key === activeCustomFieldModule)?.label}</h2>
+                <button className="custom-field-modal-close" type="button" aria-label={t.close ?? 'Close'} onClick={closeCustomFieldModal}>
+                  <X size={16} />
+                </button>
+              </header>
 
-        <label>
-          <span>{t.fieldLabel ?? 'Field Label'} *</span>
-          <input
-            autoFocus
-            placeholder="e.g. Warranty Period"
-            value={customFieldDraft.label}
-            onChange={(event) => setCustomFieldDraft((current) => ({ ...current, label: event.target.value }))}
-          />
-        </label>
+              <label>
+                <span>{t.fieldLabel ?? 'Field Label'} *</span>
+                <input
+                  autoFocus
+                  placeholder="e.g. Warranty Period"
+                  value={customFieldDraft.label}
+                  onChange={(event) => setCustomFieldDraft((current) => ({ ...current, label: event.target.value }))}
+                />
+              </label>
 
-        <label>
-          <span>{t.placeholder ?? 'Placeholder'}</span>
-          <input
-            placeholder="e.g. Enter warranty period"
-            value={customFieldDraft.placeholder}
-            onChange={(event) => setCustomFieldDraft((current) => ({ ...current, placeholder: event.target.value }))}
-          />
-        </label>
+              <label>
+                <span>{t.placeholder ?? 'Placeholder'}</span>
+                <input
+                  placeholder="e.g. Enter warranty period"
+                  value={customFieldDraft.placeholder}
+                  onChange={(event) => setCustomFieldDraft((current) => ({ ...current, placeholder: event.target.value }))}
+                />
+              </label>
 
-        <label>
-          <span>{t.fieldType ?? 'Field Type'}</span>
-          <CustomSelect
-            ariaLabel={t.fieldType ?? 'Field Type'}
-            className="custom-field-type-select"
-            menuClassName="custom-field-type-menu"
-            options={customFieldTypeOptions}
-            value={customFieldDraft.type}
-            onChange={(value) => setCustomFieldDraft((current) => ({ ...current, type: value }))}
-          />
-        </label>
+              <label>
+                <span>{t.fieldType ?? 'Field Type'}</span>
+                <CustomSelect
+                  ariaLabel={t.fieldType ?? 'Field Type'}
+                  className="custom-field-type-select"
+                  menuClassName="custom-field-type-menu"
+                  options={customFieldTypeOptions}
+                  value={customFieldDraft.type}
+                  onChange={(value) => setCustomFieldDraft((current) => ({ ...current, type: value }))}
+                />
+              </label>
 
-        {customFieldDraft.type === 'dropdown' && (
-          <label>
-            <span>{t.dropdownOptions ?? 'Dropdown Options'}</span>
-            <textarea
-              placeholder="One option per line"
-              value={customFieldDraft.options}
-              onChange={(event) => setCustomFieldDraft((current) => ({ ...current, options: event.target.value }))}
-            />
-          </label>
+              {customFieldDraft.type === 'dropdown' && (
+                <label>
+                  <span>{t.dropdownOptions ?? 'Dropdown Options'}</span>
+                  <textarea
+                    placeholder="One option per line"
+                    value={customFieldDraft.options}
+                    onChange={(event) => setCustomFieldDraft((current) => ({ ...current, options: event.target.value }))}
+                  />
+                </label>
+              )}
+
+              <label className="custom-field-required-row">
+                <span>{t.required ?? 'Required'}</span>
+                <button
+                  className={`custom-field-switch ${customFieldDraft.required ? 'active' : ''}`}
+                  type="button"
+                  role="switch"
+                  aria-checked={customFieldDraft.required}
+                  onClick={() => setCustomFieldDraft((current) => ({ ...current, required: !current.required }))}
+                >
+                  <i />
+                </button>
+              </label>
+
+              <footer className="custom-field-modal-actions">
+                <button type="button" onClick={closeCustomFieldModal}>{t.cancel ?? 'Cancel'}</button>
+                <button type="button" className="primary" onClick={saveCustomField}>{t.addField ?? 'Add Field'}</button>
+              </footer>
+            </section>
+          </div>,
+          document.querySelector('.retail-shell') ?? document.body,
         )}
-
-        <label className="custom-field-required-row">
-          <span>{t.required ?? 'Required'}</span>
-          <button
-            className={`custom-field-switch ${customFieldDraft.required ? 'active' : ''}`}
-            type="button"
-            role="switch"
-            aria-checked={customFieldDraft.required}
-            onClick={() => setCustomFieldDraft((current) => ({ ...current, required: !current.required }))}
-          >
-            <i />
-          </button>
-        </label>
-
-        <footer className="custom-field-modal-actions">
-          <button type="button" onClick={closeCustomFieldModal}>{t.cancel ?? 'Cancel'}</button>
-          <button type="button" className="primary" onClick={saveCustomField}>{t.addField ?? 'Add Field'}</button>
-        </footer>
-      </section>
-    </div>,
-    document.querySelector('.retail-shell') ?? document.body,
-  )}
-     {userModalOpen &&
-  createPortal(
-    <div
-      className="modal-backdrop settings-user-modal-backdrop"
-      onClick={closeUserModal}
-    >
-      <section
-        className="settings-user-modal"
-        onClick={(event) => event.stopPropagation()}
-      >
-        {/* Modal header */}
-        <header className="settings-user-modal-header">
-          <div className="settings-user-modal-heading">
-            <span className="settings-user-modal-icon">
-              {editingUserId ? 'E' : '+'}
-            </span>
-
-            <div>
-              <h2>
-                {editingUserId
-                  ? (t.editUser ?? 'Edit User')
-                  : (t.createNewUser ?? 'Create New User')}
-              </h2>
-
-              <p>
-                {editingUserId
-                  ? 'Update account details and module permissions.'
-                  : 'Create a new account and assign module permissions.'}
-              </p>
-            </div>
-          </div>
-
-          <button
-            className="settings-user-modal-close"
-            type="button"
-            aria-label={t.close ?? 'Close'}
-            title={t.close ?? 'Close'}
+      {userModalOpen &&
+        createPortal(
+          <div
+            className="modal-backdrop settings-user-modal-backdrop"
             onClick={closeUserModal}
           >
-            <X size={15} />
-          </button>
-        </header>
+            <section
+              className="settings-user-modal"
+              onClick={(event) => event.stopPropagation()}
+            >
+              {/* Modal header */}
+              <header className="settings-user-modal-header">
+                <div className="settings-user-modal-heading">
+                  <span className="settings-user-modal-icon">
+                    {editingUserId ? 'E' : '+'}
+                  </span>
 
-        {/* Account information */}
-        <div className="settings-user-section">
-          <div className="settings-user-section-head">
-            <div>
-              <h3>Account Information</h3>
-              <p>Enter the login and display information for this user.</p>
-            </div>
+                  <div>
+                    <h2>
+                      {editingUserId
+                        ? (t.editUser ?? 'Edit User')
+                        : (t.createNewUser ?? 'Create New User')}
+                    </h2>
 
-            <span>Required fields *</span>
-          </div>
+                    <p>
+                      {editingUserId
+                        ? 'Update account details and module permissions.'
+                        : 'Create a new account and assign module permissions.'}
+                    </p>
+                  </div>
+                </div>
 
-          <div className="settings-user-form-grid">
-            <label>
-              <span className="settings-user-field-label">
-                {t.username ?? 'Username'}
-                <b>*</b>
-              </span>
+                <button
+                  className="settings-user-modal-close"
+                  type="button"
+                  aria-label={t.close ?? 'Close'}
+                  title={t.close ?? 'Close'}
+                  onClick={closeUserModal}
+                >
+                  <X size={15} />
+                </button>
+              </header>
 
-              <input
-                autoFocus
-                autoComplete="username"
-                placeholder="Enter username"
-                value={userForm.username}
-                onChange={(event) =>
-                  updateUserField('username', event.target.value)
-                }
-              />
-            </label>
+              {/* Account information */}
+              <div className="settings-user-section">
+                <div className="settings-user-section-head">
+                  <div>
+                    <h3>Account Information</h3>
+                    <p>Enter the login and display information for this user.</p>
+                  </div>
 
-            <label>
-              <span className="settings-user-field-label">
-                {t.displayName ?? 'Display Name'}
-                <b>*</b>
-              </span>
+                  <span>Required fields *</span>
+                </div>
 
-              <input
-                autoComplete="name"
-                placeholder="Enter display name"
-                value={userForm.displayName}
-                onChange={(event) =>
-                  updateUserField('displayName', event.target.value)
-                }
-              />
-            </label>
+                <div className="settings-user-form-grid">
+                  <label>
+                    <span className="settings-user-field-label">
+                      {t.username ?? 'Username'}
+                      <b>*</b>
+                    </span>
 
-            <label>
-              <span className="settings-user-field-label">
-                {t.password ?? 'Password'}
-                {!editingUserId && <b>*</b>}
-              </span>
+                    <input
+                      autoFocus
+                      autoComplete="username"
+                      placeholder="Enter username"
+                      value={userForm.username}
+                      onChange={(event) =>
+                        updateUserField('username', event.target.value)
+                      }
+                    />
+                  </label>
 
-              <input
-                type="password"
-                autoComplete="new-password"
-                placeholder={
-                  editingUserId
-                    ? 'Leave empty to keep current password'
-                    : 'Enter password'
-                }
-                value={userForm.password}
-                onChange={(event) =>
-                  updateUserField('password', event.target.value)
-                }
-              />
-            </label>
+                  <label>
+                    <span className="settings-user-field-label">
+                      {t.displayName ?? 'Display Name'}
+                      <b>*</b>
+                    </span>
 
-            <label>
-              <span className="settings-user-field-label">
-                {t.confirmPassword ?? 'Confirm Password'}
-                {!editingUserId && <b>*</b>}
-              </span>
+                    <input
+                      autoComplete="name"
+                      placeholder="Enter display name"
+                      value={userForm.displayName}
+                      onChange={(event) =>
+                        updateUserField('displayName', event.target.value)
+                      }
+                    />
+                  </label>
 
-              <input
-                type="password"
-                autoComplete="new-password"
-                placeholder="Repeat password"
-                value={userForm.confirmPassword}
-                onChange={(event) =>
-                  updateUserField(
-                    'confirmPassword',
-                    event.target.value,
-                  )
-                }
-              />
-            </label>
-          </div>
-        </div>
+                  <label>
+                    <span className="settings-user-field-label">
+                      {t.password ?? 'Password'}
+                      {!editingUserId && <b>*</b>}
+                    </span>
 
-        {/* Permissions */}
-        <div className="settings-user-section permissions-section">
-          <div className="settings-user-section-head">
-            <div>
-              <h3>{t.modulePermissions ?? 'Module Permissions'}</h3>
-              <p>
-                Select which actions this user can perform in each module.
-              </p>
-            </div>
-          </div>
+                    <input
+                      type="password"
+                      autoComplete="new-password"
+                      placeholder={
+                        editingUserId
+                          ? 'Leave empty to keep current password'
+                          : 'Enter password'
+                      }
+                      value={userForm.password}
+                      onChange={(event) =>
+                        updateUserField('password', event.target.value)
+                      }
+                    />
+                  </label>
 
-          <div className="settings-permissions-table-wrap">
-            <table className="settings-permissions-table">
-              <thead>
-                <tr>
-                  <th>{t.modulesAccess ?? 'Module'}</th>
-                  <th>{t.createPermission ?? 'Create'}</th>
-                  <th>{t.readPermission ?? 'Read'}</th>
-                  <th>{t.updatePermission ?? 'Update'}</th>
-                  <th>{t.delete ?? 'Delete'}</th>
-                  <th>{t.allPermissions ?? 'All'}</th>
-                </tr>
-              </thead>
+                  <label>
+                    <span className="settings-user-field-label">
+                      {t.confirmPassword ?? 'Confirm Password'}
+                      {!editingUserId && <b>*</b>}
+                    </span>
 
-              <tbody>
-                {permissionModules.map((module) => {
-                  const modulePermissions =
-                    userForm.permissions[module.key] ?? {}
+                    <input
+                      type="password"
+                      autoComplete="new-password"
+                      placeholder="Repeat password"
+                      value={userForm.confirmPassword}
+                      onChange={(event) =>
+                        updateUserField(
+                          'confirmPassword',
+                          event.target.value,
+                        )
+                      }
+                    />
+                  </label>
+                </div>
+              </div>
 
-                  const allChecked = permissionActions.every(
-                    (action) => modulePermissions[action],
-                  )
+              {/* Permissions */}
+              <div className="settings-user-section permissions-section">
+                <div className="settings-user-section-head">
+                  <div>
+                    <h3>{t.modulePermissions ?? 'Module Permissions'}</h3>
+                    <p>
+                      Select which actions this user can perform in each module.
+                    </p>
+                  </div>
+                </div>
 
-                  return (
-                    <tr key={module.key}>
-                      <td>
-                        <strong>
-                          {t[module.key] ?? module.label}
-                        </strong>
-                      </td>
+                <div className="settings-permissions-table-wrap">
+                  <table className="settings-permissions-table">
+                    <thead>
+                      <tr>
+                        <th>{t.modulesAccess ?? 'Module'}</th>
+                        <th>{t.createPermission ?? 'Create'}</th>
+                        <th>{t.readPermission ?? 'Read'}</th>
+                        <th>{t.updatePermission ?? 'Update'}</th>
+                        <th>{t.delete ?? 'Delete'}</th>
+                        <th>{t.allPermissions ?? 'All'}</th>
+                      </tr>
+                    </thead>
 
-                      {permissionActions.map((action) => (
-                        <td key={action}>
-                          <label className="settings-permission-check">
-                            <input
-                              type="checkbox"
-                              checked={Boolean(
-                                modulePermissions[action],
-                              )}
-                              onChange={(event) =>
-                                setModulePermission(
-                                  module.key,
-                                  action,
-                                  event.target.checked,
-                                )
-                              }
-                            />
+                    <tbody>
+                      {permissionModules.map((module) => {
+                        const modulePermissions =
+                          userForm.permissions[module.key] ?? {}
 
-                            <span />
-                          </label>
-                        </td>
-                      ))}
+                        const allChecked = permissionActions.every(
+                          (action) => modulePermissions[action],
+                        )
 
-                      <td>
-                        <label className="settings-permission-check all">
-                          <input
-                            type="checkbox"
-                            checked={allChecked}
-                            onChange={(event) =>
-                              setModulePermission(
-                                module.key,
-                                'all',
-                                event.target.checked,
-                              )
-                            }
-                          />
+                        return (
+                          <tr key={module.key}>
+                            <td>
+                              <strong>
+                                {t[module.key] ?? module.label}
+                              </strong>
+                            </td>
 
-                          <span />
-                        </label>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                            {permissionActions.map((action) => (
+                              <td key={action}>
+                                <label className="settings-permission-check">
+                                  <input
+                                    type="checkbox"
+                                    checked={Boolean(
+                                      modulePermissions[action],
+                                    )}
+                                    onChange={(event) =>
+                                      setModulePermission(
+                                        module.key,
+                                        action,
+                                        event.target.checked,
+                                      )
+                                    }
+                                  />
 
-        {/* Footer */}
-        <footer className="settings-user-modal-actions">
-          <button
-            className="settings-user-cancel-btn"
-            type="button"
-            onClick={closeUserModal}
-          >
-            {t.cancel ?? 'Cancel'}
-          </button>
+                                  <span />
+                                </label>
+                              </td>
+                            ))}
 
-          <button
-            className="settings-user-save-btn"
-            type="button"
-            onClick={saveUser}
-          >
-            {editingUserId
-              ? (t.saveUserChanges ?? 'Save Changes')
-              : (t.createUser ?? 'Create User')}
-          </button>
-        </footer>
-      </section>
-    </div>,
-    document.querySelector('.retail-shell') ?? document.body,
-  )}
+                            <td>
+                              <label className="settings-permission-check all">
+                                <input
+                                  type="checkbox"
+                                  checked={allChecked}
+                                  onChange={(event) =>
+                                    setModulePermission(
+                                      module.key,
+                                      'all',
+                                      event.target.checked,
+                                    )
+                                  }
+                                />
+
+                                <span />
+                              </label>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <footer className="settings-user-modal-actions">
+                <button
+                  className="settings-user-cancel-btn"
+                  type="button"
+                  onClick={closeUserModal}
+                >
+                  {t.cancel ?? 'Cancel'}
+                </button>
+
+                <button
+                  className="settings-user-save-btn"
+                  type="button"
+                  onClick={saveUser}
+                >
+                  {editingUserId
+                    ? (t.saveUserChanges ?? 'Save Changes')
+                    : (t.createUser ?? 'Create User')}
+                </button>
+              </footer>
+            </section>
+          </div>,
+          document.querySelector('.retail-shell') ?? document.body,
+        )}
     </div>
   )
 }

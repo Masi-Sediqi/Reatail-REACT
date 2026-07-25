@@ -5447,3 +5447,234 @@ strong svg {
 .settings-content .settings-heading {
   margin-bottom: 22px !important;
 }
+/* =====================================================
+   YOUR LICENSE KEY
+===================================================== */
+
+.license-information-card {
+  display: grid;
+  gap: 20px;
+  padding: 22px !important;
+}
+
+.license-information-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.license-information-head h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 850;
+}
+
+.license-information-head p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.license-main-status {
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 13px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.license-main-status.active {
+  border: 1px solid
+    color-mix(
+      in srgb,
+      #22c55e 38%,
+      var(--border)
+    );
+  background: color-mix(
+    in srgb,
+    #22c55e 10%,
+    var(--panel-bg)
+  );
+  color: #15803d;
+}
+
+.license-main-status.expired {
+  border: 1px solid
+    color-mix(
+      in srgb,
+      #ef4444 38%,
+      var(--border)
+    );
+  background: color-mix(
+    in srgb,
+    #ef4444 9%,
+    var(--panel-bg)
+  );
+  color: #dc2626;
+}
+
+.license-overview-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.license-overview-item {
+  min-width: 0;
+  min-height: 96px;
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-soft);
+}
+
+.license-overview-item span {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.license-overview-item strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.license-text-active {
+  color: #16a34a !important;
+}
+
+.license-text-expired {
+  color: #dc2626 !important;
+}
+
+.license-key-display {
+  display: grid;
+  grid-template-columns:
+    minmax(160px, 0.35fr)
+    minmax(0, 1fr)
+    auto;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--panel-bg);
+}
+
+.license-key-display span {
+  display: block;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.license-key-display small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.license-key-display code {
+  min-width: 0;
+  display: block;
+  padding: 12px;
+  overflow-wrap: anywhere;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  background: var(--panel-soft);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.license-key-display button {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--navy);
+  color: #ffffff;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.license-device-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid
+    color-mix(
+      in srgb,
+      #0ea5e9 30%,
+      var(--border)
+    );
+  border-radius: 10px;
+  background: color-mix(
+    in srgb,
+    #0ea5e9 6%,
+    var(--panel-bg)
+  );
+  color: #0284c7;
+}
+
+.license-device-notice strong {
+  display: block;
+  color: var(--text);
+  font-size: 11px;
+}
+
+.license-device-notice p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .license-overview-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .license-key-display {
+    grid-template-columns: 1fr;
+  }
+
+  .license-key-display button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .license-information-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .license-overview-grid {
+    grid-template-columns: 1fr;
+  }
+}

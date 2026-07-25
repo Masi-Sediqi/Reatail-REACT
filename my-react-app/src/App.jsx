@@ -31,6 +31,8 @@ import { colorThemes, productCategories } from './data/dashboardData.js'
 import { translations } from './data/translations.js'
 import { getCurrencyMeta } from './utils/currencyExchange.js'
 import { clearLegacyJsonStorage, hasLegacyJsonStorage, loadJsonStorage, readLegacyJson, saveJsonStorage } from './utils/jsonStorage.js'
+import { loadDeviceIdentity } from './utils/deviceIdentity.js'
+import { ensureLicenseState, getLicenseStatus, validateLicenseKey } from './utils/license.js'
 import { playNotificationSound } from './utils/notificationSounds.js'
 import { hashPassword } from './utils/security.js'
 import lockWallpaper from './assets/Black Blue and White Abstract Wave Desktop Wallpaper.png'
@@ -135,6 +137,12 @@ const defaultCompanyInfo = {
     lockOnStart: false,
     passwordUpdatedAt: '',
   },
+  licenseSettings: {
+    installedAt: '',
+    licenseKey: '',
+    activatedAt: '',
+    expiresAt: '',
+  },
 }
 
 const alertBeforeDays = {
@@ -182,15 +190,38 @@ function ConfirmActionModal({ confirmText, message, onCancel, onConfirm, title, 
   )
 }
 
-function LockScreen({ companyInfo, onUnlock, t }) {
+function LockScreen({
+  companyInfo,
+  deviceId = '',
+  mode = 'password',
+  onActivateLicense,
+  onUnlock,
+  t,
+}) {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [checking, setChecking] = useState(false)
+  const isLicenseMode = mode === 'license'
 
   const unlock = async (event) => {
     event.preventDefault()
     setChecking(true)
+
+    if (isLicenseMode) {
+      const result = await onActivateLicense?.(password)
+
+      if (result?.valid) {
+        setPassword('')
+        setError('')
+      } else {
+        setError(result?.reason || 'License key is incorrect.')
+      }
+
+      setChecking(false)
+      return
+    }
+
     const passwordHash = await hashPassword(password)
     const allowedHashes = [
       companyInfo.securitySettings?.passwordHashes?.primary || companyInfo.securitySettings?.passwordHash,
@@ -215,27 +246,50 @@ function LockScreen({ companyInfo, onUnlock, t }) {
           {companyInfo.logo ? <img alt="" src={companyInfo.logo} /> : <Lock size={28} />}
         </div>
         <h1>{companyInfo.name || 'RetailPro'}</h1>
-        <p>{t.welcomeBackAdministrator ?? 'Welcome back, Administrator'}</p>
+        <p>
+          {isLicenseMode
+            ? (t.licenseExpiredMessage ?? 'Your project validity period has expired. Please renew or purchase a license to continue.')
+            : (t.welcomeBackAdministrator ?? 'Welcome back, Administrator')}
+        </p>
+        {isLicenseMode && (
+          <div className="app-license-device">
+            <span>{t.deviceId ?? 'Device ID'}</span>
+            <strong>{deviceId || 'Loading...'}</strong>
+          </div>
+        )}
         <label className="app-lock-input">
           <input
             autoFocus
-            type={showPassword ? 'text' : 'password'}
+            placeholder={isLicenseMode ? 'Enter license key' : ''}
+            type={isLicenseMode || showPassword ? 'text' : 'password'}
             value={password}
             onChange={(event) => {
               setPassword(event.target.value)
               setError('')
             }}
           />
-          <button type="button" aria-label={t.showPassword ?? 'Show password'} onClick={() => setShowPassword((current) => !current)}>
-            <Eye size={16} />
-          </button>
+          {!isLicenseMode && (
+            <button type="button" aria-label={t.showPassword ?? 'Show password'} onClick={() => setShowPassword((current) => !current)}>
+              <Eye size={16} />
+            </button>
+          )}
         </label>
         {error && <span className="app-lock-error">{error}</span>}
-        <button className="app-lock-submit" type="submit" disabled={checking || !password}>
+        <button className="app-lock-submit" type="submit" disabled={checking || !password || (isLicenseMode && !deviceId)}>
           <Shield size={15} />
-          <span>{checking ? (t.checking ?? 'Checking...') : (t.unlock ?? 'Unlock')}</span>
+          <span>
+            {checking
+              ? (t.checking ?? 'Checking...')
+              : isLicenseMode
+                ? (t.activateLicense ?? 'Activate License')
+                : (t.unlock ?? 'Unlock')}
+          </span>
         </button>
-        <small>{t.lockScreenHelp ?? 'Screen is locked for security. Enter your password to continue.'}</small>
+        <small>
+          {isLicenseMode
+            ? (t.licenseRenewalHelp ?? 'Send this Device ID to receive a new monthly license key.')
+            : (t.lockScreenHelp ?? 'Screen is locked for security. Enter your password to continue.')}
+        </small>
       </form>
     </div>
   )
@@ -279,11 +333,18 @@ function App() {
   const [printSettings, setPrintSettings] = useState(() => readStorage('retail-print-settings', defaultPrintSettings))
   const [companyInfo, setCompanyInfo] = useState(() => readStorage('retail-company-info', defaultCompanyInfo))
   const [isLocked, setIsLocked] = useState(false)
+  const [deviceIdentity, setDeviceIdentity] = useState(null)
+  const [licenseNow, setLicenseNow] = useState(() => Date.now())
   const initialLockAppliedRef = useRef(false)
   const t = useMemo(() => translations[language], [language])
   const isRtl = language === 'fa' || language === 'ps'
   const selectedColorTheme = colorThemes.find((item) => item.id === activeColorTheme) ?? colorThemes[0]
   const securitySettings = companyInfo.securitySettings ?? defaultCompanyInfo.securitySettings
+  const licenseStatus = useMemo(
+    () => getLicenseStatus(companyInfo.licenseSettings, licenseNow),
+    [companyInfo.licenseSettings, licenseNow],
+  )
+  const isLicenseExpired = storageLoaded && licenseStatus.expired
   const hasSecurityPassword = Boolean(
     securitySettings.passwordHash ||
     securitySettings.passwordHashes?.primary ||
@@ -457,6 +518,31 @@ function App() {
     navigate('salesBills')
   }
 
+  const activateLicense = async (licenseKey) => {
+    const result = await validateLicenseKey({
+      deviceId: deviceIdentity?.deviceId,
+      key: licenseKey,
+    })
+
+    if (!result.valid) return result
+
+    setCompanyInfo((current) => ({
+      ...current,
+      licenseSettings: {
+        installedAt:
+          current.licenseSettings?.installedAt ||
+          new Date().toISOString(),
+        licenseKey: licenseKey.trim().toUpperCase(),
+        activatedAt: result.activatedAt,
+        expiresAt: result.expiresAt,
+      },
+    }))
+
+    showToast(t.licenseActivated ?? 'License activated successfully')
+
+    return result
+  }
+
   useEffect(() => {
     const syncPageFromPath = () => {
       setPage(getPageFromPath())
@@ -543,6 +629,35 @@ function App() {
       isActive = false
     }
   }, [])
+
+  useEffect(() => {
+    let isActive = true
+
+    loadDeviceIdentity().then((identity) => {
+      if (isActive) setDeviceIdentity(identity)
+    })
+
+    return () => {
+      isActive = false
+    }
+  }, [])
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setLicenseNow(Date.now())
+    }, 1000)
+
+    return () => window.clearInterval(timer)
+  }, [])
+
+  useEffect(() => {
+    if (!storageLoaded || companyInfo.licenseSettings?.installedAt) return
+
+    setCompanyInfo((current) => ({
+      ...current,
+      licenseSettings: ensureLicenseState(current.licenseSettings),
+    }))
+  }, [companyInfo.licenseSettings?.installedAt, storageLoaded])
 
   useEffect(() => {
     if (!storageLoaded) return
@@ -803,6 +918,7 @@ function App() {
             exchangeCurrency={exchangeCurrency}
             exchangeRates={exchangeRates}
             language={language}
+            licenseStatus={licenseStatus}
             notifications={notifications}
             searchData={{
               bundles,
@@ -861,24 +977,26 @@ function App() {
 ) : page === 'settings' ? (
   
             <SettingsPage
-              activeColorTheme={activeColorTheme}
-              appBackupData={appBackupData}
-              baseCurrency={baseCurrency}
-              companyInfo={companyInfo}
-              exchangeRates={exchangeRates}
-              language={language}
-              onColorThemeChange={setActiveColorTheme}
-              onCompanyInfoChange={setCompanyInfo}
-              onBaseCurrencyChange={setBaseCurrency}
-              onExchangeRatesChange={setExchangeRates}
-              onClearBusinessData={clearBusinessData}
-              onImportBackupData={importBackupData}
-              onLanguageChange={setLanguage}
-              onNotify={showToast}
-              onPrintSettingsChange={setPrintSettings}
-              printSettings={printSettings}
-              t={t}
-            />
+  activeColorTheme={activeColorTheme}
+  appBackupData={appBackupData}
+  baseCurrency={baseCurrency}
+  companyInfo={companyInfo}
+  deviceId={deviceIdentity?.deviceId || ''}
+  exchangeRates={exchangeRates}
+  language={language}
+  licenseStatus={licenseStatus}
+  onColorThemeChange={setActiveColorTheme}
+  onCompanyInfoChange={setCompanyInfo}
+  onBaseCurrencyChange={setBaseCurrency}
+  onExchangeRatesChange={setExchangeRates}
+  onClearBusinessData={clearBusinessData}
+  onImportBackupData={importBackupData}
+  onLanguageChange={setLanguage}
+  onNotify={showToast}
+  onPrintSettingsChange={setPrintSettings}
+  printSettings={printSettings}
+  t={t}
+/>
           ) : page === 'profile' ? (
             <Profile companyInfo={companyInfo} onCompanyInfoChange={setCompanyInfo} onNotify={showToast} t={t} />
           ) : page === 'products' ? (
@@ -1134,7 +1252,15 @@ function App() {
           </div>
         </div>
       )}
-      {storageLoaded && isLocked && (
+      {isLicenseExpired ? (
+        <LockScreen
+          companyInfo={{ ...defaultCompanyInfo, ...companyInfo, securitySettings }}
+          deviceId={deviceIdentity?.deviceId || ''}
+          mode="license"
+          onActivateLicense={activateLicense}
+          t={t}
+        />
+      ) : storageLoaded && isLocked && (
         <LockScreen
           companyInfo={{ ...defaultCompanyInfo, ...companyInfo, securitySettings }}
           onUnlock={() => setIsLocked(false)}
