@@ -1,0 +1,195 @@
+/* Extracted from App.css. Keep component/page styles out of App.css. */
+
+.main-area > .content,
+.main-area > .profile-content,
+.main-area > .settings-content,
+.main-area > .entity-content {
+  animation: pageFadeIn 180ms ease both;
+}
+
+.main-area > .content,
+.main-area > .profile-content,
+.main-area > .settings-content,
+.main-area > .entity-content,
+.main-area > .billing-content,
+.main-area > .sales-content {
+  font-size: 13px;
+}
+
+.main-area:has(.modal-backdrop) > .content,
+.main-area:has(.modal-backdrop) > .profile-content,
+.main-area:has(.modal-backdrop) > .settings-content,
+.main-area:has(.modal-backdrop) > .entity-content {
+  position: relative;
+  z-index: 1200;
+}
+
+.page-heading,
+.profile-heading,
+.settings-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 34px;
+}
+
+.page-heading h1,
+.profile-heading h1,
+.settings-heading h1 {
+  margin: 0 0 4px;
+  color: var(--text);
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 800;
+}
+
+.page-heading p,
+.profile-heading p,
+.settings-heading p,
+.profile-card > p,
+.settings-card > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.dashboard-section h2,
+.panel h2,
+.profile-card h2 {
+  margin: 0 0 14px;
+  color: var(--text);
+  font-size: 18px;
+  line-height: 1.25;
+  font-weight: 800;
+}
+
+.panel,
+.profile-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-bg);
+  box-shadow: var(--shadow);
+  animation: fadeLiftIn 220ms ease both;
+}
+
+.profile-content {
+  width: min(768px, calc(100% - 32px));
+  margin: 26px auto 48px;
+}
+
+.profile-card {
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.profile-identity {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin: 26px 0 22px;
+}
+
+.profile-avatar {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-size: 24px;
+}
+
+.profile-avatar button {
+  position: absolute;
+  inset-inline-end: -4px;
+  bottom: 0;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  box-shadow: 0 0 0 3px var(--panel-bg);
+}
+
+.profile-identity strong,
+.profile-identity span,
+.profile-identity small {
+  display: block;
+}
+
+.profile-identity strong {
+  margin-bottom: 4px;
+  color: var(--text);
+  font-size: 18px;
+}
+
+.profile-identity span,
+.profile-identity small {
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.profile-identity small {
+  margin-top: 8px;
+}
+
+.profile-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px 16px;
+}
+
+.profile-form label {
+  display: grid;
+  gap: 8px;
+}
+
+.profile-form label span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.profile-form input {
+  width: 100%;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-soft);
+  color: var(--text);
+  padding: 0 12px;
+  outline: none;
+}
+
+.profile-form input:focus {
+  border-color: var(--border);
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.16);
+}
+
+.theme-choice,
+.quick-action,
+.metric-card,
+.panel,
+.profile-card,
+.settings-card,
+.data-panel,
+.summary-grid article,
+.entity-actions button,
+.primary-btn,
+.row-action-menu {
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}

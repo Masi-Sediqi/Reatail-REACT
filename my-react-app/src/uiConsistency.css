@@ -946,3 +946,395 @@
 #root#root#root .retail-shell.theme-dark .main-area .agent-page .agent-history-menu button.danger {
   color: #dc2626 !important;
 }
+
+/* Final button color lock: page theme colors must not recolor action buttons. */
+#root#root#root .retail-shell {
+  --app-primary-button-bg: hsl(222 47% 20%);
+  --app-primary-button-bg-hover: hsl(222 47% 16%);
+  --app-secondary-button-bg: #ffffff;
+  --app-secondary-button-bg-hover: #f8fafc;
+  --app-secondary-button-text: #020617;
+  --app-button-border: #dbe3ef;
+}
+
+#root#root#root .retail-shell .main-area :is(
+  .entity-actions > button:not(.primary-btn),
+  .heading-actions > button:not(.primary-btn),
+  .financial-actions > button:not(.primary-btn),
+  .report-actions > button:not(.primary-btn),
+  .cash-wallet-top-actions > button:not(.primary-btn):not(.cash-wallet-add-btn),
+  .billing-actions > button:not(.primary-btn),
+  .modal-actions > button:not(.primary-btn):not(.danger-btn),
+  .print-action-bar > button:not(.primary-btn):not(.print-confirm-btn),
+  .print-action-bar > a,
+  .print-preview-top .print-top-link:not(.primary-btn):not(.print-confirm-btn),
+  .invoice-preview-top .print-top-link:not(.primary-btn):not(.print-confirm-btn)
+):not(.date-range-btn):not(.smooth-select-btn):not(.modal-close):not(.icon-only):not(:disabled) {
+  border: 1px solid var(--app-button-border) !important;
+  background: var(--app-secondary-button-bg) !important;
+  background-color: var(--app-secondary-button-bg) !important;
+  background-image: none !important;
+  color: var(--app-secondary-button-text) !important;
+  box-shadow: none !important;
+}
+
+#root#root#root .retail-shell .main-area :is(
+  .entity-actions > button:not(.primary-btn),
+  .heading-actions > button:not(.primary-btn),
+  .financial-actions > button:not(.primary-btn),
+  .report-actions > button:not(.primary-btn),
+  .cash-wallet-top-actions > button:not(.primary-btn):not(.cash-wallet-add-btn),
+  .billing-actions > button:not(.primary-btn),
+  .modal-actions > button:not(.primary-btn):not(.danger-btn),
+  .print-action-bar > button:not(.primary-btn):not(.print-confirm-btn),
+  .print-action-bar > a,
+  .print-preview-top .print-top-link:not(.primary-btn):not(.print-confirm-btn),
+  .invoice-preview-top .print-top-link:not(.primary-btn):not(.print-confirm-btn)
+):not(.date-range-btn):not(.smooth-select-btn):not(.modal-close):not(.icon-only):not(:disabled):hover {
+  border-color: #cbd5e1 !important;
+  background: var(--app-secondary-button-bg-hover) !important;
+  color: var(--app-secondary-button-text) !important;
+  transform: translateY(-1px);
+  box-shadow: none !important;
+}
+
+#root#root#root .retail-shell .main-area :is(
+  .primary-btn,
+  .save-btn,
+  .print-confirm-btn,
+  .cash-wallet-add-btn,
+  .scanner-active-btn,
+  .payroll-btn,
+  .barcode-print-btn,
+  .wide-print-btn,
+  .print-pdf-btn,
+  .history-toolbar .primary-btn,
+  .add-payment-modal .primary-btn,
+  .loan-modal-actions .primary-btn,
+  .loan-payment-modal .primary-btn,
+  .supplier-statement-modal .primary-btn,
+  .statement-actions .primary-btn
+):not(.date-range-btn):not(.smooth-select-btn):not(.modal-close):not(.icon-only):not(:disabled) {
+  border: 1px solid var(--app-primary-button-bg) !important;
+  background: var(--app-primary-button-bg) !important;
+  background-color: var(--app-primary-button-bg) !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+#root#root#root .retail-shell .main-area :is(
+  .primary-btn,
+  .save-btn,
+  .print-confirm-btn,
+  .cash-wallet-add-btn,
+  .scanner-active-btn,
+  .payroll-btn,
+  .barcode-print-btn,
+  .wide-print-btn,
+  .print-pdf-btn,
+  .history-toolbar .primary-btn,
+  .add-payment-modal .primary-btn,
+  .loan-modal-actions .primary-btn,
+  .loan-payment-modal .primary-btn,
+  .supplier-statement-modal .primary-btn,
+  .statement-actions .primary-btn
+):not(.date-range-btn):not(.smooth-select-btn):not(.modal-close):not(.icon-only):not(:disabled):hover {
+  border-color: var(--app-primary-button-bg-hover) !important;
+  background: var(--app-primary-button-bg-hover) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: none !important;
+}
+
+#root#root#root .retail-shell .main-area :is(
+  .entity-actions > button,
+  .heading-actions > button,
+  .financial-actions > button,
+  .report-actions > button,
+  .cash-wallet-top-actions > button,
+  .billing-actions > button,
+  .modal-actions > button,
+  .print-action-bar > button,
+  .print-action-bar > a,
+  .primary-btn,
+  .save-btn,
+  .print-confirm-btn,
+  .cash-wallet-add-btn,
+  .scanner-active-btn,
+  .payroll-btn,
+  .barcode-print-btn,
+  .wide-print-btn,
+  .print-pdf-btn
+) :is(svg, span, i) {
+  color: inherit !important;
+  stroke: currentColor !important;
+}
+
+#root#root#root .retail-shell .main-area :is(
+  .primary-btn,
+  .save-btn,
+  .print-confirm-btn,
+  .cash-wallet-add-btn,
+  .scanner-active-btn,
+  .payroll-btn,
+  .barcode-print-btn,
+  .wide-print-btn,
+  .print-pdf-btn
+):disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Final modal backdrop: keep the system visible behind forms, with a light blurred veil. */
+body:has(.modal-backdrop) {
+  overflow: hidden;
+}
+
+#root#root#root .retail-shell .modal-backdrop,
+#root#root#root .modal-backdrop {
+  background: rgba(226, 232, 240, 0.72) !important;
+  background-color: rgba(226, 232, 240, 0.72) !important;
+  background-image: none !important;
+  backdrop-filter: blur(16px) saturate(0.92) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(0.92) !important;
+}
+
+#root#root#root .retail-shell.theme-dark .modal-backdrop,
+#root#root#root .theme-dark .modal-backdrop {
+  background: rgba(148, 163, 184, 0.5) !important;
+  background-color: rgba(148, 163, 184, 0.5) !important;
+}
+
+#root#root#root .retail-shell :is(.header-modal-backdrop, .print-backdrop, .search-backdrop, .cash-wallet-backdrop, .cash-print-backdrop),
+#root#root#root :is(.header-modal-backdrop, .print-backdrop, .search-backdrop, .cash-wallet-backdrop, .cash-print-backdrop) {
+  background: rgba(226, 232, 240, 0.72) !important;
+  background-color: rgba(226, 232, 240, 0.72) !important;
+  backdrop-filter: blur(16px) saturate(0.92) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(0.92) !important;
+}
+
+#root#root#root .retail-shell.theme-dark :is(.header-modal-backdrop, .print-backdrop, .search-backdrop, .cash-wallet-backdrop, .cash-print-backdrop),
+#root#root#root .theme-dark :is(.header-modal-backdrop, .print-backdrop, .search-backdrop, .cash-wallet-backdrop, .cash-print-backdrop) {
+  background: rgba(148, 163, 184, 0.5) !important;
+  background-color: rgba(148, 163, 184, 0.5) !important;
+}
+
+/* Final Cash Wallet page lock */
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-top-actions {
+  display: grid !important;
+  grid-template-columns: repeat(2, 220px) 42px max-content !important;
+  gap: 8px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-top-actions.has-custom-range {
+  grid-template-columns: repeat(3, 220px) 34px 42px max-content !important;
+}
+
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-top-actions .cash-wallet-action-select .smooth-select-btn,
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-top-actions .date-range-btn,
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-top-actions .cash-wallet-reset-filter,
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-top-actions .cash-wallet-print-btn,
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-top-actions .cash-wallet-print-btn:hover {
+  height: 40px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  color: hsl(222 47% 20%) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-top-actions .cash-wallet-action-select,
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-top-actions .cash-wallet-action-select .smooth-select,
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-top-actions .cash-wallet-action-select .smooth-select-btn,
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-top-actions .cash-wallet-date-range,
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-top-actions .cash-wallet-date-range .date-range-btn {
+  width: 220px !important;
+}
+
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-top-actions .cash-wallet-action-select .smooth-select-btn {
+  padding-left: 16px !important;
+}
+
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-top-actions .cash-wallet-action-select > svg,
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-top-actions .date-range-btn > svg {
+  display: none !important;
+}
+
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-top-actions .cash-wallet-reset-filter {
+  width: 34px !important;
+  min-width: 34px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-top-actions .cash-wallet-add-btn,
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-top-actions .cash-wallet-add-btn:hover,
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-print-actions .primary-btn {
+  background: hsl(222 47% 20%) !important;
+  border-color: hsl(222 47% 20%) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-add-btn {
+  width: 42px !important;
+  min-width: 42px !important;
+  border-radius: 999px !important;
+}
+
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-print-btn {
+  min-width: 156px !important;
+  font-weight: 800 !important;
+}
+
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-filters {
+  display: block !important;
+  padding: 24px !important;
+  border-radius: 8px !important;
+  background: var(--panel-bg) !important;
+}
+
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-filters .search-field {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-card {
+  min-height: 96px !important;
+  border-radius: 8px !important;
+  background: var(--panel-bg) !important;
+}
+
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-summary {
+  gap: 14px !important;
+}
+
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-summary .cash-wallet-card {
+  position: relative !important;
+  min-height: 96px !important;
+  display: grid !important;
+  align-content: center !important;
+  padding: 18px 70px 18px 20px !important;
+  border-radius: 10px !important;
+  text-align: left !important;
+}
+
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-summary .cash-wallet-card span {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-summary .cash-wallet-card strong {
+  margin-top: 8px !important;
+  font-size: 24px !important;
+  font-weight: 850 !important;
+  line-height: 1.1 !important;
+}
+
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-summary .cash-wallet-card i {
+  position: absolute !important;
+  top: 19px !important;
+  right: 19px !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 10px !important;
+}
+
+#root#root#root .retail-shell .main-area .cash-wallet-page .back-icon-btn,
+#root#root#root .retail-shell .main-area .cash-wallet-page .back-icon-btn:hover {
+  display: grid !important;
+  flex: 0 0 34px !important;
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  place-items: center !important;
+  margin: 0 2px 0 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root .retail-shell .main-area .cash-wallet-page .back-icon-btn:hover {
+  border-color: var(--border) !important;
+  background: var(--panel-soft) !important;
+  background-color: var(--panel-soft) !important;
+}
+
+#root#root#root .retail-shell .main-area .cash-wallet-page .back-icon-btn svg {
+  display: block !important;
+  width: 18px !important;
+  height: 18px !important;
+  color: currentColor !important;
+  stroke: currentColor !important;
+  stroke-width: 2 !important;
+  opacity: 1 !important;
+}
+
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-row-actions button,
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-row-actions button:hover {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  color: hsl(222 47% 20%) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-row-actions button {
+  background: #fff !important;
+  border: 1px solid var(--border) !important;
+}
+
+#root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-row-actions button.danger {
+  color: #dc2626 !important;
+}
+
+#root#root#root .retail-shell .main-area .metric-detail-content .metric-filter-reset,
+#root#root#root .retail-shell .main-area .metric-detail-content .metric-filter-reset:hover {
+  width: 40px !important;
+  min-width: 40px !important;
+  height: 42px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root .retail-shell .main-area .metric-detail-content .metric-filter-reset:hover {
+  background: var(--panel-soft) !important;
+  background-color: var(--panel-soft) !important;
+}
+
+@media (max-width: 760px) {
+  #root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-top-actions,
+  #root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-top-actions:has(.date-range-picker),
+  #root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-top-actions.has-custom-range {
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+  }
+
+  #root#root#root .retail-shell .main-area .cash-wallet-page .cash-wallet-add-btn {
+    width: 100% !important;
+    border-radius: 8px !important;
+  }
+}

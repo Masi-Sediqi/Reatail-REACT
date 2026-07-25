@@ -1,0 +1,644 @@
+/* Extracted from App.css. Keep component/page styles out of App.css. */
+
+.date-range-picker {
+  position: relative;
+  min-width: 220px;
+}
+
+.filter-card .search-field:focus-within,
+.filter-bar .search-field:focus-within,
+.products-filter-card .search-field:focus-within,
+.sales-filter-card .search-field:focus-within,
+.date-range-picker:focus-within .date-range-btn {
+  border-color: var(--border);
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.16);
+}
+
+.filter-card .date-range-picker,
+.filter-bar .date-range-picker,
+.products-filter-card .date-range-picker,
+.sales-filter-card .date-range-picker {
+  min-width: 0;
+  width: 100%;
+}
+
+.date-range-btn {
+  width: 100%;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-soft);
+  color: var(--text);
+  padding: 0 12px;
+  cursor: pointer;
+  font: inherit;
+  text-align: start;
+}
+
+.date-range-btn span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.date-range-calendar {
+  position: absolute;
+  top: calc(100% + 8px);
+  inset-inline-end: 0;
+  z-index: 10020;
+  width: min(278px, calc(100vw - 32px));
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel-bg);
+  color: var(--text);
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.22);
+  animation: dropdownIn 140ms ease both;
+}
+
+.date-range-calendar .calendar-head {
+  display: grid;
+  grid-template-columns: 30px 1fr 30px;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-range-calendar .calendar-head strong {
+  text-align: center;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.date-range-calendar .calendar-head button,
+.date-range-calendar .calendar-days button {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  display: grid !important;
+  place-items: center !important;
+  border: 1px solid var(--border) !important;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  font: inherit !important;
+}
+
+.date-range-calendar .calendar-head button {
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 8px !important;
+}
+
+.date-range-calendar .calendar-weekdays,
+.date-range-calendar .calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.date-range-calendar .calendar-weekdays span {
+  display: grid;
+  place-items: center;
+  min-height: 22px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.date-range-calendar .calendar-days button {
+  aspect-ratio: 1;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+.date-range-calendar .calendar-days button.muted {
+  color: color-mix(in srgb, var(--muted) 70%, transparent) !important;
+}
+
+.date-range-calendar .calendar-days button.in-range {
+  background: var(--accent-soft) !important;
+  border-color: var(--accent-soft) !important;
+}
+
+.date-range-calendar .calendar-days button.selected {
+  border-color: var(--accent) !important;
+  background: var(--accent) !important;
+  color: var(--accent-contrast) !important;
+}
+
+.dashboard-range-shell .date-range-picker,
+.dashboard-range-shell .date-range-btn {
+  width: 100%;
+}
+
+
+.dashboard-date-range {
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 760px) {
+  html,
+  body,
+  #root {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .app-shell,
+  .main-area,
+  .content-area,
+  .entity-content,
+  .dashboard-page,
+  .products-page,
+  .sales-page,
+  .staff-page,
+  .customers-page,
+  .godown-page,
+  .suppliers-page,
+  .loans-page,
+  .recycle-page {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .filter-card,
+  .filter-bar,
+  .sales-filter-card,
+  .products-filter-card {
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .filter-card > *,
+  .filter-bar > *,
+  .sales-filter-card > *,
+  .products-filter-card > * {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .data-panel,
+  .supplier-section-card,
+  .godown-table-card,
+  .table-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .data-panel .data-table,
+  .supplier-section-card .data-table,
+  .godown-table-card .data-table,
+  .table-card .data-table {
+    min-width: 680px;
+  }
+
+  .date-range-picker {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .date-range-calendar {
+    position: fixed !important;
+    inset-inline: 12px !important;
+    top: auto !important;
+    bottom: max(12px, env(safe-area-inset-bottom)) !important;
+    width: auto !important;
+    max-height: min(430px, calc(100dvh - 30px));
+    overflow-y: auto;
+    z-index: 10050 !important;
+  }
+
+  .dashboard-date-actions {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .dashboard-date-control {
+    width: 100%;
+    flex: 1 1 150px;
+  }
+
+  .dashboard-range-shell,
+  .dashboard-date-range {
+    width: 100%;
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+}
+
+.retail-shell .date-range-btn,
+.retail-shell .date-range-picker .date-range-btn,
+.retail-shell .financial-date-control .date-range-btn,
+.retail-shell .report-date-control .date-range-btn {
+  position: static !important;
+  overflow: visible !important;
+  min-width: 0 !important;
+  border: 1px solid var(--border) !important;
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+  animation: none !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+.retail-shell .date-range-btn::before,
+.retail-shell .date-range-calendar button::before {
+  display: none !important;
+}
+
+.retail-shell .date-range-calendar button {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  border: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+  animation: none !important;
+}
+
+.retail-shell .date-range-calendar .calendar-day.is-selected,
+.retail-shell .date-range-calendar .calendar-day.selected,
+.retail-shell .date-range-calendar button.is-selected,
+.retail-shell .date-range-calendar button.selected {
+  background: var(--accent) !important;
+  color: var(--accent-contrast) !important;
+}
+
+.retail-shell .date-range-calendar .calendar-day.is-in-range,
+.retail-shell .date-range-calendar .calendar-day.in-range,
+.retail-shell .date-range-calendar button.is-in-range,
+.retail-shell .date-range-calendar button.in-range {
+  background: var(--accent-soft) !important;
+  color: var(--text) !important;
+}
+
+.date-range-btn,
+.smooth-select-btn,
+.date-range-calendar button,
+.calendar-head button,
+.calendar-days button {
+  animation: none !important;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+.date-range-calendar .calendar-days button.selected,
+.date-range-calendar button.selected {
+  background: var(--accent) !important;
+  color: var(--accent-contrast) !important;
+}
+
+.retail-shell :is(.date-range-calendar button, .date-range-calendar .calendar-day, .calendar-days button),
+.retail-shell :is(.date-range-calendar button.selected, .date-range-calendar button.is-selected, .date-range-calendar button.in-range, .date-range-calendar button.is-in-range, .date-range-calendar .calendar-day.selected, .date-range-calendar .calendar-day.is-selected, .date-range-calendar .calendar-day.in-range, .date-range-calendar .calendar-day.is-in-range) {
+  border-color: var(--border) !important;
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+  animation: none !important;
+}
+
+.retail-shell :is(
+  input:focus,
+  textarea:focus,
+  select:focus,
+  .smooth-select-btn.active,
+  .smooth-select-btn:focus,
+  .smooth-select-btn:focus-visible,
+  .category-search:focus-within input,
+  .search-field:focus-within,
+  .date-range-picker:focus-within .date-range-btn
+) {
+  border-color: var(--border) !important;
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.16) !important;
+  outline: none !important;
+}
+
+.retail-shell .main-area :is(
+  input,
+  textarea,
+  select,
+  .search-field,
+  .products-search-field,
+  .sales-search-field,
+  .date-input-shell,
+  .customer-search-input,
+  .currency-trigger,
+  .customer-search-btn,
+  .smooth-select-btn,
+  .date-range-btn
+) {
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+.retail-shell .main-area :is(
+  input:focus,
+  textarea:focus,
+  select:focus,
+  .search-field:focus-within,
+  .products-search-field:focus-within,
+  .sales-search-field:focus-within,
+  .customer-search-input:focus-within,
+  .smooth-select-btn.active,
+  .smooth-select-btn:focus,
+  .date-range-btn:focus
+) {
+  border-color: var(--border) !important;
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.18) !important;
+  outline: none !important;
+}
+
+.retail-shell .main-area :is(
+  .smooth-select,
+  .date-range-picker,
+  .product-date-range-picker,
+  .sales-date-range-picker,
+  .customer-search-select
+) {
+  min-width: 0;
+}
+
+.retail-shell .main-area :is(
+  .smooth-select-btn,
+  .date-range-btn,
+  .product-date-range-btn,
+  .sales-date-range-btn,
+  .customer-search-btn,
+  .currency-trigger
+) {
+  width: 100%;
+  min-height: var(--control-height) !important;
+  height: var(--control-height) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  border: 1px solid var(--control-border) !important;
+  border-radius: var(--control-radius) !important;
+  background: var(--control-bg) !important;
+  color: var(--text) !important;
+  padding: 0 var(--control-padding-x) !important;
+  box-shadow: none !important;
+  overflow: hidden;
+  text-align: start !important;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease,
+    transform 160ms ease !important;
+}
+
+.retail-shell .main-area :is(
+  .smooth-select-btn:hover,
+  .date-range-btn:hover,
+  .product-date-range-btn:hover,
+  .sales-date-range-btn:hover,
+  .customer-search-btn:hover,
+  .currency-trigger:hover
+) {
+  background: var(--control-hover-bg) !important;
+  border-color: color-mix(in srgb, var(--control-border) 70%, #2563eb) !important;
+}
+
+.retail-shell .main-area :is(
+  .smooth-select-label,
+  .date-range-btn span,
+  .product-date-range-btn span,
+  .sales-date-range-btn span,
+  .customer-search-btn span
+) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) {
+  width: min(300px, calc(100vw - 28px)) !important;
+  padding: 12px !important;
+  overflow: hidden;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-head strong {
+  color: var(--text) !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) :is(.calendar-weekdays, .calendar-days) {
+  display: grid !important;
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+  gap: 4px !important;
+  text-align: center !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-weekdays span {
+  color: var(--muted) !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-head button {
+  width: 32px !important;
+  min-width: 32px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  display: grid !important;
+  place-items: center !important;
+  border: 1px solid var(--control-border) !important;
+  border-radius: 9px !important;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-days button {
+  min-width: 0 !important;
+  min-height: 32px !important;
+  height: 32px !important;
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  color: var(--text) !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  font-size: 13px !important;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    box-shadow 140ms ease !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-days button.muted {
+  color: color-mix(in srgb, var(--muted) 72%, transparent) !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-days button:hover:not(.selected):not(.in-range) {
+  background: var(--control-hover-bg) !important;
+  color: var(--text) !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-days button.in-range {
+  border-color: transparent !important;
+  background: color-mix(in srgb, #2563eb 12%, var(--panel-bg)) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-days button.in-range:hover:not(.selected) {
+  background: color-mix(in srgb, #2563eb 12%, var(--panel-bg)) !important;
+  color: var(--text) !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-days button.selected,
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-days button.range-start,
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-days button.range-end,
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-days button.selected:hover {
+  border-color: #2563eb !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22) !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-days button.range-start {
+  border-start-end-radius: 8px !important;
+  border-end-end-radius: 8px !important;
+}
+
+.retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) .calendar-days button.range-end {
+  border-start-start-radius: 8px !important;
+  border-end-start-radius: 8px !important;
+}
+
+@media (max-width: 760px) {
+  .retail-shell {
+    --control-height: 42px;
+  }
+
+  .retail-shell .main-area :is(
+    .smooth-select,
+    .date-range-picker,
+    .product-date-range-picker,
+    .sales-date-range-picker,
+    .products-date-filter,
+    .date-filter-shell,
+    .customer-date-filter
+  ) {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .retail-shell :is(.date-range-calendar, .product-date-calendar, .sales-date-calendar) {
+    width: min(300px, calc(100vw - 24px)) !important;
+  }
+}
+
+.retail-shell.retail-shell.retail-shell .date-range-calendar .calendar-days button.selected.selected.selected.selected,
+.retail-shell.retail-shell.retail-shell .date-range-calendar .calendar-days button.range-start.range-start.range-start.range-start,
+.retail-shell.retail-shell.retail-shell .date-range-calendar .calendar-days button.range-end.range-end.range-end.range-end,
+.retail-shell.retail-shell.retail-shell .product-date-calendar .calendar-days button.selected.selected.selected.selected,
+.retail-shell.retail-shell.retail-shell .product-date-calendar .calendar-days button.range-start.range-start.range-start.range-start,
+.retail-shell.retail-shell.retail-shell .product-date-calendar .calendar-days button.range-end.range-end.range-end.range-end,
+.retail-shell.retail-shell.retail-shell .sales-date-calendar .calendar-days button.selected.selected.selected.selected,
+.retail-shell.retail-shell.retail-shell .sales-date-calendar .calendar-days button.range-start.range-start.range-start.range-start,
+.retail-shell.retail-shell.retail-shell .sales-date-calendar .calendar-days button.range-end.range-end.range-end.range-end {
+  border-color: #2563eb !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22) !important;
+}
+
+.retail-shell .date-range-calendar .calendar-days button:hover {
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+}
+
+.retail-shell .date-range-calendar .calendar-days button.muted {
+  color: var(--muted) !important;
+}
+
+.retail-shell.retail-shell.retail-shell.retail-shell
+.main-area .financial-date-range .date-range-calendar .calendar-days button,
+.retail-shell.retail-shell.retail-shell.retail-shell
+.main-area .report-date-range .date-range-calendar .calendar-days button,
+.retail-shell.retail-shell.retail-shell.retail-shell
+.main-area .financial-date-range .date-range-calendar .calendar-days button.selected,
+.retail-shell.retail-shell.retail-shell.retail-shell
+.main-area .report-date-range .date-range-calendar .calendar-days button.selected,
+.retail-shell.retail-shell.retail-shell.retail-shell
+.main-area .financial-date-range .date-range-calendar .calendar-days button.in-range,
+.retail-shell.retail-shell.retail-shell.retail-shell
+.main-area .report-date-range .date-range-calendar .calendar-days button.in-range,
+.retail-shell.retail-shell.retail-shell.retail-shell
+.main-area .financial-date-range .date-range-calendar .calendar-days button.range-start,
+.retail-shell.retail-shell.retail-shell.retail-shell
+.main-area .report-date-range .date-range-calendar .calendar-days button.range-start,
+.retail-shell.retail-shell.retail-shell.retail-shell
+.main-area .financial-date-range .date-range-calendar .calendar-days button.range-end,
+.retail-shell.retail-shell.retail-shell.retail-shell
+.main-area .report-date-range .date-range-calendar .calendar-days button.range-end {
+  background: transparent !important;
+  background-color: transparent !important;
+  color: var(--text) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .financial-date-range .date-range-calendar .calendar-days button:hover,
+.retail-shell .report-date-range .date-range-calendar .calendar-days button:hover {
+  background: var(--panel-soft) !important;
+}
+
+.retail-shell .date-range-calendar .calendar-days button.in-range {
+  background: #e8f0ff !important;
+  color: var(--text) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .date-range-calendar .calendar-days button.range-start,
+.retail-shell .date-range-calendar .calendar-days button.range-end,
+.retail-shell .date-range-calendar .calendar-days button.selected {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22) !important;
+}
+
+.retail-shell .date-range-calendar .calendar-days button:hover:not(.selected):not(.range-start):not(.range-end) {
+  background: #eef4ff !important;
+}

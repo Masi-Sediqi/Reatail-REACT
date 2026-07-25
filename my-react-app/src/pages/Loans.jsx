@@ -3,15 +3,25 @@ import CustomSelect from '../components/CustomSelect.jsx'
 import DateRangePicker from '../components/DateRangePicker.jsx'
 import FloatingActionMenu from '../components/FloatingActionMenu.jsx'
 import PrintPreviewModal from '../components/PrintPreviewModal.jsx'
-import { CalendarDays, CreditCard, DollarSign, Eye, ReceiptText, Search, Trash2, WalletCards } from '../components/Icons.jsx'
+import {
+  CalendarDays,
+  CreditCard,
+  DollarSign,
+  Eye,
+  ReceiptText,
+  Search,
+  Trash2,
+  WalletCards,
+  X,
+} from '../components/Icons.jsx'
+import { formatBusinessCurrencyAmount } from '../utils/currencyExchange.js'
 import './Loans.css'
 
 const parseNumber = (value) => Number.parseFloat(value || 0) || 0
 const roundMoney = (value) => Math.round((parseNumber(value) + Number.EPSILON) * 100) / 100
 
 const formatMoney = (value, currency = 'AFN') => {
-  const symbol = currency === 'USD' ? '$' : currency === 'EUR' ? '\u20AC' : currency === 'PKR' ? 'Rs' : '\u060B'
-  return `${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${symbol}`
+  return formatBusinessCurrencyAmount(value, currency)
 }
 
 const getGregorianLabel = (isoDate) => new Date(`${isoDate}T12:00:00`).toLocaleDateString('en-US', {
@@ -60,71 +70,378 @@ const getDateMatches = (dateValue, filter, customStartDate, customEndDate) => {
     || (filter === 'custom' && (!rangeStart || date >= rangeStart) && (!rangeEnd || date <= rangeEnd))
 }
 
-function LoanDetailsModal({ loan, onClose, onDelete, onMarkPaid, onPayment, t }) {
+function LoanDetailsModal({
+  loan,
+  onClose,
+  onDelete,
+  onMarkPaid,
+  onPayment,
+  t,
+}) {
   const paid = parseNumber(loan.paidAmount)
   const total = parseNumber(loan.total)
   const remaining = parseNumber(loan.balance)
-  const progress = total > 0 ? Math.min(100, Math.round((paid / total) * 100)) : 0
+
+  const progress =
+    total > 0
+      ? Math.min(
+          100,
+          Math.round((paid / total) * 100),
+        )
+      : 0
+
   const status = getLoanStatus(loan)
 
+  const statusLabel =
+    status === 'paid'
+      ? t.paid
+      : status === 'overdue'
+        ? (t.overdue ?? 'Overdue')
+        : t.pending
+
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="loan-modal loan-details-modal" onClick={(event) => event.stopPropagation()}>
-        <button className="modal-close" type="button" onClick={onClose}>x</button>
-        <header>
-          <h2>{t.loanDetails ?? 'Loan Details'}</h2>
-          <span className={`status-pill ${status === 'paid' ? 'active' : status === 'overdue' ? 'danger' : 'warning'}`}>{status === 'paid' ? t.paid : status === 'overdue' ? (t.overdue ?? 'Overdue') : t.pending}</span>
+    <div
+      className="modal-backdrop"
+      onClick={onClose}
+    >
+      <section
+        className="loan-modal loan-details-modal loan-modal-v2"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="loan-details-title"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <header className="loan-modal-v2-header">
+          <div className="loan-modal-v2-title">
+            <div className="loan-modal-v2-icon">
+              <CreditCard size={18} />
+            </div>
+
+            <div>
+              <h2 id="loan-details-title">
+                {t.loanDetails ?? 'Loan Details'}
+              </h2>
+
+              <p>
+                {loan.invoiceNumber || 'Loan record'}
+              </p>
+            </div>
+          </div>
+
+          <span
+  className={`loan-header-status status-pill ${
+    status === 'paid'
+      ? 'active'
+      : status === 'overdue'
+        ? 'danger'
+        : 'warning'
+  }`}
+>
+  {statusLabel}
+</span>
+
+          <button
+  className="loan-modal-v2-close"
+  type="button"
+  onClick={onClose}
+  aria-label={t.close ?? 'Close'}
+  title={t.close ?? 'Close'}
+>
+  <span aria-hidden="true">×</span>
+</button>
         </header>
-        <div className="loan-detail-pair">
-          <div><span>{t.invoice}</span><strong>{loan.invoiceNumber}</strong></div>
-          <div><span>{t.customer}</span><strong>{loan.customerName}</strong></div>
+
+        <div className="loan-modal-v2-body">
+          <section className="loan-info-grid">
+            <div className="loan-info-card">
+              <span>{t.invoice}</span>
+              <strong>
+                {loan.invoiceNumber || '-'}
+              </strong>
+            </div>
+
+            <div className="loan-info-card">
+              <span>{t.customer}</span>
+              <strong>
+                {loan.customerName || '-'}
+              </strong>
+            </div>
+          </section>
+
+          <section className="loan-progress-card">
+            <div className="loan-progress-head">
+              <span>
+                {t.paymentProgress ??
+                  'Payment Progress'}
+              </span>
+
+              <strong>{progress}%</strong>
+            </div>
+
+            <div className="loan-progress-track">
+              <span
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </section>
+
+          <section className="loan-amount-card">
+            <div>
+              <span>
+                {t.totalAmount ?? t.total}
+              </span>
+
+              <strong>
+                {formatMoney(total, loan.currency)}
+              </strong>
+            </div>
+
+            <div>
+              <span className="success-text">
+                {t.paid}
+              </span>
+
+              <strong className="success-text">
+                {formatMoney(paid, loan.currency)}
+              </strong>
+            </div>
+
+            <div>
+              <span className="danger-text">
+                {t.remaining}
+              </span>
+
+              <strong className="danger-text">
+                {formatMoney(
+                  remaining,
+                  loan.currency,
+                )}
+              </strong>
+            </div>
+          </section>
+
+          <section className="loan-created-card">
+            <CalendarDays size={16} />
+
+            <div>
+              <span>{t.created ?? 'Created'}</span>
+
+              <strong>
+                {getGregorianLabel(loan.date)}
+              </strong>
+            </div>
+          </section>
         </div>
-        <div className="loan-progress-row">
-          <div><span>{t.paymentProgress ?? 'Payment Progress'}</span><strong>{progress}%</strong></div>
-          <div className="loan-progress-track"><span style={{ width: `${progress}%` }} /></div>
-        </div>
-        <div className="loan-amount-list">
-          <div><span>{t.totalAmount ?? t.total}</span><strong>{formatMoney(total, loan.currency)}</strong></div>
-          <div><span className="success-text">{t.paid}</span><strong className="success-text">{formatMoney(paid, loan.currency)}</strong></div>
-          <div><span className="danger-text">{t.remaining}</span><strong className="danger-text">{formatMoney(remaining, loan.currency)}</strong></div>
-        </div>
-        <div className="loan-created-row">
-          <span>{t.created ?? 'Created'}</span>
-          <strong>{getGregorianLabel(loan.date)}</strong>
-        </div>
-        <div className="loan-modal-actions">
-          <button type="button" onClick={onPayment}><DollarSign size={16} /> {t.recordPayment}</button>
-          <button className="primary-btn" type="button" disabled={remaining <= 0} onClick={onMarkPaid}>✓ {t.markAsPaid ?? 'Mark as Paid'}</button>
-        </div>
-        <button className="danger-btn wide" type="button" onClick={onDelete}>{t.deleteLoanRecord ?? 'Delete Loan Record'}</button>
-      </div>
+
+        <footer className="loan-modal-v2-footer">
+          <button
+            className="loan-record-payment-btn"
+            type="button"
+            onClick={onPayment}
+          >
+            <DollarSign size={15} />
+            <span>{t.recordPayment}</span>
+          </button>
+
+          <button
+            className="loan-mark-paid-btn"
+            type="button"
+            disabled={remaining <= 0}
+            onClick={onMarkPaid}
+          >
+            <CreditCard size={15} />
+
+            <span>
+              {t.markAsPaid ?? 'Mark as Paid'}
+            </span>
+          </button>
+
+          <button
+            className="loan-delete-record-btn"
+            type="button"
+            onClick={onDelete}
+          >
+            <Trash2 size={15} />
+
+            <span>
+              {t.deleteLoanRecord ??
+                'Delete Loan Record'}
+            </span>
+          </button>
+        </footer>
+      </section>
     </div>
   )
 }
 
-function LoanPaymentModal({ loan, onClose, onRecord, t }) {
+function LoanPaymentModal({
+  loan,
+  onClose,
+  onRecord,
+  t,
+}) {
   const [amount, setAmount] = useState('')
   const [notes, setNotes] = useState('')
+
   const remaining = parseNumber(loan.balance)
   const amountValue = parseNumber(amount)
-  const invalid = amountValue <= 0 || amountValue > remaining
+
+  const invalid =
+    amountValue <= 0 ||
+    amountValue > remaining
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <form className="loan-modal loan-payment-modal" onClick={(event) => event.stopPropagation()} onSubmit={(event) => { event.preventDefault(); if (!invalid) onRecord(amountValue, notes) }}>
-        <button className="modal-close" type="button" onClick={onClose}>x</button>
-        <h2>{t.recordPayment}</h2>
-        <div className="loan-payment-summary">
-          <div><span>{t.invoice}:</span><strong>{loan.invoiceNumber}</strong></div>
-          <div><span>{t.total}:</span><strong>{formatMoney(loan.total, loan.currency)}</strong></div>
-          <div><span>{t.alreadyPaid ?? 'Already Paid'}:</span><strong className="success-text">{formatMoney(loan.paidAmount, loan.currency)}</strong></div>
-          <div><span>{t.remaining}:</span><strong className="danger-text">{formatMoney(remaining, loan.currency)}</strong></div>
+    <div
+      className="modal-backdrop"
+      onClick={onClose}
+    >
+      <form
+        className="loan-modal loan-payment-modal loan-payment-modal-v2"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="loan-payment-title"
+        onClick={(event) => event.stopPropagation()}
+        onSubmit={(event) => {
+          event.preventDefault()
+
+          if (!invalid) {
+            onRecord(amountValue, notes)
+          }
+        }}
+      >
+        <header className="loan-modal-v2-header">
+          <div className="loan-modal-v2-title">
+            <div className="loan-modal-v2-icon payment">
+              <DollarSign size={18} />
+            </div>
+
+            <div>
+              <h2 id="loan-payment-title">
+                {t.recordPayment}
+              </h2>
+
+              <p>
+                {loan.invoiceNumber || 'Loan payment'}
+              </p>
+            </div>
+          </div>
+
+          <button
+  className="loan-modal-v2-close"
+  type="button"
+  onClick={onClose}
+  aria-label={t.close ?? 'Close'}
+  title={t.close ?? 'Close'}
+>
+  <span aria-hidden="true">×</span>
+</button>
+        </header>
+
+        <div className="loan-payment-modal-v2-body">
+          <section className="loan-payment-summary-card">
+            <div>
+              <span>{t.invoice}</span>
+              <strong>
+                {loan.invoiceNumber || '-'}
+              </strong>
+            </div>
+
+            <div>
+              <span>{t.total}</span>
+              <strong>
+                {formatMoney(
+                  loan.total,
+                  loan.currency,
+                )}
+              </strong>
+            </div>
+
+            <div>
+              <span>
+                {t.alreadyPaid ?? 'Already Paid'}
+              </span>
+
+              <strong className="success-text">
+                {formatMoney(
+                  loan.paidAmount,
+                  loan.currency,
+                )}
+              </strong>
+            </div>
+
+            <div>
+              <span>{t.remaining}</span>
+
+              <strong className="danger-text">
+                {formatMoney(
+                  remaining,
+                  loan.currency,
+                )}
+              </strong>
+            </div>
+          </section>
+
+          <label className="loan-payment-field">
+            <span>
+              {t.paymentAmount ??
+                'Payment Amount'}
+              <b className="required-mark">*</b>
+            </span>
+
+            <div className="loan-payment-input-shell">
+  <input
+    autoFocus
+    inputMode="decimal"
+    placeholder={`${t.max ?? 'Max'}: ${remaining}`}
+    value={amount}
+    onChange={(event) =>
+      setAmount(event.target.value)
+    }
+  />
+</div>
+
+            {amountValue > remaining && (
+              <small className="loan-payment-error">
+                Payment cannot exceed the remaining balance.
+              </small>
+            )}
+          </label>
+
+          <label className="loan-payment-field">
+            <span>
+              {t.notes} ({t.optional})
+            </span>
+
+            <textarea
+              placeholder={
+                t.paymentReference ??
+                'Payment reference...'
+              }
+              value={notes}
+              onChange={(event) =>
+                setNotes(event.target.value)
+              }
+            />
+          </label>
         </div>
-        <label><span>{t.paymentAmount ?? 'Payment Amount'}</span><input autoFocus inputMode="decimal" placeholder={`${t.max ?? 'Max'}: ${remaining}`} value={amount} onChange={(event) => setAmount(event.target.value)} /></label>
-        <label><span>{t.notes} ({t.optional})</span><textarea placeholder={t.paymentReference ?? 'Payment reference...'} value={notes} onChange={(event) => setNotes(event.target.value)} /></label>
-        <footer className="modal-actions">
-          <button type="button" onClick={onClose}>{t.cancel}</button>
-          <button className="primary-btn" disabled={invalid} type="submit">{t.recordPayment}</button>
+
+        <footer className="loan-payment-footer">
+          <button
+            className="loan-payment-cancel-btn"
+            type="button"
+            onClick={onClose}
+          >
+            {t.cancel}
+          </button>
+
+          <button
+            className="loan-payment-submit-btn"
+            disabled={invalid}
+            type="submit"
+          >
+            <DollarSign size={15} />
+            <span>{t.recordPayment}</span>
+          </button>
         </footer>
       </form>
     </div>

@@ -596,6 +596,48 @@
   gap: 4px;
 }
 
+.payment-edit-fields {
+  width: min(320px, 100%);
+  grid-template-columns: 120px minmax(0, 1fr);
+}
+
+.payment-edit-fields input {
+  width: 100%;
+  min-height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-bg);
+  color: var(--text);
+  padding: 0 10px;
+  outline: none;
+}
+
+.payment-row-actions {
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px !important;
+}
+
+.payment-row-actions button {
+  min-height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-bg);
+  color: hsl(222 47% 20%);
+  padding: 0 10px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.payment-row-actions .danger-action {
+  width: 34px;
+  padding: 0;
+  color: #ef4444;
+}
+
 .add-payment-modal {
   width: min(448px, calc(100vw - 24px));
   gap: 18px;
@@ -705,7 +747,10 @@
 }
 
 .refund-modal {
-  width: min(672px, calc(100vw - 24px));
+  width: min(606px, calc(100vw - 24px));
+  gap: 14px;
+  padding: 24px;
+  border-radius: 10px;
 }
 
 .refund-headline {
@@ -721,7 +766,7 @@
 .refund-mode-panel {
   display: grid;
   gap: 10px;
-  padding: 12px;
+  padding: 12px 14px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--panel-soft);
@@ -743,7 +788,7 @@
 }
 
 .refund-mode-tabs button {
-  min-height: 30px;
+  min-height: 28px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--panel-bg);
@@ -784,13 +829,13 @@
 
 .refund-table {
   width: 100%;
-  min-width: 620px;
+  min-width: 560px;
   border-collapse: collapse;
 }
 
 .refund-table th,
 .refund-table td {
-  padding: 12px 16px;
+  padding: 12px 14px;
   border-bottom: 1px solid var(--border);
   text-align: start;
   vertical-align: middle;
@@ -814,14 +859,14 @@
 
 .refund-qty-control {
   display: grid;
-  grid-template-columns: 30px minmax(54px, 84px) 30px;
+  grid-template-columns: 28px minmax(54px, 74px) 28px;
   align-items: center;
   gap: 4px;
 }
 
 .refund-qty-control button,
 .refund-qty-control input {
-  min-height: 30px;
+  min-height: 28px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--panel-bg);
@@ -880,6 +925,41 @@
   border-color: #f87171;
   background: #f87171;
   color: #ffffff;
+}
+
+.sales-content .invoice-preview-modal {
+  width: min(760px, calc(100vw - 24px));
+}
+
+.sales-content .invoice-preview-top {
+  align-items: center;
+}
+
+.sales-content .invoice-preview-top .print-action-bar {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.sales-content .invoice-preview-top button,
+.sales-content .invoice-preview-top a {
+  min-height: 28px;
+  gap: 5px;
+  padding: 0 9px;
+  font-size: 12px;
+}
+
+.sales-content .invoice-scroll {
+  padding: 24px 14px;
+}
+
+.sales-content .invoice-paper {
+  width: min(560px, 100%);
+}
+
+.sales-content .invoice-summary .remaining-total strong {
+  color: #f59e0b;
 }
 
 .modal-actions .refund-confirm-btn:disabled {

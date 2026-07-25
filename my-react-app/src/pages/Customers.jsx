@@ -1,9 +1,29 @@
 import { useEffect, useMemo, useState } from 'react'
 import PrintPreviewModal from '../components/PrintPreviewModal.jsx'
 import CustomSelect from '../components/CustomSelect.jsx'
+import CustomFieldInputs from '../components/CustomFieldInputs.jsx'
 import DateRangePicker from '../components/DateRangePicker.jsx'
 import FloatingActionMenu from '../components/FloatingActionMenu.jsx'
-import { BarChart3, CalendarDays, ChevronLeft, CreditCard, DollarSign, Eye, History, Mail, Phone, ReceiptText, Search, ShoppingCart, SquareMenu, Trash2, Users, WalletCards } from '../components/Icons.jsx'
+import {
+  BarChart3,
+  CalendarDays,
+  ChevronLeft,
+  CreditCard,
+  DollarSign,
+  Eye,
+  History,
+  Mail,
+  Phone,
+  Plus,
+  ReceiptText,
+  Search,
+  ShoppingCart,
+  SquareMenu,
+  Trash2,
+  Users,
+  WalletCards,
+} from '../components/Icons.jsx'
+import { formatBusinessCurrencyAmount } from '../utils/currencyExchange.js'
 import './Customers.css'
 
 const emptyCustomer = {
@@ -16,11 +36,12 @@ const emptyCustomer = {
   purchases: '0.00',
   pending: '0.00',
   status: 'Active',
+  customFields: {},
 }
 
 const parseNumber = (value) => Number.parseFloat(value || 0) || 0
 const parseDateInput = (value) => (value ? new Date(`${value}T12:00:00`) : null)
-const formatMoney = (value, currency = 'AFN') => `${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency === 'USD' ? '$' : currency === 'EUR' ? '€' : '؋'}`
+const formatMoney = (value, currency = 'AFN') => formatBusinessCurrencyAmount(value, currency)
 const getDateLabel = (value) => {
   const date = parseDateInput(value)
   return date ? date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '-'
@@ -62,11 +83,15 @@ function CustomerActionMenu({ customer, onDelete, onEdit, onViewProfile, t }) {
   ]} />
 }
 
-function CustomerModal({ initialCustomer, onClose, onSave, t }) {
-  const [form, setForm] = useState(initialCustomer ?? emptyCustomer)
+function CustomerModal({ customFields = [], initialCustomer, onClose, onSave, t }) {
+  const [form, setForm] = useState(() => ({ ...emptyCustomer, ...(initialCustomer ?? {}), customFields: { ...(initialCustomer?.customFields ?? {}) } }))
   const [closing, setClosing] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }))
+  const updateCustomField = (fieldId, value) => setForm((current) => ({
+    ...current,
+    customFields: { ...(current.customFields ?? {}), [fieldId]: value },
+  }))
   const requestClose = () => {
     if (closing) return
     setClosing(true)
@@ -81,7 +106,8 @@ function CustomerModal({ initialCustomer, onClose, onSave, t }) {
         onSubmit={(event) => {
           event.preventDefault()
           setSubmitted(true)
-          if (!form.name.trim()) return
+          const missingCustomField = customFields.some((field) => field.required && !String(form.customFields?.[field.id] ?? '').trim())
+          if (!form.name.trim() || missingCustomField) return
           onSave({ ...form, id: form.id ?? crypto.randomUUID(), status: form.status || 'Active' })
         }}
       >
@@ -92,15 +118,38 @@ function CustomerModal({ initialCustomer, onClose, onSave, t }) {
         <label><span><Mail size={13} /> {t.email}</span><input placeholder={t.emailAddress} value={form.email} onChange={(e) => update('email', e.target.value)} /></label>
         <label className="wide"><span>{t.address}</span><input placeholder={t.address} value={form.address} onChange={(e) => update('address', e.target.value)} /></label>
         <label className="wide"><span>{t.notes}</span><textarea placeholder={t.additionalNotes} value={form.notes} onChange={(e) => update('notes', e.target.value)} /></label>
-        <label className="toggle-label wide">
-          <button className={form.vip ? 'toggle on' : 'toggle'} type="button" onClick={() => update('vip', !form.vip)}><span>{form.vip ? 'ON' : ''}</span></button>
-          <span>{t.vipCustomer}</span>
-        </label>
+        <div className={`customer-vip-field wide ${form.vip ? 'is-active' : ''}`}>
+          <div className="customer-vip-info">
+            <strong>{t.vipCustomer}</strong>
+
+            <small>
+              {form.vip
+                ? (t.vipCustomerActive ?? 'VIP customer is active')
+                : (t.vipCustomerInactive ?? 'VIP customer is inactive')}
+            </small>
+          </div>
+
+          <button
+            className={`customer-vip-toggle ${form.vip ? 'is-on' : ''}`}
+            type="button"
+            role="switch"
+            aria-checked={form.vip}
+            aria-label={t.vipCustomer}
+            onClick={() => update('vip', !form.vip)}
+          >
+            <span className="customer-vip-toggle-track">
+              <span className="customer-vip-toggle-thumb" />
+            </span>
+
+            <strong>{form.vip ? 'ON' : 'OFF'}</strong>
+          </button>
+        </div>
         <div className="customer-status-choice wide">
           <span>{t.status}</span>
           <label><input checked={(form.status || 'Active') === 'Active'} name="customer-status" type="radio" onChange={() => update('status', 'Active')} /> {t.active}</label>
           <label><input checked={(form.status || 'Active') === 'Inactive'} name="customer-status" type="radio" onChange={() => update('status', 'Inactive')} /> {t.inactive ?? 'Inactive'}</label>
         </div>
+        <CustomFieldInputs fields={customFields} onChange={updateCustomField} submitted={submitted} values={form.customFields} />
         <button className="primary-btn wide" type="submit">{initialCustomer ? t.saveChanges : t.addCustomer}</button>
       </form>
     </div>
@@ -214,15 +263,38 @@ function CustomerProfile({ companyInfo, customer, onBack, onEdit, printSettings,
   return (
     <div className="entity-content customer-profile-content">
       <div className="customer-profile-head">
-        <button className="back-icon-btn" type="button" onClick={onBack} aria-label={t.back ?? 'Back'}><ChevronLeft size={18} /></button>
+        <button
+          className="staff-profile-back-btn"
+          type="button"
+          onClick={onBack}
+          aria-label={t.back ?? 'Back'}
+          title={t.back ?? 'Back'}
+        >
+          <ChevronLeft size={19} />
+        </button>
         <div className="customer-avatar"><Users size={25} /></div>
         <div>
           <h1>{customer.name}</h1>
           <p>{[customer.phone, customer.email, `${t.memberSince} ${getDateLabel((customer.createdAt || customerSales[0]?.createdAt || customerSales[0]?.date || '').slice(0, 10))}`].filter(Boolean).join('   ')}</p>
         </div>
         <div className="customer-profile-actions">
-          <button type="button" onClick={() => onEdit(customer)}><SquareMenu size={16} /> {t.edit}</button>
-          <button type="button" onClick={() => setPrintRows(printConfig)}><ReceiptText size={16} /> {t.printStatement}</button>
+          <button
+            className="customer-profile-edit-btn"
+            type="button"
+            onClick={() => onEdit(customer)}
+          >
+            <SquareMenu size={16} />
+            <span>{t.edit}</span>
+          </button>
+
+          <button
+            className="customer-profile-print-btn"
+            type="button"
+            onClick={() => setPrintRows(printConfig)}
+          >
+            <ReceiptText size={16} />
+            <span>{t.printStatement}</span>
+          </button>
         </div>
       </div>
 
@@ -236,29 +308,36 @@ function CustomerProfile({ companyInfo, customer, onBack, onEdit, printSettings,
       </div>
 
       <div className="filter-card customer-profile-filter">
-        <div className="search-field"><Search size={17} /><input placeholder={t.searchInvoices ?? 'Search invoices...'} value={query} onChange={(event) => setQuery(event.target.value)} /></div>
-        <CustomSelect ariaLabel={t.allTime} options={dateOptions} value={dateFilter} onChange={setDateFilter} />
-       <div className="customer-date-filter">
-  <CustomSelect
-    ariaLabel={t.allTime}
-    options={dateOptions}
-    value={dateFilter}
-    onChange={setDateFilter}
-  />
+        <div className="search-field">
+          <Search size={17} />
+          <input
+            placeholder={t.searchInvoices ?? 'Search invoices...'}
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+        </div>
 
-  {dateFilter === 'custom' && (
-    <DateRangePicker
-      className="customer-inline-date-range"
-      end={customEndDate}
-      onChange={({ start, end }) => {
-        setCustomStartDate(start)
-        setCustomEndDate(end)
-      }}
-      start={customStartDate}
-      t={t}
-    />
-  )}
-</div>
+        <div className="customer-date-filter">
+          <CustomSelect
+            ariaLabel={t.allTime}
+            options={dateOptions}
+            value={dateFilter}
+            onChange={setDateFilter}
+          />
+
+          {dateFilter === 'custom' && (
+            <DateRangePicker
+              className="customer-inline-date-range"
+              end={customEndDate}
+              onChange={({ start, end }) => {
+                setCustomStartDate(start)
+                setCustomEndDate(end)
+              }}
+              start={customStartDate}
+              t={t}
+            />
+          )}
+        </div>
       </div>
 
       <div className="customer-profile-tabs">
@@ -335,6 +414,7 @@ function CustomersPage({ companyInfo, customers, initialProfileCustomerId = '', 
   const [dateFilter, setDateFilter] = useState('all')
   const [customStartDate, setCustomStartDate] = useState('')
   const [customEndDate, setCustomEndDate] = useState('')
+  const customerCustomFields = companyInfo?.customFormFields?.customers ?? []
   const profileCustomer = customers.find((customer) => customer.id === profileCustomerId)
 
   useEffect(() => {
@@ -410,7 +490,7 @@ function CustomersPage({ companyInfo, customers, initialProfileCustomerId = '', 
           sales={sales}
           t={t}
         />
-        {modalOpen && <CustomerModal initialCustomer={editingCustomer} onClose={() => { setModalOpen(false); setEditingCustomer(null) }} onSave={saveCustomer} t={t} />}
+        {modalOpen && <CustomerModal customFields={customerCustomFields} initialCustomer={editingCustomer} onClose={() => { setModalOpen(false); setEditingCustomer(null) }} onSave={saveCustomer} t={t} />}
       </>
     )
   }
@@ -419,9 +499,24 @@ function CustomersPage({ companyInfo, customers, initialProfileCustomerId = '', 
     <div className="entity-content customer-content">
       <div className="entity-heading">
         <div><h1>{t.customerManagement}</h1><p>{t.manageCustomerRelationships}</p></div>
-        <div className="entity-actions">
-          <button type="button" onClick={() => setPrintOpen(true)}><ReceiptText size={16} /> {t.printReport}</button>
-          <button className="primary-btn" type="button" onClick={() => setModalOpen(true)}>+ {t.addCustomer}</button>
+        <div className="entity-actions customer-header-actions">
+          <button
+            className="customer-print-btn"
+            type="button"
+            onClick={() => setPrintOpen(true)}
+          >
+            <ReceiptText size={16} />
+            <span>{t.printReport}</span>
+          </button>
+
+          <button
+            className="primary-btn customer-add-btn"
+            type="button"
+            onClick={() => setModalOpen(true)}
+          >
+            <Plus size={16} />
+            <span>{t.addCustomer}</span>
+          </button>
         </div>
       </div>
 
@@ -437,26 +532,26 @@ function CustomersPage({ companyInfo, customers, initialProfileCustomerId = '', 
         <CustomSelect ariaLabel={t.status} options={statusOptions} value={statusFilter} onChange={setStatusFilter} />
         <CustomSelect ariaLabel={t.paymentStatus} options={paymentOptions} value={paymentFilter} onChange={setPaymentFilter} />
         <div className="customer-date-filter">
-  <CustomSelect
-    ariaLabel={t.allTime}
-    options={dateOptions}
-    value={dateFilter}
-    onChange={setDateFilter}
-  />
+          <CustomSelect
+            ariaLabel={t.allTime}
+            options={dateOptions}
+            value={dateFilter}
+            onChange={setDateFilter}
+          />
 
-  {dateFilter === 'custom' && (
-    <DateRangePicker
-      className="customer-inline-date-range"
-      end={customEndDate}
-      onChange={({ start, end }) => {
-        setCustomStartDate(start)
-        setCustomEndDate(end)
-      }}
-      start={customStartDate}
-      t={t}
-    />
-  )}
-</div>
+          {dateFilter === 'custom' && (
+            <DateRangePicker
+              className="customer-inline-date-range"
+              end={customEndDate}
+              onChange={({ start, end }) => {
+                setCustomStartDate(start)
+                setCustomEndDate(end)
+              }}
+              start={customStartDate}
+              t={t}
+            />
+          )}
+        </div>
       </div>
 
       <div className="data-panel customer-panel">
@@ -486,7 +581,7 @@ function CustomersPage({ companyInfo, customers, initialProfileCustomerId = '', 
         </table>
       </div>
 
-      {modalOpen && <CustomerModal initialCustomer={editingCustomer} onClose={() => { setModalOpen(false); setEditingCustomer(null) }} onSave={saveCustomer} t={t} />}
+      {modalOpen && <CustomerModal customFields={customerCustomFields} initialCustomer={editingCustomer} onClose={() => { setModalOpen(false); setEditingCustomer(null) }} onSave={saveCustomer} t={t} />}
       {printOpen && <PrintPreviewModal companyInfo={companyInfo} onClose={() => setPrintOpen(false)} printSettings={printSettings} rows={filteredCustomers} title={t.customerReport} columns={[{ key: 'name', label: t.name }, { key: 'phone', label: t.phoneNumber }, { key: 'email', label: t.email }, { key: 'purchases', label: t.purchases }, { key: 'pending', label: t.pending }]} t={t} />}
     </div>
   )

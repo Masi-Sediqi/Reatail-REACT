@@ -69,12 +69,43 @@ function ReportsPage({ cashWallet, companyInfo, expenses = [], printSettings, pr
       <div className="entity-heading reports-heading">
         <div><h1>{t.reports}</h1><p>{t.analyzeBusinessData ?? 'Analyze your business data'}</p></div>
         <div className="entity-actions report-actions">
-          <div className="report-date-control">
-            <CustomSelect ariaLabel={t.allTime} options={options} value={dateFilter} onChange={setDateFilter} />
-            {dateFilter === 'custom' && <DateRangePicker className="report-date-range" end={customEndDate} onChange={({ start, end }) => { setCustomStartDate(start); setCustomEndDate(end) }} start={customStartDate} t={t} />}
-          </div>
-          <button type="button" onClick={() => setPrintOpen(true)}><ReceiptText size={16} /> {t.print}</button>
-        </div>
+  <div
+    className={`report-date-control ${
+      dateFilter === 'custom'
+        ? 'has-custom-range'
+        : ''
+    }`}
+  >
+    <CustomSelect
+      ariaLabel={t.allTime}
+      options={options}
+      value={dateFilter}
+      onChange={setDateFilter}
+    />
+
+    {dateFilter === 'custom' && (
+      <DateRangePicker
+        className="report-date-range"
+        end={customEndDate}
+        onChange={({ start, end }) => {
+          setCustomStartDate(start)
+          setCustomEndDate(end)
+        }}
+        start={customStartDate}
+        t={t}
+      />
+    )}
+  </div>
+
+  <button
+    className="report-print-btn"
+    type="button"
+    onClick={() => setPrintOpen(true)}
+  >
+    <ReceiptText size={15} />
+    <span>{t.print}</span>
+  </button>
+</div>
       </div>
 
       <div className="report-metric-grid">

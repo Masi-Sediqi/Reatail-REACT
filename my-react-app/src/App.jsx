@@ -6,6 +6,7 @@ import Profile from './pages/Profile.jsx'
 import SettingsPage from './pages/Settings.jsx'
 import ProductsPage from './pages/Products.jsx'
 import SuppliersPage from './pages/Suppliers.jsx'
+import BundlesPage from './pages/Bundles.jsx'
 import CustomersPage from './pages/Customers.jsx'
 import ExpensesPage from './pages/Expenses.jsx'
 import RecycleBinPage from './pages/RecycleBin.jsx'
@@ -24,9 +25,11 @@ import UserGuide from './pages/UserGuide.jsx'
 import HelpCenter from './pages/HelpCenter.jsx'
 import { colorThemes, productCategories } from './data/dashboardData.js'
 import { translations } from './data/translations.js'
+import { getCurrencyMeta } from './utils/currencyExchange.js'
 import { clearLegacyJsonStorage, hasLegacyJsonStorage, loadJsonStorage, readLegacyJson, saveJsonStorage } from './utils/jsonStorage.js'
 import { playNotificationSound } from './utils/notificationSounds.js'
 import './App.css'
+import './pages/PageShared.css'
 
 const getPageFromPath = () => {
   if (window.location.pathname.startsWith('/dashboard/')) return `dashboardMetric:${window.location.pathname.split('/').pop() || 'totalRevenue'}`
@@ -38,6 +41,7 @@ const getPageFromPath = () => {
   if (window.location.pathname === '/terms') return 'terms'
   if (window.location.pathname === '/products') return 'products'
   if (window.location.pathname === '/suppliers') return 'suppliers'
+  if (window.location.pathname === '/bundles') return 'bundles'
   if (window.location.pathname === '/customers') return 'customers'
   if (window.location.pathname === '/staff') return 'staff'
   if (window.location.pathname === '/expenses') return 'expenses'
@@ -50,6 +54,29 @@ const getPageFromPath = () => {
   if (window.location.pathname === '/sales-bills') return 'salesBills'
   if (window.location.pathname === '/recycle-bin') return 'recycleBin'
   return 'dashboard'
+}
+
+function CurrencyRateWarningModal({ currencyCode, onClose, onSettings }) {
+  const currency = getCurrencyMeta(currencyCode)
+
+  return (
+    <div className="modal-backdrop currency-rate-warning-backdrop" onClick={onClose}>
+      <section className="currency-rate-warning-modal" onClick={(event) => event.stopPropagation()}>
+        <button className="modal-close" type="button" aria-label="Close" onClick={onClose}>
+          ×
+        </button>
+        <div className="currency-rate-warning-icon">!</div>
+        <h2>Exchange rate is not defined</h2>
+        <p>
+          No rate/value is set for {currency.name} ({currency.code}). Values will show as 0 until you set it in Settings.
+        </p>
+        <div className="currency-rate-warning-actions">
+          <button type="button" onClick={onClose}>Cancel</button>
+          <button type="button" className="primary" onClick={onSettings}>Go to Settings</button>
+        </div>
+      </section>
+    </div>
+  )
 }
 
 const readStorage = readLegacyJson
@@ -144,6 +171,7 @@ function App() {
   const [storageLoaded, setStorageLoaded] = useState(false)
   const [theme, setTheme] = useState(() => readStorage('retail-theme-mode', 'light'))
   const [language, setLanguage] = useState(() => readStorage('retail-language', 'en'))
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [page, setPage] = useState(getPageFromPath)
   const [activeColorTheme, setActiveColorTheme] = useState(() => readStorage('retail-color-theme', 'default'))
   const [suppliers, setSuppliers] = useState(() => readStorage('retail-suppliers', []))
@@ -153,11 +181,13 @@ function App() {
   const [staffMembers, setStaffMembers] = useState(() => readStorage('retail-staff-members', []))
   const [salesBills, setSalesBills] = useState(() => readStorage('retail-sales-bills', []))
   const [godownEntries, setGodownEntries] = useState(() => readStorage('retail-godown-entries', []))
+  const [bundles, setBundles] = useState(() => readStorage('retail-bundles', []))
   const [cashWallet, setCashWallet] = useState(() => readStorage('retail-cash-wallet', 120))
   const [cashWalletEntries, setCashWalletEntries] = useState(() => readStorage('retail-cash-wallet-entries', []))
   const [editingSale, setEditingSale] = useState(null)
   const [deletedItems, setDeletedItems] = useState(() => readStorage('retail-recycle-bin', []))
   const [pendingConfirmation, setPendingConfirmation] = useState(null)
+  const [dismissedNotificationIds, setDismissedNotificationIds] = useState([])
   const [categories, setCategories] = useState(() => mergeCategories(readStorage('retail-product-categories', [])))
   const [expenseCategories, setExpenseCategories] = useState(() => {
     const stored = readStorage('retail-expense-categories', [])
@@ -166,6 +196,9 @@ function App() {
   })
   const [baseCurrency, setBaseCurrency] = useState(() => readStorage('retail-base-currency', 'AFN'))
   const [exchangeRates, setExchangeRates] = useState(() => readStorage('retail-exchange-rates', {}))
+  const [businessCurrencyFilter, setBusinessCurrencyFilter] = useState(() => readStorage('retail-business-currency-filter', 'all'))
+  const [exchangeCurrency, setExchangeCurrency] = useState(() => readStorage('retail-dashboard-exchange-currency', 'original'))
+  const [currencyRateWarning, setCurrencyRateWarning] = useState(null)
   const [toast, setToast] = useState('')
   const toastTimerRef = useRef(null)
   const alertSoundTimerRef = useRef(null)
@@ -174,6 +207,11 @@ function App() {
   const t = useMemo(() => translations[language], [language])
   const isRtl = language === 'fa' || language === 'ps'
   const selectedColorTheme = colorThemes.find((item) => item.id === activeColorTheme) ?? colorThemes[0]
+  window.__retailCurrencyView = {
+    baseCurrency,
+    businessCurrencyFilter,
+    exchangeRates,
+  }
   const themeStyle = {
     '--accent': selectedColorTheme.accent,
     '--accent-contrast': getContrastColor(selectedColorTheme.accent),
@@ -195,10 +233,12 @@ function App() {
               ? '/help-center'
               : nextPage === 'userGuide'
                 ? '/user-guide'
-          : nextPage === 'products'
+            : nextPage === 'products'
             ? '/products'
             : nextPage === 'suppliers'
               ? '/suppliers'
+              : nextPage === 'bundles'
+                ? '/bundles'
               : nextPage === 'customers'
                 ? '/customers'
                 : nextPage === 'staff'
@@ -224,6 +264,7 @@ function App() {
                                 : '/'
                                
     setPage(nextPage)
+    setSidebarOpen(false)
     window.history.pushState({ page: nextPage }, '', nextPath)
   }
 
@@ -241,6 +282,7 @@ function App() {
       language,
       activeColorTheme,
       suppliers,
+      bundles,
       products,
       customers,
       expenses,
@@ -253,11 +295,13 @@ function App() {
       categories,
       expenseCategories,
       baseCurrency,
+      businessCurrencyFilter,
+      exchangeCurrency,
       exchangeRates,
       printSettings,
       companyInfo,
     },
-  }), [activeColorTheme, baseCurrency, cashWallet, cashWalletEntries, categories, companyInfo, customers, deletedItems, exchangeRates, expenseCategories, expenses, godownEntries, language, printSettings, products, salesBills, staffMembers, suppliers, theme])
+  }), [activeColorTheme, baseCurrency, bundles, businessCurrencyFilter, cashWallet, cashWalletEntries, categories, companyInfo, customers, deletedItems, exchangeCurrency, exchangeRates, expenseCategories, expenses, godownEntries, language, printSettings, products, salesBills, staffMembers, suppliers, theme])
 
   const importBackupData = (backup) => {
     const data = backup?.data ?? backup
@@ -266,6 +310,7 @@ function App() {
     setLanguage(data.language ?? 'en')
     setActiveColorTheme(data.activeColorTheme ?? 'default')
     setSuppliers(Array.isArray(data.suppliers) ? data.suppliers : [])
+    setBundles(Array.isArray(data.bundles) ? data.bundles : [])
     setProducts(Array.isArray(data.products) ? data.products : [])
     setCustomers(Array.isArray(data.customers) ? data.customers : [])
     setExpenses(Array.isArray(data.expenses) ? data.expenses : [])
@@ -278,6 +323,8 @@ function App() {
     setCategories(mergeCategories(data.categories))
     setExpenseCategories(Array.isArray(data.expenseCategories) && data.expenseCategories.length ? data.expenseCategories : defaultExpenseCategories)
     setBaseCurrency(data.baseCurrency ?? 'AFN')
+    setBusinessCurrencyFilter(data.businessCurrencyFilter ?? 'all')
+    setExchangeCurrency(data.exchangeCurrency ?? 'original')
     setExchangeRates(data.exchangeRates ?? {})
     setPrintSettings({ ...defaultPrintSettings, ...(data.printSettings ?? {}) })
     setCompanyInfo({ ...defaultCompanyInfo, ...(data.companyInfo ?? {}) })
@@ -287,6 +334,7 @@ function App() {
 
   const clearBusinessData = () => {
     setSuppliers([])
+    setBundles([])
     setProducts([])
     setCustomers([])
     setExpenses([])
@@ -325,6 +373,7 @@ function App() {
       setLanguage(data.language ?? 'en')
       setActiveColorTheme(data.activeColorTheme ?? 'default')
       setSuppliers(Array.isArray(data.suppliers) ? data.suppliers : [])
+      setBundles(Array.isArray(data.bundles) ? data.bundles : [])
       setProducts(Array.isArray(data.products) ? data.products : [])
       setCustomers(Array.isArray(data.customers) ? data.customers : [])
       setExpenses(Array.isArray(data.expenses) ? data.expenses : [])
@@ -337,6 +386,8 @@ function App() {
       setCategories(mergeCategories(data.categories))
       setExpenseCategories(Array.isArray(data.expenseCategories) && data.expenseCategories.length ? data.expenseCategories : defaultExpenseCategories)
       setBaseCurrency(data.baseCurrency ?? 'AFN')
+      setBusinessCurrencyFilter(data.businessCurrencyFilter ?? 'all')
+      setExchangeCurrency(data.exchangeCurrency ?? 'original')
       setExchangeRates(data.exchangeRates ?? {})
       setPrintSettings({ ...defaultPrintSettings, ...(data.printSettings ?? {}) })
       setCompanyInfo({ ...defaultCompanyInfo, ...(data.companyInfo ?? {}) })
@@ -349,6 +400,7 @@ function App() {
         language: readStorage('retail-language', 'en'),
         activeColorTheme: readStorage('retail-color-theme', 'default'),
         suppliers: readStorage('retail-suppliers', []),
+        bundles: readStorage('retail-bundles', []),
         products: readStorage('retail-products', []),
         customers: readStorage('retail-customers', []),
         expenses: readStorage('retail-expenses', []),
@@ -361,6 +413,8 @@ function App() {
         categories: mergeCategories(readStorage('retail-product-categories', [])),
         expenseCategories: mergedExpenseCategories.filter((category, index) => mergedExpenseCategories.findIndex((item) => item.toLowerCase() === category.toLowerCase()) === index),
         baseCurrency: readStorage('retail-base-currency', 'AFN'),
+        businessCurrencyFilter: readStorage('retail-business-currency-filter', 'all'),
+        exchangeCurrency: readStorage('retail-dashboard-exchange-currency', 'original'),
         exchangeRates: readStorage('retail-exchange-rates', {}),
         printSettings: { ...defaultPrintSettings, ...readStorage('retail-print-settings', {}) },
         companyInfo: { ...defaultCompanyInfo, ...readStorage('retail-company-info', {}) },
@@ -397,6 +451,7 @@ function App() {
       language,
       activeColorTheme,
       suppliers,
+      bundles,
       products,
       customers,
       expenses,
@@ -409,11 +464,28 @@ function App() {
       categories,
       expenseCategories,
       baseCurrency,
+      businessCurrencyFilter,
+      exchangeCurrency,
       exchangeRates,
       printSettings,
       companyInfo,
     }).catch(() => {})
-  }, [activeColorTheme, baseCurrency, cashWallet, cashWalletEntries, categories, companyInfo, customers, deletedItems, exchangeRates, expenseCategories, expenses, godownEntries, language, printSettings, products, salesBills, staffMembers, storageLoaded, suppliers, theme])
+  }, [activeColorTheme, baseCurrency, bundles, businessCurrencyFilter, cashWallet, cashWalletEntries, categories, companyInfo, customers, deletedItems, exchangeCurrency, exchangeRates, expenseCategories, expenses, godownEntries, language, printSettings, products, salesBills, staffMembers, storageLoaded, suppliers, theme])
+
+  useEffect(() => {
+    window.__retailCurrencyView = {
+      baseCurrency,
+      businessCurrencyFilter,
+      exchangeRates,
+    }
+  }, [baseCurrency, businessCurrencyFilter, exchangeRates])
+
+  useEffect(() => {
+    const direction = isRtl ? 'rtl' : 'ltr'
+    document.documentElement.dir = direction
+    document.documentElement.lang = language
+    document.body.dir = direction
+  }, [isRtl, language])
 
   useEffect(() => {
     if (!storageLoaded) return
@@ -421,6 +493,10 @@ function App() {
     const dueAlerts = []
     products.forEach((product) => {
       const quantity = Number(product.quantity || 0)
+      if (quantity <= 0) {
+        dueAlerts.push(`product-out-${product.id}`)
+      }
+
       const lowStock = Number(product.lowStock || product.lowStockThreshold || 0)
       if (lowStock > 0 && quantity > 0 && quantity <= lowStock) {
         dueAlerts.push(`product-low-${product.id}`)
@@ -460,6 +536,52 @@ function App() {
 
     return () => window.clearTimeout(alertSoundTimerRef.current)
   }, [companyInfo.notificationSettings?.sound, godownEntries, products, storageLoaded, t.alertsOptional])
+
+  const notifications = useMemo(() => {
+    const items = []
+    products.forEach((product) => {
+      const quantity = Number(product.quantity || 0)
+      const productName = product.name || t.product || 'Product'
+      const codeText = product.code ? ` (${product.code})` : ''
+      if (quantity <= 0) {
+        items.push({
+          id: `product-out-${product.id}`,
+          title: productName,
+          detail: t.outOfStock ?? 'Out of stock',
+          tone: 'danger',
+          time: '',
+        })
+      }
+
+      const lowStock = Number(product.lowStock || product.lowStockThreshold || 0)
+      if (lowStock > 0 && quantity > 0 && quantity <= lowStock) {
+        items.push({
+          id: `product-low-${product.id}`,
+          title: t.lowStockAlert ?? 'Low Stock Alert',
+          detail: `${productName}${codeText} ${t.notificationLowStockDemo ?? 'is low in stock.'}`,
+          tone: 'warning',
+          time: '',
+        })
+      }
+
+      const expiryDate = dateOnly(product.expiry || product.expiryDate)
+      const alertDays = alertBeforeDays[product.alertBefore] ?? Number(product.alertDaysBefore || 0)
+      if (expiryDate && alertDays >= 0) {
+        const remainingDays = daysUntil(expiryDate)
+        if (remainingDays >= 0 && remainingDays <= alertDays) {
+          items.push({
+            id: `product-expiry-${product.id}`,
+            title: t.expiringSoon ?? 'Expiring soon',
+            detail: `${productName} — ${remainingDays} days (${expiryDate.toISOString().slice(0, 10)})`,
+            tone: 'warning',
+            time: '',
+          })
+        }
+      }
+    })
+
+    return items.filter((item) => !dismissedNotificationIds.includes(item.id))
+  }, [dismissedNotificationIds, products, t.expiringSoon, t.lowStockAlert, t.notificationLowStockDemo, t.outOfStock, t.product])
 
   useEffect(() => () => window.clearTimeout(toastTimerRef.current), [])
 
@@ -531,17 +653,41 @@ function App() {
   }
 
   return (
-    <div className={`retail-shell theme-${theme}`} dir={isRtl ? 'rtl' : 'ltr'} style={themeStyle}>
+    <div className={`retail-shell theme-${theme} ${sidebarOpen ? 'sidebar-open' : ''}`.trim()} dir={isRtl ? 'rtl' : 'ltr'} style={themeStyle}>
       <div className="workspace">
-        <Sidebar activePage={page.startsWith('dashboardMetric:') ? 'dashboard' : page.startsWith('customerProfile:') ? 'customers' : page} companyInfo={companyInfo} onNavigate={navigate} t={t} />
+        <button className="mobile-sidebar-toggle" type="button" aria-label={t.menu ?? 'Menu'} onClick={() => setSidebarOpen(true)}>
+          <span />
+          <span />
+          <span />
+        </button>
+        <button className="mobile-sidebar-scrim" type="button" aria-label={t.close ?? 'Close'} onClick={() => setSidebarOpen(false)} />
+        <Sidebar activePage={page.startsWith('dashboardMetric:') ? 'dashboard' : page.startsWith('customerProfile:') ? 'customers' : page} companyInfo={companyInfo} onNavigate={navigate} onToggle={() => setSidebarOpen((current) => !current)} t={t} />
         <main className="main-area">
           <Header
+            baseCurrency={baseCurrency}
+            businessCurrencyFilter={businessCurrencyFilter}
             cashWallet={cashWallet}
+            exchangeCurrency={exchangeCurrency}
+            exchangeRates={exchangeRates}
             language={language}
+            notifications={notifications}
+            onBusinessCurrencyFilterChange={setBusinessCurrencyFilter}
             onCashWalletChange={setCashWallet}
+            onExchangeCurrencyChange={setExchangeCurrency}
             onWalletEntriesChange={setCashWalletEntries}
             onLanguageChange={setLanguage}
+            onMissingCurrencyRate={setCurrencyRateWarning}
             onNavigate={navigate}
+            onNotificationsChange={(updater) => {
+              const nextNotifications = typeof updater === 'function' ? updater(notifications) : updater
+              const visibleIds = new Set((nextNotifications || []).map((item) => item.id))
+              setDismissedNotificationIds((current) => [
+                ...new Set([
+                  ...current,
+                  ...notifications.filter((item) => !visibleIds.has(item.id)).map((item) => item.id),
+                ]),
+              ])
+            }}
             onThemeToggle={() => setTheme((current) => (current === 'dark' ? 'light' : 'dark'))}
             t={t}
             theme={theme}
@@ -600,6 +746,16 @@ function App() {
               onSuppliersChange={setSuppliers}
               printSettings={printSettings}
               products={products}
+              suppliers={suppliers}
+              t={t}
+            />
+          ) : page === 'bundles' ? (
+            <BundlesPage
+              bundles={bundles}
+              companyInfo={companyInfo}
+              onBundlesChange={setBundles}
+              onSuppliersChange={setSuppliers}
+              printSettings={printSettings}
               suppliers={suppliers}
               t={t}
             />
@@ -769,9 +925,14 @@ function App() {
             />
           ) : (
             <Dashboard
+              baseCurrency={baseCurrency}
+              businessCurrencyFilter={businessCurrencyFilter}
               cashWallet={cashWallet}
               customers={customers}
+              exchangeCurrency={exchangeCurrency}
+              exchangeRates={exchangeRates}
               expenses={expenses}
+              onMissingCurrencyRate={setCurrencyRateWarning}
               onNavigate={navigate}
               products={products}
               sales={salesBills}
@@ -793,6 +954,16 @@ function App() {
           }}
           title={pendingConfirmation.title}
           t={t}
+        />
+      )}
+      {currencyRateWarning && (
+        <CurrencyRateWarningModal
+          currencyCode={currencyRateWarning}
+          onClose={() => setCurrencyRateWarning(null)}
+          onSettings={() => {
+            setCurrencyRateWarning(null)
+            navigate('settings')
+          }}
         />
       )}
       {!storageLoaded && (

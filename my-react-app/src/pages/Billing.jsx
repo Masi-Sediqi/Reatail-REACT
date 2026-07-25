@@ -16,6 +16,7 @@ import {
   X,
 } from '../components/Icons.jsx'
 import CustomSelect from '../components/CustomSelect.jsx'
+import { formatBusinessCurrencyAmount } from '../utils/currencyExchange.js'
 import './Billing.css'
 
 const currencyOptions = [
@@ -44,8 +45,7 @@ const parseMoney = (value) => Number.parseFloat(value || 0) || 0
 const getCurrency = (code) => currencyOptions.find((item) => item.code === code) ?? currencyOptions[0]
 
 const formatMoney = (value, currencyCode) => {
-  const currency = getCurrency(currencyCode)
-  return `${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency.symbol}`
+  return formatBusinessCurrencyAmount(value, getCurrency(currencyCode).code)
 }
 
 const getGregorianLabel = (isoDate) => new Date(`${isoDate}T12:00:00`).toLocaleDateString('en-US', {
@@ -212,8 +212,9 @@ function InvoicePreviewModal({ companyInfo, invoice, onClose, t }) {
           <style>
             @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap');
             * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            @page { size: A4; margin: 10mm; }
             body { margin: 0; background: #e5e7eb; font-family: "Vazirmatn", Arial, sans-serif; }
-            .invoice-paper { width: 794px; min-height: 1123px; margin: 0 auto; background: #fff; color: #111827; position: relative; overflow: hidden; }
+            .invoice-paper { width: 190mm; min-height: 270mm; margin: 0 auto; background: #fff; color: #111827; position: relative; overflow: hidden; }
             .invoice-ribbon { height: 62px; background: linear-gradient(100deg, #1e5265, #20c765); border-bottom-left-radius: 58% 22px; border-bottom-right-radius: 8px; }
             .invoice-head { display: flex; justify-content: space-between; gap: 24px; padding: 22px 38px 12px; }
             .invoice-brand { display: flex; align-items: center; gap: 16px; }
@@ -227,8 +228,9 @@ function InvoicePreviewModal({ companyInfo, invoice, onClose, t }) {
             .invoice-watermark { position: absolute; left: 50%; top: 68%; transform: translate(-50%, -50%); width: 180px; height: 180px; border-radius: 30px; background: #f1f5f9; display: grid; place-items: center; color: #fff; font-size: 96px; opacity: .72; }
             .invoice-summary { width: 300px; margin: 18px 38px 0 auto; display: grid; gap: 7px; font-size: 12px; }
             .invoice-summary div { display: flex; justify-content: space-between; gap: 20px; }
+            .invoice-summary .remaining-total strong { color: #f59e0b; }
             .invoice-summary .grand { border-top: 1px solid #cbd5e1; padding-top: 8px; font-weight: 800; }
-            @media print { body { background: #fff; } .invoice-paper { width: 100%; margin: 0; } }
+            @media print { body { background: #fff; } .invoice-paper { width: 190mm; min-height: auto; margin: 0 auto; } }
           </style>
         </head>
         <body>${html}</body>
@@ -297,6 +299,7 @@ function InvoicePreviewModal({ companyInfo, invoice, onClose, t }) {
             <div className="invoice-summary">
               <div><span>{t.subtotal}</span><strong>{formatMoney(invoice.subtotal, invoice.currency)}</strong></div>
               <div><span>{t.discount}</span><strong>{formatMoney(invoice.discountTotal, invoice.currency)}</strong></div>
+              {invoice.balance > 0 && <div className="remaining-total"><span>{t.remaining}</span><strong>{formatMoney(invoice.balance, invoice.currency)}</strong></div>}
               <div className="grand"><span>{t.total}</span><strong>{formatMoney(invoice.total, invoice.currency)}</strong></div>
             </div>
             <div className="invoice-watermark">$</div>
@@ -399,6 +402,7 @@ function BillingPage({
   const [paymentMethod, setPaymentMethod] = useState('cash')
   const [paidAmountInput, setPaidAmountInput] = useState('')
   const [paymentError, setPaymentError] = useState('')
+  const [scannerEnabled, setScannerEnabled] = useState(true)
   const [scannerOpen, setScannerOpen] = useState(false)
   const [previewInvoice, setPreviewInvoice] = useState(null)
   const isEditing = Boolean(editingSale)
@@ -442,10 +446,14 @@ function BillingPage({
       return
     }
     const stock = parseMoney(product.quantity)
+    if (stock <= 0) {
+      onNotify?.(t.outOfStock ?? 'Out of stock')
+      return
+    }
     setItems((current) => {
       const exists = current.find((item) => item.productId === product.id)
       if (exists) {
-        if (stock && exists.quantity >= stock) {
+        if (exists.quantity >= stock) {
           onNotify?.(t.insufficientStock)
           return current
         }
@@ -477,7 +485,16 @@ function BillingPage({
   }, [products, searchTerm])
 
   const updateItem = (productId, patch) => {
-    setItems((current) => current.map((item) => item.productId === productId ? { ...item, ...patch } : item))
+    setItems((current) => current.map((item) => {
+      if (item.productId !== productId) return item
+      const nextItem = { ...item, ...patch }
+      if ('quantity' in patch) {
+        const requestedQuantity = Math.max(1, parseMoney(patch.quantity))
+        nextItem.quantity = item.stock > 0 ? Math.min(item.stock, requestedQuantity) : 1
+        if (requestedQuantity > item.stock) onNotify?.(t.insufficientStock)
+      }
+      return nextItem
+    }))
   }
 
   const removeItem = (productId) => setItems((current) => current.filter((item) => item.productId !== productId))
@@ -578,8 +595,14 @@ function BillingPage({
         <div><h1>{isEditing ? t.editBill : t.billing}</h1><p>{isEditing ? t.modifyExistingInvoice : t.billingSubtitle}</p></div>
         <div className="entity-actions">
           {isEditing && <button className="cancel-edit-btn" type="button" onClick={onCancelEdit}>{t.cancel}</button>}
-          <button className="scanner-active-btn" type="button" onClick={() => setScannerOpen(true)}><ReceiptText size={16} /> {t.scannerActive}</button>
-          <button className="camera-icon-btn" type="button" onClick={() => setScannerOpen(true)} aria-label={t.barcodeScanner}><Camera size={18} /></button>
+          <button
+            className={scannerEnabled ? 'scanner-active-btn' : 'scanner-active-btn scanner-off'}
+            type="button"
+            onClick={() => setScannerEnabled((current) => !current)}
+          >
+            <ReceiptText size={16} /> {scannerEnabled ? (t.scannerActive ?? 'Scanner Active') : (t.scannerOff ?? 'Scanner Off')}
+          </button>
+          <button className="camera-icon-btn" type="button" onClick={() => scannerEnabled ? setScannerOpen(true) : onNotify?.(t.scannerOff ?? 'Scanner Off')} aria-label={t.barcodeScanner}><Camera size={18} /></button>
         </div>
       </div>
 
@@ -595,13 +618,17 @@ function BillingPage({
             />
             {searchResults.length > 0 && (
               <div className="billing-search-results">
-                {searchResults.map((product) => (
-                  <button key={product.id} type="button" onClick={() => addProductToBill(product.barcode || product.code || product.name)}>
+                {searchResults.map((product) => {
+                  const stock = parseMoney(product.quantity)
+                  const isUnavailable = stock <= 0
+                  return (
+                  <button className={isUnavailable ? 'out-of-stock-result' : ''} disabled={isUnavailable} key={product.id} type="button" onClick={() => addProductToBill(product.barcode || product.code || product.name)}>
                     <strong>{product.name || t.product}</strong>
                     <span>{product.code || '-'} · {product.barcode || '-'} · {formatMoney(product.selling, currency)}</span>
-                    <small>{product.quantity || 0} {product.unit || 'pcs'} {t.available ?? 'available'}</small>
+                    <small>{stock} {product.unit || 'pcs'} {isUnavailable ? (t.outOfStock ?? 'Out of stock') : (t.available ?? 'available')}</small>
                   </button>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>
@@ -624,7 +651,7 @@ function BillingPage({
                 <label><small>{t.discount}</small><input type="number" value={item.discount} min="0" onChange={(event) => updateItem(item.productId, { discount: parseMoney(event.target.value) })} /></label>
                 <div className="qty-stepper">
                   <button type="button" onClick={() => updateItem(item.productId, { quantity: Math.max(1, item.quantity - 1) })}>−</button>
-                  <input type="number" value={item.quantity} min="1" max={item.stock || undefined} onChange={(event) => updateItem(item.productId, { quantity: Math.max(1, parseMoney(event.target.value)) })} />
+                  <input type="number" value={item.quantity} min="1" max={item.stock || undefined} onChange={(event) => updateItem(item.productId, { quantity: event.target.value })} />
                   <button type="button" onClick={() => updateItem(item.productId, { quantity: item.stock ? Math.min(item.stock, item.quantity + 1) : item.quantity + 1 })}>+</button>
                 </div>
                 <strong className="line-total">{formatMoney(Math.max(0, item.price * item.quantity - parseMoney(item.discount)), currency)}</strong>
@@ -696,6 +723,7 @@ function BillingPage({
           <div className="billing-panel totals-card">
             <div><span>{t.subtotal}</span><strong>{formatMoney(subtotal, currency)}</strong></div>
             <div><span>{t.discount}</span><strong>{formatMoney(billDiscount, currency)}</strong></div>
+            {paidAmountInput !== '' && balanceDue > 0 && <div className="remaining-total"><span>{t.remaining}</span><strong>{formatMoney(balanceDue, currency)}</strong></div>}
             <div className="grand-total"><span>{t.total}</span><strong>{formatMoney(total, currency)}</strong></div>
             <div className="billing-actions">
               <button type="button" onClick={() => saveInvoice(false)}>{isEditing ? t.updateBill : t.saveBill}</button>

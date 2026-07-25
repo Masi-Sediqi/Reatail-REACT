@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronDown } from './Icons.jsx'
+import './CustomSelect.css'
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
-
-function CustomSelect({ ariaLabel, className = '', onChange, options, value }) {
+function CustomSelect({ ariaLabel, buttonClassName = '', className = '', menuClassName = '', onChange, options, value }) {
   const [open, setOpen] = useState(false)
   const [position, setPosition] = useState(null)
   const rootRef = useRef(null)
@@ -59,10 +59,10 @@ function CustomSelect({ ariaLabel, className = '', onChange, options, value }) {
 
   const menu = (
     <div
-      className={`smooth-select-menu floating-select-menu ${open ? 'open' : ''}`}
+      className={`smooth-select-menu floating-select-menu ${menuClassName} ${open ? 'open' : ''}`.trim()}
       ref={menuRef}
       role="listbox"
-      style={position ?? { left: -9999, top: -9999 }}
+      style={{ ...(position ?? { left: -9999, top: -9999 }), zIndex: 2147483002 }}
     >
       {options.map((option) => (
         <button
@@ -77,7 +77,6 @@ function CustomSelect({ ariaLabel, className = '', onChange, options, value }) {
           type="button"
         >
           <span>{option.label}</span>
-          <span className="smooth-select-check" aria-hidden="true" />
         </button>
       ))}
     </div>
@@ -89,7 +88,7 @@ function CustomSelect({ ariaLabel, className = '', onChange, options, value }) {
         aria-expanded={open}
         aria-haspopup="listbox"
         aria-label={ariaLabel}
-        className={`smooth-select-btn ${open ? 'active' : ''}`}
+        className={`smooth-select-btn ${buttonClassName} ${open ? 'active' : ''}`.trim()}
         onClick={() => setOpen((current) => !current)}
         type="button"
       >

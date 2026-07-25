@@ -1,15 +1,30 @@
 import { useMemo, useState } from 'react'
 import CustomSelect from '../components/CustomSelect.jsx'
+import CustomFieldInputs from '../components/CustomFieldInputs.jsx'
 import DateRangePicker from '../components/DateRangePicker.jsx'
 import FloatingActionMenu from '../components/FloatingActionMenu.jsx'
 import PrintPreviewModal from '../components/PrintPreviewModal.jsx'
 import { currencies } from '../data/dashboardData.js'
-import { BarChart3, CalendarDays, DollarSign, Eye, Plus, ReceiptText, Search, Trash2, WalletCards } from '../components/Icons.jsx'
+import {
+  BarChart3,
+  CalendarDays,
+  DollarSign,
+  Eye,
+  Plus,
+  ReceiptText,
+  Search,
+  SquareMenu,
+  Trash2,
+  WalletCards,
+  X,
+} from '../components/Icons.jsx'
 import { AdjustmentModal, SupplierStatementModal } from './Godown.jsx'
+import { formatBusinessCurrencyAmount } from '../utils/currencyExchange.js'
 import './Godown.css'
 import './Suppliers.css'
 
 const emptySupplier = {
+  accountType: 'supplier',
   name: '',
   phone: '',
   businessType: '',
@@ -18,6 +33,7 @@ const emptySupplier = {
   items: [],
   notes: '',
   balance: '',
+  customFields: {},
 }
 
 const parseNumber = (value) => Number.parseFloat(value || 0) || 0
@@ -25,9 +41,7 @@ const todayInput = () => new Date().toISOString().slice(0, 10)
 const parseDateInput = (value) => (value ? new Date(`${String(value).slice(0, 10)}T12:00:00`) : null)
 
 const formatCurrencyMoney = (value, currency = 'AFN') => {
-  const amount = Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-  const symbol = currency === 'EUR' ? 'EUR' : currency === 'USD' ? 'USD' : currency || 'AFN'
-  return `${amount} ${symbol}`
+  return formatBusinessCurrencyAmount(value, currency)
 }
 
 const getGregorianLabel = (isoDate) => {
@@ -73,7 +87,7 @@ const normalizeSupplier = (supplier) => {
       .split(',')
       .map((item) => item.trim())
       .filter(Boolean)
-  return { ...emptySupplier, ...source, items }
+  return { ...emptySupplier, ...source, accountType: source.accountType || 'supplier', items }
 }
 
 function ActionMenu({ onDelete, onEdit, onView, supplier, t }) {
@@ -82,61 +96,281 @@ function ActionMenu({ onDelete, onEdit, onView, supplier, t }) {
       ariaLabel={t.actions}
       actions={[
         { icon: <Eye size={15} />, label: t.viewProfile ?? 'View profile', onClick: () => onView(supplier) },
-        { label: t.edit, onClick: onEdit },
+        {
+          icon: <SquareMenu size={15} />,
+          label: t.edit ?? 'Edit',
+          onClick: onEdit,
+        },
         { danger: true, icon: <Trash2 size={15} />, label: t.delete, onClick: () => onDelete(supplier) },
       ]}
     />
   )
 }
 
-export function SupplierModal({ initialSupplier, onClose, onSave, t }) {
+export function SupplierModal({ customFields = [], initialSupplier, onClose, onSave, t }) {
   const [form, setForm] = useState(() => normalizeSupplier(initialSupplier))
   const [itemInput, setItemInput] = useState('')
   const [closing, setClosing] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }))
+  const updateCustomField = (fieldId, value) => setForm((current) => ({
+    ...current,
+    customFields: { ...(current.customFields ?? {}), [fieldId]: value },
+  }))
   const requestClose = () => {
     if (closing) return
     setClosing(true)
     window.setTimeout(onClose, 160)
   }
+
   const addSupplyItem = () => {
     const item = itemInput.trim()
+
     if (!item) return
-    setForm((current) => current.items.some((value) => value.toLowerCase() === item.toLowerCase()) ? current : { ...current, items: [...current.items, item] })
+
+    setForm((current) => {
+      const currentItems = Array.isArray(current.items)
+        ? current.items
+        : []
+
+      const alreadyExists = currentItems.some(
+        (value) => value.toLowerCase() === item.toLowerCase()
+      )
+
+      if (alreadyExists) return current
+
+      return {
+        ...current,
+        items: [...currentItems, item],
+      }
+    })
+
     setItemInput('')
   }
-  const removeSupplyItem = (item) => {
-    setForm((current) => ({ ...current, items: current.items.filter((value) => value !== item) }))
+
+  const removeSupplyItem = (itemToRemove) => {
+    setForm((current) => ({
+      ...current,
+      items: (current.items ?? []).filter(
+        (item) => item !== itemToRemove
+      ),
+    }))
   }
   const currencyOptions = currencies.map((currency) => ({ value: currency.code, label: `${currency.symbol} ${currency.name}` }))
 
   return (
-    <div className={`modal-backdrop ${closing ? 'closing' : ''}`} onClick={(event) => { event.stopPropagation(); requestClose() }}>
-      <form
-        className="entity-modal supplier-modal"
-        onClick={(event) => event.stopPropagation()}
-        onSubmit={(event) => {
-          event.preventDefault()
-          setSubmitted(true)
-          if (!form.name.trim()) return
-          onSave({ ...form, id: form.id ?? crypto.randomUUID(), status: form.status || 'Active' })
-        }}
-      >
-        <button className="modal-close" type="button" onClick={requestClose}>x</button>
-        <h2>{initialSupplier ? t.editSupplier : t.createSupplierAccount}</h2>
-        <label className="wide"><span>{t.name} *</span><input autoFocus className={submitted && !form.name.trim() ? 'field-invalid' : ''} placeholder={t.supplierName} value={form.name} onChange={(e) => update('name', e.target.value)} /></label>
-        <label><span>{t.phoneNumber}</span><input value={form.phone} onChange={(e) => update('phone', e.target.value)} /></label>
-        <label><span>{t.businessType}</span><input placeholder={t.businessTypePlaceholder} value={form.businessType} onChange={(e) => update('businessType', e.target.value)} /></label>
-        <label className="wide"><span>{t.address}</span><input value={form.address} onChange={(e) => update('address', e.target.value)} /></label>
-        <label className="wide"><span>{t.currency}</span><CustomSelect ariaLabel={t.currency} options={currencyOptions} value={form.currency} onChange={(value) => update('currency', value)} /></label>
-        <label className="wide">
-          <span>{t.itemsTheySupply}</span>
-          <div className="inline-field">
+  <div
+    className={`modal-backdrop ${closing ? 'closing' : ''}`}
+    onClick={(event) => {
+      event.stopPropagation()
+      requestClose()
+    }}
+  >
+    <form
+      className="entity-modal supplier-modal supplier-form-v2"
+      onClick={(event) => event.stopPropagation()}
+      onSubmit={(event) => {
+        event.preventDefault()
+        setSubmitted(true)
+
+        const missingCustomField = customFields.some((field) => field.required && !String(form.customFields?.[field.id] ?? '').trim())
+        if (!form.name.trim() || missingCustomField) return
+
+        onSave({
+          ...form,
+          id: form.id ?? crypto.randomUUID(),
+          status: form.status || 'Active',
+        })
+      }}
+    >
+      {/* Header */}
+      <header className="supplier-form-v2-header">
+        <div>
+          <h2>
+            {initialSupplier
+              ? t.editSupplier
+              : t.createSupplierAccount}
+          </h2>
+
+          <p>
+            {form.accountType === 'partner'
+              ? 'Create and manage a partner financial account.'
+              : 'Create a supplier account for purchases and payments.'}
+          </p>
+        </div>
+
+        <button
+          className="supplier-form-v2-close"
+          type="button"
+          onClick={requestClose}
+          aria-label={t.close ?? 'Close'}
+          title={t.close ?? 'Close'}
+        >
+          <X size={15} />
+        </button>
+      </header>
+
+      {/* Scrollable body */}
+      <div className="supplier-form-v2-body">
+        {/* Account type */}
+        <section className="supplier-form-v2-section supplier-type-section">
+          <span className="supplier-form-v2-label">
+            {t.accountType ?? 'Account type'}
+          </span>
+
+          <div className="supplier-form-v2-tabs">
+            <button
+              className={
+                form.accountType !== 'partner'
+                  ? 'active'
+                  : ''
+              }
+              type="button"
+              onClick={() =>
+                update('accountType', 'supplier')
+              }
+            >
+              <span>
+                {t.supplierAccounts ??
+                  'Supplier accounts'}
+              </span>
+            </button>
+
+            <button
+              className={
+                form.accountType === 'partner'
+                  ? 'active'
+                  : ''
+              }
+              type="button"
+              onClick={() =>
+                update('accountType', 'partner')
+              }
+            >
+              <span>
+                {t.partnerAccounts ??
+                  'Partner accounts'}
+              </span>
+            </button>
+          </div>
+
+          <small className="supplier-form-v2-hint">
+            {form.accountType === 'partner'
+              ? (t.accountTypePartnerHint ??
+                'Partner accounts track deposits, withdrawals and profit share.')
+              : (t.accountTypeSupplierHint ??
+                'Supplier accounts track purchases, payments and ledgers.')}
+          </small>
+        </section>
+
+        {/* Main fields */}
+        <section className="supplier-form-v2-grid">
+          <label className="supplier-form-v2-field wide">
+            <span>
+              {t.name}
+              <b className="required-mark">*</b>
+            </span>
+
             <input
-              placeholder={t.itemsPlaceholder}
+              autoFocus
+              className={
+                submitted && !form.name.trim()
+                  ? 'field-invalid'
+                  : ''
+              }
+              placeholder={t.supplierName}
+              value={form.name}
+              onChange={(event) =>
+                update('name', event.target.value)
+              }
+            />
+          </label>
+
+          <label className="supplier-form-v2-field">
+            <span>{t.phoneNumber}</span>
+
+            <input
+              value={form.phone}
+              onChange={(event) =>
+                update('phone', event.target.value)
+              }
+            />
+          </label>
+
+          <label className="supplier-form-v2-field">
+            <span>{t.businessType}</span>
+
+            <input
+              placeholder={t.businessTypePlaceholder}
+              value={form.businessType}
+              onChange={(event) =>
+                update(
+                  'businessType',
+                  event.target.value
+                )
+              }
+            />
+          </label>
+
+          <label className="supplier-form-v2-field wide">
+            <span>{t.address}</span>
+
+            <input
+              value={form.address}
+              onChange={(event) =>
+                update('address', event.target.value)
+              }
+            />
+          </label>
+
+          <label className="supplier-form-v2-field wide">
+            <span>{t.currency}</span>
+
+            <CustomSelect
+              ariaLabel={t.currency}
+              className="supplier-form-currency-select"
+              options={currencyOptions}
+              value={form.currency}
+              onChange={(value) =>
+                update('currency', value)
+              }
+            />
+          </label>
+        </section>
+
+        {/* Items */}
+        <section className="supplier-form-v2-items">
+          <div className="supplier-form-v2-items-head">
+            <div>
+              <strong>
+                {t.itemsTheySupply ??
+                  'Items They Supply'}
+              </strong>
+
+              <small>
+                Add one or more items supplied by this
+                account.
+              </small>
+            </div>
+
+            {form.items.length > 0 && (
+              <span className="supplier-form-items-count">
+                {form.items.length}
+              </span>
+            )}
+          </div>
+
+          <div className="supplier-form-v2-item-entry">
+            <input
+              type="text"
+              placeholder={
+                t.itemsPlaceholder ??
+                'Type item name and press Enter'
+              }
               value={itemInput}
-              onChange={(e) => setItemInput(e.target.value)}
+              onChange={(event) =>
+                setItemInput(event.target.value)
+              }
               onKeyDown={(event) => {
                 if (event.key === 'Enter') {
                   event.preventDefault()
@@ -144,27 +378,113 @@ export function SupplierModal({ initialSupplier, onClose, onSave, t }) {
                 }
               }}
             />
-            <button type="button" onClick={addSupplyItem}>{t.add}</button>
+
+            <button
+              type="button"
+              onClick={addSupplyItem}
+              disabled={!itemInput.trim()}
+            >
+              <Plus size={14} />
+              <span>{t.add ?? 'Add'}</span>
+            </button>
           </div>
-          {form.items.length > 0 && (
-            <div className="item-chip-row">
+
+          {form.items.length > 0 ? (
+            <div className="supplier-form-v2-item-list">
               {form.items.map((item) => (
-                <button type="button" key={item} onClick={() => removeSupplyItem(item)}>
-                  {item} <span>x</span>
-                </button>
+                <div
+                  className="supplier-form-v2-chip"
+                  key={item}
+                >
+                  <span className="supplier-form-v2-chip-name">
+                    {item}
+                  </span>
+
+                  <button
+                    className="supplier-form-v2-chip-remove"
+                    type="button"
+                    aria-label={`Remove ${item}`}
+                    title={`Remove ${item}`}
+                    onClick={() =>
+                      removeSupplyItem(item)
+                    }
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
               ))}
             </div>
+          ) : (
+            <div className="supplier-form-v2-items-empty">
+              No items added yet
+            </div>
           )}
-        </label>
-        <label className="wide"><span>{t.notes}</span><textarea placeholder={t.supplierNotesPlaceholder} value={form.notes} onChange={(e) => update('notes', e.target.value)} /></label>
-        <label className="wide"><span>{t.openingBalance}</span><input placeholder="0.00" value={form.balance} onChange={(e) => update('balance', e.target.value)} /><small>{t.openingBalanceHint}</small></label>
-        <div className="modal-actions">
-          <button type="button" onClick={requestClose}>{t.cancel}</button>
-          <button className="primary-btn" type="submit">{initialSupplier ? t.saveChanges : t.createSupplierAccount}</button>
-        </div>
-      </form>
-    </div>
-  )
+        </section>
+
+        {/* Notes and balance */}
+        <section className="supplier-form-v2-grid">
+          <label className="supplier-form-v2-field wide">
+            <span>{t.notes}</span>
+
+            <textarea
+              placeholder={
+                t.supplierNotesPlaceholder
+              }
+              value={form.notes}
+              onChange={(event) =>
+                update('notes', event.target.value)
+              }
+            />
+          </label>
+
+          <label className="supplier-form-v2-field wide">
+            <span>{t.openingBalance}</span>
+
+            <input
+              inputMode="decimal"
+              placeholder="0.00"
+              value={form.balance}
+              onChange={(event) =>
+                update('balance', event.target.value)
+              }
+            />
+
+            <small>
+              {t.openingBalanceHint}
+            </small>
+          </label>
+        </section>
+        <CustomFieldInputs
+          className="supplier-form-v2-custom-fields"
+          fields={customFields}
+          onChange={updateCustomField}
+          submitted={submitted}
+          values={form.customFields}
+        />
+      </div>
+
+      {/* Footer */}
+      <footer className="supplier-form-v2-footer">
+        <button
+          className="supplier-form-v2-cancel"
+          type="button"
+          onClick={requestClose}
+        >
+          {t.cancel}
+        </button>
+
+        <button
+          className="supplier-form-v2-submit"
+          type="submit"
+        >
+          {initialSupplier
+            ? t.saveChanges
+            : t.createSupplierAccount}
+        </button>
+      </footer>
+    </form>
+  </div>
+)
 }
 
 function SuppliersPage({
@@ -194,6 +514,8 @@ function SuppliersPage({
   const [portalCustomEnd, setPortalCustomEnd] = useState('')
   const [adjustmentOpen, setAdjustmentOpen] = useState(false)
   const [statementConfig, setStatementConfig] = useState(null)
+  const [accountTab, setAccountTab] = useState('supplier')
+  const supplierCustomFields = companyInfo?.customFormFields?.suppliers ?? []
 
   const dateOptions = [
     { value: 'all', label: t.allTime },
@@ -272,7 +594,11 @@ function SuppliersPage({
     return stats
   }, [supplierAdjustments, supplierRows, suppliers])
 
-  const filteredSuppliers = suppliers.filter((supplier) => {
+  const typedSuppliers = suppliers.filter((supplier) => (supplier.accountType || 'supplier') === accountTab)
+  const supplierAccountCount = suppliers.filter((supplier) => (supplier.accountType || 'supplier') === 'supplier').length
+  const partnerAccountCount = suppliers.filter((supplier) => supplier.accountType === 'partner').length
+
+  const filteredSuppliers = typedSuppliers.filter((supplier) => {
     const stat = supplierStats.get(supplier.id)
     const query = search.trim().toLowerCase()
     const text = [supplier.name, supplier.phone, supplier.address, supplier.currency].join(' ').toLowerCase()
@@ -282,8 +608,9 @@ function SuppliersPage({
     return matchesSearch && matchesBalance && matchesDate
   })
 
-  const totalPayables = Array.from(supplierStats.values()).reduce((sum, stat) => sum + Math.max(0, stat.balance), 0)
-  const totalReceivables = Array.from(supplierStats.values()).reduce((sum, stat) => sum + Math.max(0, -stat.balance), 0)
+  const activeStats = typedSuppliers.map((supplier) => supplierStats.get(supplier.id)).filter(Boolean)
+  const totalPayables = activeStats.reduce((sum, stat) => sum + Math.max(0, stat.balance), 0)
+  const totalReceivables = activeStats.reduce((sum, stat) => sum + Math.max(0, -stat.balance), 0)
   const netBalance = totalPayables - totalReceivables
 
   const saveSupplier = (supplier) => {
@@ -502,34 +829,38 @@ function SuppliersPage({
           <button className="primary-btn" type="button" onClick={() => setModalOpen(true)}><Plus size={16} /> {t.createSupplierAccount}</button>
         </div>
       </div>
+      <div className="supplier-account-tabs">
+        <button className={accountTab === 'supplier' ? 'active' : ''} type="button" onClick={() => setAccountTab('supplier')}>{t.supplierAccounts ?? 'Supplier accounts'} <span>({supplierAccountCount})</span></button>
+        <button className={accountTab === 'partner' ? 'active' : ''} type="button" onClick={() => setAccountTab('partner')}>{t.partnerAccounts ?? 'Partner accounts'} <span>({partnerAccountCount})</span></button>
+      </div>
       <div className="summary-grid four supplier-summary-grid">
-  <article className="supplier-summary-card tone-blue">
-    <span>{t.totalSuppliers}</span>
-    <strong>{suppliers.length}</strong>
-    <WalletCards size={22} />
-  </article>
+        <article className="supplier-summary-card tone-blue">
+          <span>{accountTab === 'partner' ? (t.totalPartners ?? 'Total partners') : t.totalSuppliers}</span>
+          <strong>{typedSuppliers.length}</strong>
+          <WalletCards size={22} />
+        </article>
 
-  <article className="supplier-summary-card tone-orange">
-    <span>{t.totalPayables}</span>
-    <strong className="danger-text">{formatCurrencyMoney(totalPayables)}</strong>
-    <BarChart3 size={22} />
-  </article>
+        <article className="supplier-summary-card tone-orange">
+          <span>{accountTab === 'partner' ? (t.totalDeposits ?? 'Total deposits') : t.totalPayables}</span>
+          <strong className="danger-text">{formatCurrencyMoney(totalPayables)}</strong>
+          <BarChart3 size={22} />
+        </article>
 
-  <article className="supplier-summary-card tone-green">
-    <span>{t.totalReceivables}</span>
-    <strong className="success-text">{formatCurrencyMoney(totalReceivables)}</strong>
-    <BarChart3 size={22} />
-  </article>
+        <article className="supplier-summary-card tone-green">
+          <span>{accountTab === 'partner' ? (t.totalWithdrawals ?? 'Total withdrawals') : t.totalReceivables}</span>
+          <strong className="success-text">{formatCurrencyMoney(totalReceivables)}</strong>
+          <BarChart3 size={22} />
+        </article>
 
-  <article className="supplier-summary-card tone-navy">
-    <span>{t.netBalance}</span>
-    <strong className={netBalance > 0 ? 'danger-text' : 'success-text'}>
-      {formatCurrencyMoney(Math.abs(netBalance))}
-    </strong>
-    <small>{netBalance > 0 ? (t.netPayable ?? 'Net Payable') : netBalance < 0 ? (t.netReceivable ?? 'Net Receivable') : t.settledPlain}</small>
-    <DollarSign size={22} />
-  </article>
-</div>
+        <article className="supplier-summary-card tone-navy">
+          <span>{t.netBalance}</span>
+          <strong className={netBalance > 0 ? 'danger-text' : 'success-text'}>
+            {formatCurrencyMoney(Math.abs(netBalance))}
+          </strong>
+          <small>{accountTab === 'partner' ? (netBalance >= 0 ? '(net deposit)' : '(net withdraw)') : netBalance > 0 ? (t.netPayable ?? 'Net Payable') : netBalance < 0 ? (t.netReceivable ?? 'Net Receivable') : t.settledPlain}</small>
+          <DollarSign size={22} />
+        </article>
+      </div>
       <div className="filter-card supplier-filter-card">
         <div className="supplier-filter-row">
           <div className="search-field"><Search size={17} /><input placeholder={t.searchSuppliers} value={search} onChange={(event) => setSearch(event.target.value)} /></div>
@@ -572,7 +903,7 @@ function SuppliersPage({
           </tbody>
         </table>
       </div>
-      {modalOpen && <SupplierModal initialSupplier={editingSupplier} onClose={() => { setModalOpen(false); setEditingSupplier(null) }} onSave={saveSupplier} t={t} />}
+      {modalOpen && <SupplierModal customFields={supplierCustomFields} initialSupplier={editingSupplier} onClose={() => { setModalOpen(false); setEditingSupplier(null) }} onSave={saveSupplier} t={t} />}
       {printOpen && <PrintPreviewModal companyInfo={companyInfo} onClose={() => setPrintOpen(false)} printSettings={printSettings} rows={filteredSuppliers} title={t.supplierReport} columns={[{ key: 'name', label: t.name }, { key: 'phone', label: t.phoneNumber }, { key: 'currency', label: t.currency }, { key: 'balance', label: t.balance }]} t={t} />}
     </div>
   )

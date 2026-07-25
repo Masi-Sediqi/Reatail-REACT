@@ -32,12 +32,11 @@
 
 .detail-summary-card.tone-red {
   border-inline-start-color: #ef4444;
-  background: color-mix(in srgb, #ef4444 7%, var(--panel-bg));
+  background: var(--panel-bg);
 }
-
 .detail-summary-card.tone-green {
   border-inline-start-color: #22c55e;
-  background: color-mix(in srgb, #22c55e 6%, var(--panel-bg));
+  background: var(--panel-bg);
 }
 
 .detail-summary-card.tone-navy {
@@ -101,6 +100,35 @@
 .metric-detail-date-range,
 .metric-detail-date-range .date-range-btn {
   width: 100%;
+}
+
+.metric-detail-filter.has-custom-range:not(.revenue-view-filter) {
+  grid-template-columns: minmax(260px, 1fr) minmax(150px, 190px) minmax(220px, 280px) 40px;
+}
+
+.expenses-view-filter:has(.metric-filter-reset) {
+  grid-template-columns: minmax(260px, 1fr) minmax(150px, 190px) minmax(220px, 280px) 40px minmax(150px, 190px) minmax(150px, 190px);
+}
+
+.metric-filter-reset {
+  display: inline-grid;
+  width: 40px;
+  height: 42px;
+  min-width: 40px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  box-shadow: none;
+}
+
+.metric-filter-reset:hover {
+  background: var(--panel-soft);
+  color: var(--text);
+  transform: none;
+  box-shadow: none;
 }
 
 .metric-detail-filter .search-field {
@@ -207,17 +235,23 @@
 }
 
 .net-profit-date-filter {
-  display: flex;
-  justify-content: flex-end;
+  display: grid;
+  grid-template-columns: minmax(180px, 220px);
+  justify-content: start;
+  gap: 8px;
   padding: 0;
   border: 0;
   background: transparent;
   box-shadow: none;
 }
 
+.net-profit-date-filter:has(.metric-detail-date-range) {
+  grid-template-columns: minmax(180px, 220px) minmax(180px, 220px) 40px;
+}
+
 .net-profit-date-filter .smooth-select,
 .net-profit-date-filter .date-range-picker {
-  width: min(220px, 100%);
+  width: 100%;
 }
 
 .net-profit-breakdown h2,
@@ -290,6 +324,39 @@
   width: min(760px, 100%);
 }
 
+.net-profit-detail .net-source-tabs {
+  display: inline-grid;
+  grid-template-columns: repeat(5, max-content);
+  width: auto;
+  gap: 4px;
+  margin-bottom: 14px;
+  padding: 4px;
+  border-radius: 7px;
+  background: #f1f5f9;
+  box-shadow: none;
+}
+
+.net-profit-detail .net-source-tabs button,
+.net-profit-detail .net-source-tabs button:hover {
+  min-height: 32px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #435675;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: none;
+  transform: none;
+}
+
+.net-profit-detail .net-source-tabs button.active,
+.net-profit-detail .net-source-tabs button.active:hover {
+  background: #fff;
+  color: #020617;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
 .net-profit-search {
   margin-bottom: 12px;
 }
@@ -356,6 +423,7 @@
 
   .net-source-tabs {
     grid-template-columns: 1fr;
+    width: 100%;
   }
 
   .net-source-table {
@@ -365,5 +433,1092 @@
   .net-profit-rows > div {
     align-items: flex-start;
     flex-direction: column;
+  }
+}
+/* =========================================
+   REVENUE VIEW
+========================================= */
+
+#root#root#root
+.retail-shell
+.revenue-view-page {
+  display: grid;
+  gap: 24px;
+}
+
+/* Heading */
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.metric-detail-heading {
+  min-height: 52px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.metric-detail-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.metric-detail-title h1 {
+  margin: 0;
+  color: var(--text);
+  font-size: 24px;
+  font-weight: 850;
+  line-height: 1.2;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.metric-detail-title p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+/* Back button */
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.back-icon-btn {
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+
+  background: transparent !important;
+  background-image: none !important;
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.back-icon-btn:hover {
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Print button */
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.revenue-print-btn {
+  min-width: auto !important;
+  min-height: 40px !important;
+  height: 40px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+
+  padding: 0 14px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+
+  background: var(--panel-bg) !important;
+  background-color: var(--panel-bg) !important;
+  background-image: none !important;
+
+  color: var(--text) !important;
+
+  font-family: inherit !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.revenue-print-btn:hover {
+  border-color: #cbd5e1 !important;
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.revenue-print-btn svg,
+#root#root#root
+.retail-shell
+.revenue-view-page
+.revenue-print-btn span {
+  color: inherit !important;
+}
+
+/* Summary cards */
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.metric-detail-summary {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.detail-summary-card {
+  position: relative;
+
+  min-height: 96px;
+  display: grid;
+  align-content: center;
+
+  padding: 18px 70px 18px 20px;
+
+  border: 1px solid var(--border) !important;
+  border-inline-start-width: 4px !important;
+  border-radius: 10px !important;
+
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+
+  box-shadow: var(--shadow-soft) !important;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.detail-summary-card.tone-green {
+  border-inline-start-color: #22c55e !important;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.detail-summary-card.tone-blue {
+  border-inline-start-color: #0ea5e9 !important;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.detail-summary-card.tone-navy {
+  border-inline-start-color: #16264e !important;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.detail-summary-card span {
+  color: var(--muted) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.detail-summary-card strong {
+  display: block;
+  margin-top: 8px;
+
+  color: var(--text) !important;
+  font-size: 24px !important;
+  font-weight: 850 !important;
+  line-height: 1.1;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.detail-summary-card > svg {
+  position: absolute;
+  top: 19px;
+  inset-inline-end: 19px;
+
+  width: 40px;
+  height: 40px;
+  padding: 10px;
+
+  border-radius: 10px;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.detail-summary-card.tone-green > svg {
+  background: rgba(34, 197, 94, 0.1) !important;
+  color: #22c55e !important;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.detail-summary-card.tone-blue > svg {
+  background: rgba(14, 165, 233, 0.1) !important;
+  color: #0ea5e9 !important;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.detail-summary-card.tone-navy > svg {
+  background: rgba(22, 38, 78, 0.08) !important;
+  color: #16264e !important;
+}
+
+.retail-shell.theme-dark
+.revenue-view-page
+.detail-summary-card.tone-navy > svg {
+  background: rgba(226, 232, 240, 0.1) !important;
+  color: var(--text) !important;
+}
+
+/* Filter container */
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.revenue-view-filter {
+  display: grid !important;
+  grid-template-columns:
+    minmax(260px, 1fr)
+    minmax(150px, 190px) !important;
+
+  align-items: center !important;
+  gap: 10px !important;
+
+  padding: 22px 24px !important;
+  margin: 0 !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  box-shadow: var(--shadow-soft) !important;
+
+  overflow: visible !important;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.revenue-view-filter.has-custom-range {
+  grid-template-columns:
+    minmax(260px, 1fr)
+    minmax(140px, 180px)
+    minmax(170px, 210px)
+    34px !important;
+}
+
+/* Search */
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.revenue-view-filter
+.search-field {
+  width: 100% !important;
+  min-height: 40px !important;
+  height: 40px !important;
+
+  display: grid !important;
+  grid-template-columns: 18px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 9px !important;
+
+  padding: 0 12px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.revenue-view-filter
+.search-field input {
+  width: 100% !important;
+  height: 38px !important;
+
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+
+  background: transparent !important;
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Select and date */
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.revenue-view-filter
+.smooth-select-btn,
+#root#root#root
+.retail-shell
+.revenue-view-page
+.revenue-view-filter
+.date-range-btn {
+  width: 100% !important;
+  min-height: 40px !important;
+  height: 40px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+
+  background: var(--panel-soft) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.revenue-view-filter
+.smooth-select-btn:hover,
+#root#root#root
+.retail-shell
+.revenue-view-page
+.revenue-view-filter
+.date-range-btn:hover {
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+}
+
+/* Reset */
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.revenue-filter-reset {
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  padding: 0 !important;
+
+  border: 0 !important;
+  border-radius: 7px !important;
+
+  background: transparent !important;
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.revenue-filter-reset:hover {
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Main panel */
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.metric-detail-panel {
+  min-height: 336px;
+
+  padding: 24px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+
+  box-shadow: var(--shadow-soft) !important;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.metric-detail-panel h2 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  margin: 0 0 14px;
+
+  color: var(--text) !important;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+/* Tabs */
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.metric-detail-tabs {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 4px !important;
+
+  margin-bottom: 22px !important;
+  padding: 4px !important;
+
+  border: 0 !important;
+  border-radius: 8px !important;
+
+  background: var(--panel-soft) !important;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.metric-detail-tabs button {
+  width: 100% !important;
+  min-height: 34px !important;
+  height: 34px !important;
+
+  padding: 0 10px !important;
+
+  border: 0 !important;
+  border-radius: 7px !important;
+
+  background: transparent !important;
+  background-image: none !important;
+
+  color: var(--muted) !important;
+
+  font-family: inherit !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.metric-detail-tabs button:hover {
+  background: color-mix(
+    in srgb,
+    var(--panel-bg) 70%,
+    transparent
+  ) !important;
+
+  color: var(--text) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.metric-detail-tabs button.active {
+  border: 1px solid var(--border) !important;
+
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+
+  color: var(--text) !important;
+
+  font-weight: 700 !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+/* Remove global button effects */
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+:is(
+  .back-icon-btn,
+  .revenue-print-btn,
+  .revenue-filter-reset,
+  .metric-detail-tabs button
+)::before,
+#root#root#root
+.retail-shell
+.revenue-view-page
+:is(
+  .back-icon-btn,
+  .revenue-print-btn,
+  .revenue-filter-reset,
+  .metric-detail-tabs button
+)::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Empty state */
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.revenue-empty-state {
+  min-height: 190px;
+
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 12px;
+
+  padding: 28px;
+  text-align: center;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.revenue-empty-state svg {
+  color: #aab5c5 !important;
+}
+
+#root#root#root
+.retail-shell
+.revenue-view-page
+.revenue-empty-state strong {
+  color: var(--text) !important;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+  #root#root#root
+  .retail-shell
+  .revenue-view-page
+  .metric-detail-summary {
+    grid-template-columns: 1fr !important;
+  }
+
+  #root#root#root
+  .retail-shell
+  .revenue-view-page
+  .revenue-view-filter,
+  #root#root#root
+  .retail-shell
+  .revenue-view-page
+  .revenue-view-filter.has-custom-range {
+    grid-template-columns: 1fr !important;
+  }
+
+  #root#root#root
+  .retail-shell
+  .revenue-view-page
+  .revenue-filter-reset {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 640px) {
+  #root#root#root
+  .retail-shell
+  .revenue-view-page
+  .metric-detail-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  #root#root#root
+  .retail-shell
+  .revenue-view-page
+  .revenue-print-btn {
+    width: 100% !important;
+  }
+
+  #root#root#root
+  .retail-shell
+  .revenue-view-page
+  .metric-detail-tabs {
+    grid-template-columns: 1fr !important;
+  }
+
+  #root#root#root
+  .retail-shell
+  .revenue-view-page
+  .metric-detail-panel {
+    padding: 18px 14px !important;
+  }
+}
+/* =========================================
+   NORMAL BACK BUTTON — ALL METRIC PAGES
+========================================= */
+
+#root#root#root
+.retail-shell
+.metric-detail-content
+.back-icon-btn {
+  flex: 0 0 auto !important;
+
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+
+  /* دیگر از رنگ اصلی Theme استفاده نمی‌کند */
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+  outline: none !important;
+  transform: none !important;
+
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+}
+
+#root#root#root
+.retail-shell
+.metric-detail-content
+.back-icon-btn:hover {
+  border-color: var(--border) !important;
+  background: var(--panel-soft) !important;
+  background-color: var(--panel-soft) !important;
+
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root
+.retail-shell
+.metric-detail-content
+.back-icon-btn:active {
+  background: color-mix(
+    in srgb,
+    var(--panel-soft) 80%,
+    var(--border)
+  ) !important;
+
+  color: var(--text) !important;
+  transform: none !important;
+}
+
+#root#root#root
+.retail-shell
+.metric-detail-content
+.back-icon-btn:focus-visible {
+  border-color: var(--border) !important;
+  outline: 2px solid color-mix(
+    in srgb,
+    var(--text) 18%,
+    transparent
+  ) !important;
+  outline-offset: 2px !important;
+}
+
+#root#root#root
+.retail-shell
+.metric-detail-content
+.back-icon-btn svg {
+  width: 18px !important;
+  height: 18px !important;
+
+  color: currentColor !important;
+  stroke: currentColor !important;
+  stroke-width: 2 !important;
+
+  filter: none !important;
+}
+
+/* حذف افکت‌ها و رنگ‌های عمومی دکمه‌های سیستم */
+
+#root#root#root
+.retail-shell
+.metric-detail-content
+.back-icon-btn::before,
+#root#root#root
+.retail-shell
+.metric-detail-content
+.back-icon-btn::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* حالت تاریک */
+
+#root#root#root
+.retail-shell.theme-dark
+.metric-detail-content
+.back-icon-btn {
+  background: transparent !important;
+  color: var(--text) !important;
+}
+
+#root#root#root
+.retail-shell.theme-dark
+.metric-detail-content
+.back-icon-btn:hover {
+  border-color: var(--border) !important;
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+}
+
+/* Net Profit source tabs - simple segmented style */
+#root#root#root
+.retail-shell
+.net-profit-detail
+.net-source-tabs {
+  display: inline-grid !important;
+  grid-template-columns: repeat(5, max-content) !important;
+  width: auto !important;
+  gap: 4px !important;
+  margin-bottom: 14px !important;
+  padding: 4px !important;
+  border-radius: 7px !important;
+  background: #f1f5f9 !important;
+  box-shadow: none !important;
+}
+
+#root#root#root
+.retail-shell
+.net-profit-detail
+.net-source-tabs button,
+#root#root#root
+.retail-shell
+.net-profit-detail
+.net-source-tabs button:hover {
+  min-height: 32px !important;
+  padding: 0 13px !important;
+  border: 0 !important;
+  border-radius: 6px !important;
+  background: transparent !important;
+  background-image: none !important;
+  color: #435675 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root
+.retail-shell
+.net-profit-detail
+.net-source-tabs button.active,
+#root#root#root
+.retail-shell
+.net-profit-detail
+.net-source-tabs button.active:hover {
+  background: #fff !important;
+  color: #020617 !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08) !important;
+}
+
+@media (max-width: 640px) {
+  #root#root#root
+  .retail-shell
+  .net-profit-detail
+  .net-source-tabs {
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+  }
+}
+
+/* DashboardMetricDetail non-Revenue filter/card alignment */
+#root#root#root
+.retail-shell
+.metric-detail-content:not(.revenue-view-page)
+.metric-detail-summary {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+#root#root#root
+.retail-shell
+.metric-detail-content:not(.revenue-view-page)
+.detail-summary-card {
+  min-height: 96px !important;
+  padding: 18px 70px 18px 20px !important;
+  border-radius: 10px !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+#root#root#root
+.retail-shell
+.metric-detail-content:not(.revenue-view-page)
+.detail-summary-card span {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+#root#root#root
+.retail-shell
+.metric-detail-content:not(.revenue-view-page)
+.detail-summary-card strong {
+  margin-top: 8px !important;
+  font-size: 24px !important;
+  font-weight: 850 !important;
+  line-height: 1.1 !important;
+}
+
+#root#root#root
+.retail-shell
+.metric-detail-content:not(.revenue-view-page)
+.detail-summary-card > svg {
+  top: 19px !important;
+  inset-inline-end: 19px !important;
+  width: 40px !important;
+  height: 40px !important;
+}
+
+#root#root#root
+.retail-shell
+.metric-detail-content:not(.revenue-view-page)
+.metric-detail-filter {
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+#root#root#root
+.retail-shell
+.metric-detail-content:not(.revenue-view-page)
+.metric-detail-filter.has-custom-range {
+  grid-template-columns: minmax(280px, 1fr) 190px 190px 34px !important;
+}
+
+#root#root#root
+.retail-shell
+.metric-detail-content:not(.revenue-view-page)
+.metric-detail-filter:not(.has-custom-range):not(.customer-view-filter):not(.expenses-view-filter) {
+  grid-template-columns: minmax(280px, 1fr) 190px !important;
+}
+
+#root#root#root
+.retail-shell
+.metric-detail-content:not(.revenue-view-page)
+.metric-detail-filter .smooth-select,
+#root#root#root
+.retail-shell
+.metric-detail-content:not(.revenue-view-page)
+.metric-detail-filter .smooth-select-btn,
+#root#root#root
+.retail-shell
+.metric-detail-content:not(.revenue-view-page)
+.metric-detail-filter .metric-detail-date-range,
+#root#root#root
+.retail-shell
+.metric-detail-content:not(.revenue-view-page)
+.metric-detail-filter .metric-detail-date-range .date-range-btn {
+  width: 190px !important;
+  max-width: 190px !important;
+}
+
+#root#root#root
+.retail-shell
+.metric-detail-content:not(.revenue-view-page)
+.metric-filter-reset,
+#root#root#root
+.retail-shell
+.metric-detail-content:not(.revenue-view-page)
+.metric-filter-reset:hover {
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 42px !important;
+  border: 0 !important;
+  border-radius: 7px !important;
+  background: transparent !important;
+  background-image: none !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root
+.retail-shell
+.metric-detail-content:not(.revenue-view-page)
+.metric-filter-reset:hover {
+  background: var(--panel-soft) !important;
+}
+
+#root#root#root
+.retail-shell
+.metric-detail-content:not(.revenue-view-page)
+.customer-view-filter.has-custom-range {
+  grid-template-columns: minmax(280px, 1fr) 190px 190px 34px !important;
+}
+
+#root#root#root
+.retail-shell
+.metric-detail-content:not(.revenue-view-page)
+.expenses-view-filter {
+  grid-template-columns: minmax(260px, 1fr) 180px 180px 180px !important;
+}
+
+#root#root#root
+.retail-shell
+.metric-detail-content:not(.revenue-view-page)
+.expenses-view-filter:has(.metric-filter-reset) {
+  grid-template-columns: minmax(260px, 1fr) 180px 180px 34px 180px 180px !important;
+}
+
+#root#root#root
+.retail-shell
+.metric-detail-content:not(.revenue-view-page)
+.expenses-view-filter .smooth-select,
+#root#root#root
+.retail-shell
+.metric-detail-content:not(.revenue-view-page)
+.expenses-view-filter .smooth-select-btn,
+#root#root#root
+.retail-shell
+.metric-detail-content:not(.revenue-view-page)
+.expenses-view-filter .metric-detail-date-range,
+#root#root#root
+.retail-shell
+.metric-detail-content:not(.revenue-view-page)
+.expenses-view-filter .metric-detail-date-range .date-range-btn {
+  width: 180px !important;
+  max-width: 180px !important;
+}
+
+@media (max-width: 1180px) {
+  #root#root#root
+  .retail-shell
+  .metric-detail-content:not(.revenue-view-page)
+  .expenses-view-filter,
+  #root#root#root
+  .retail-shell
+  .metric-detail-content:not(.revenue-view-page)
+  .expenses-view-filter:has(.metric-filter-reset) {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  #root#root#root
+  .retail-shell
+  .metric-detail-content:not(.revenue-view-page)
+  .expenses-view-filter .smooth-select,
+  #root#root#root
+  .retail-shell
+  .metric-detail-content:not(.revenue-view-page)
+  .expenses-view-filter .smooth-select-btn,
+  #root#root#root
+  .retail-shell
+  .metric-detail-content:not(.revenue-view-page)
+  .expenses-view-filter .metric-detail-date-range,
+  #root#root#root
+  .retail-shell
+  .metric-detail-content:not(.revenue-view-page)
+  .expenses-view-filter .metric-detail-date-range .date-range-btn {
+    width: 100% !important;
+    max-width: none !important;
+  }
+}
+
+@media (max-width: 900px) {
+  #root#root#root
+  .retail-shell
+  .metric-detail-content:not(.revenue-view-page)
+  .metric-detail-summary,
+  #root#root#root
+  .retail-shell
+  .metric-detail-content:not(.revenue-view-page)
+  .metric-detail-filter,
+  #root#root#root
+  .retail-shell
+  .metric-detail-content:not(.revenue-view-page)
+  .metric-detail-filter.has-custom-range,
+  #root#root#root
+  .retail-shell
+  .metric-detail-content:not(.revenue-view-page)
+  .customer-view-filter.has-custom-range,
+  #root#root#root
+  .retail-shell
+  .metric-detail-content:not(.revenue-view-page)
+  .expenses-view-filter,
+  #root#root#root
+  .retail-shell
+  .metric-detail-content:not(.revenue-view-page)
+  .expenses-view-filter:has(.metric-filter-reset) {
+    grid-template-columns: 1fr !important;
+  }
+
+  #root#root#root
+  .retail-shell
+  .metric-detail-content:not(.revenue-view-page)
+  .metric-detail-filter .smooth-select,
+  #root#root#root
+  .retail-shell
+  .metric-detail-content:not(.revenue-view-page)
+  .metric-detail-filter .smooth-select-btn,
+  #root#root#root
+  .retail-shell
+  .metric-detail-content:not(.revenue-view-page)
+  .metric-detail-filter .metric-detail-date-range,
+  #root#root#root
+  .retail-shell
+  .metric-detail-content:not(.revenue-view-page)
+  .metric-detail-filter .metric-detail-date-range .date-range-btn,
+  #root#root#root
+  .retail-shell
+  .metric-detail-content:not(.revenue-view-page)
+  .metric-filter-reset {
+    width: 100% !important;
+    max-width: none !important;
   }
 }

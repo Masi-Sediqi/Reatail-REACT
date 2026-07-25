@@ -1,6 +1,46 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { MessageCircle, Search, Send, Trash2, X } from '../components/Icons.jsx'
+import { formatBusinessCurrencyAmount } from '../utils/currencyExchange.js'
 import './Agent.css'
+
+function MoreHorizontalIcon({ size = 16 }) {
+  return (
+    <svg
+      aria-hidden="true"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="5" cy="12" r="1" />
+      <circle cx="12" cy="12" r="1" />
+      <circle cx="19" cy="12" r="1" />
+    </svg>
+  )
+}
+
+function RenameIcon({ size = 15 }) {
+  return (
+    <svg
+      aria-hidden="true"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </svg>
+  )
+}
 
 const parseNumber = (value) => Number.parseFloat(value || 0) || 0
 const normalize = (value) => String(value || '').toLowerCase()
@@ -49,7 +89,7 @@ const defaultSuggestions = [
 ]
 
 const getCurrency = (companyInfo) => companyInfo?.currency || 'AFN'
-const money = (value, companyInfo) => `${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${getCurrency(companyInfo)}`
+const money = (value, companyInfo) => formatBusinessCurrencyAmount(value, getCurrency(companyInfo))
 
 const dateOnly = (value) => (value ? new Date(`${String(value).slice(0, 10)}T12:00:00`) : null)
 const daysUntil = (value) => {
@@ -386,17 +426,34 @@ function AgentPage({ cashWallet, cashWalletEntries, companyInfo, customers, expe
                     <span>{session.title}</span>
                   </button>
                   <button
-                    className="agent-history-menu-trigger"
-                    type="button"
-                    aria-label={t.actions ?? 'Actions'}
-                    aria-expanded={openSessionMenuId === session.id}
-                    onClick={() => setOpenSessionMenuId((current) => current === session.id ? '' : session.id)}
-                  >
-                    ...
-                  </button>
+  className={`agent-history-menu-trigger ${
+    openSessionMenuId === session.id ? 'active' : ''
+  }`}
+  type="button"
+  aria-label={t.actions ?? 'Actions'}
+  aria-expanded={openSessionMenuId === session.id}
+  title={t.actions ?? 'Actions'}
+  onClick={() =>
+    setOpenSessionMenuId((current) =>
+      current === session.id ? '' : session.id
+    )
+  }
+>
+  <MoreHorizontalIcon size={16} />
+</button>
                   {openSessionMenuId === session.id && (
                     <div className="agent-history-menu">
-                      <button type="button" onClick={() => startRename(session)}>{t.agentRenameChat ?? 'Rename'}</button>
+                      <button
+  className="agent-history-rename-action"
+  type="button"
+  onClick={() => startRename(session)}
+>
+  <RenameIcon size={15} />
+
+  <span>
+    {t.agentRenameChat ?? 'Rename'}
+  </span>
+</button>
                       <button className="danger" type="button" onClick={() => deleteChat(session.id)}>
                         <Trash2 size={14} />
                         <span>{t.delete}</span>

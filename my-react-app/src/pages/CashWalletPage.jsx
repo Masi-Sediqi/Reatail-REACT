@@ -1,11 +1,15 @@
 import { useMemo, useState } from 'react'
 import CustomSelect from '../components/CustomSelect.jsx'
 import DateRangePicker from '../components/DateRangePicker.jsx'
-import { CalendarDays, ChevronLeft, DollarSign, Download, Plus, ReceiptText, Search, Upload, WalletCards, X } from '../components/Icons.jsx'
+import { CalendarDays, ChevronLeft, DollarSign, Download, Plus, Printer, Search, SquareMenu, Trash2, Upload, WalletCards, X } from '../components/Icons.jsx'
+import { currencies } from '../data/dashboardData.js'
 import { calculateBusinessMetrics, dateOptionsFor, filterByDate, formatMoney, getExpenseCategory, parseNumber } from '../utils/businessMetrics.js'
 import './CashWalletPage.css'
 
-const currencyOptions = ['AFN', 'USD', 'EUR', 'PKR'].map((currency) => ({ value: currency, label: currency }))
+const currencyOptions = currencies.map((currency) => ({
+  value: currency.code,
+  label: `${currency.code} - ${currency.name}`,
+}))
 
 const dateLabel = (value) => {
   if (!value) return '-'
@@ -19,22 +23,22 @@ const shamsiLabel = (value) => {
   return new Intl.DateTimeFormat('fa-AF-u-ca-persian', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(date)
 }
 
-function CashWalletModal({ baseCurrency, onClose, onSave, t }) {
-  const [mode, setMode] = useState('deposit')
-  const [amount, setAmount] = useState('')
-  const [currency, setCurrency] = useState(baseCurrency || 'AFN')
-  const [note, setNote] = useState('')
+function CashWalletModal({ baseCurrency, initialEntry, onClose, onSave, t }) {
+  const [mode, setMode] = useState(initialEntry?.type || 'deposit')
+  const [amount, setAmount] = useState(initialEntry?.amount ? String(initialEntry.amount) : '')
+  const [currency, setCurrency] = useState(initialEntry?.currency || baseCurrency || 'AFN')
+  const [note, setNote] = useState(initialEntry?.note || '')
   const parsedAmount = parseNumber(amount)
   const canSubmit = parsedAmount > 0
 
   const save = () => {
     if (!canSubmit) return
     onSave({
-      id: crypto.randomUUID(),
+      id: initialEntry?.id || crypto.randomUUID(),
       amount: parsedAmount,
-      createdAt: new Date().toISOString(),
+      createdAt: initialEntry?.createdAt || new Date().toISOString(),
       currency,
-      date: new Date().toISOString().slice(0, 10),
+      date: initialEntry?.date || new Date().toISOString().slice(0, 10),
       note: note.trim() || (mode === 'deposit' ? t.deposit : t.withdraw),
       type: mode,
     })
@@ -42,40 +46,36 @@ function CashWalletModal({ baseCurrency, onClose, onSave, t }) {
 
   return (
     <div className="modal-backdrop cash-wallet-backdrop" onClick={onClose}>
-      <section className="cash-wallet-modal" onClick={(event) => event.stopPropagation()}>
+      <section className="cash-wallet-modal cash-wallet-header-modal" onClick={(event) => event.stopPropagation()}>
         <button className="modal-close" type="button" onClick={onClose}><X size={17} /></button>
-        <header className="cash-wallet-modal-head">
-          <WalletCards size={22} />
+        <header className="cash-wallet-modal-head header-shared-modal-head">
+          <span className="header-shared-modal-icon"><WalletCards size={18} /></span>
           <div>
             <h2>{t.cashWallet ?? 'Cash Wallet'}</h2>
             <p>{t.cashWalletHint ?? 'Track owner cash deposits and withdrawals.'}</p>
           </div>
         </header>
-        <div className="cash-wallet-current-box">
-  <span>{t.currentCashWallet ?? 'Current cash wallet'}</span>
-  <strong>{formatMoney(108)}</strong>
-        </div>
-        <div className="cash-wallet-mode-tabs">
+        <div className="cash-wallet-mode-tabs wallet-mode-tabs">
           <button className={`deposit-mode ${mode === 'deposit' ? 'active' : ''}`} type="button" onClick={() => setMode('deposit')}><Download size={15} /> <span>{t.deposit ?? 'Deposit'}</span></button>
           <button className={`withdraw-mode ${mode === 'withdraw' ? 'active' : ''}`} type="button" onClick={() => setMode('withdraw')}><Upload size={15} /> <span>{t.withdraw ?? 'Withdraw'}</span></button>
         </div>
-        <div className="cash-wallet-form-grid">
+        <div className="cash-wallet-form-grid wallet-form-grid">
           <label>
             <span>{t.amount ?? 'Amount'} *</span>
             <input autoFocus min="0" step="0.01" type="number" placeholder="0.00" value={amount} onChange={(event) => setAmount(event.target.value)} />
           </label>
           <label>
             <span>{t.currency ?? 'Currency'}</span>
-            <CustomSelect ariaLabel={t.currency ?? 'Currency'} options={currencyOptions} value={currency} onChange={setCurrency} />
+            <CustomSelect ariaLabel={t.currency ?? 'Currency'} buttonClassName="wallet-currency-select" options={currencyOptions} value={currency} onChange={setCurrency} />
           </label>
           <label className="wide">
             <span>{t.reasonNote ?? 'Reason / Note'}</span>
             <textarea placeholder={t.walletNotePlaceholder ?? 'e.g. Owner injection from personal funds'} value={note} onChange={(event) => setNote(event.target.value)} />
           </label>
         </div>
-        <footer className="modal-actions">
-          <button type="button" onClick={onClose}>{t.cancel ?? 'Cancel'}</button>
-          <button className="primary-btn" disabled={!canSubmit} type="button" onClick={save}>{mode === 'deposit' ? (t.saveDeposit ?? 'Save Deposit') : (t.saveWithdraw ?? 'Save Withdraw')}</button>
+        <footer className="modal-actions wallet-modal-actions">
+          <button className="wallet-cancel-btn" type="button" onClick={onClose}>{t.cancel ?? 'Cancel'}</button>
+          <button className={`wallet-save-btn ${mode}`} disabled={!canSubmit} type="button" onClick={save}>{mode === 'deposit' ? (t.saveDeposit ?? 'Save Deposit') : (t.saveWithdraw ?? 'Save Withdraw')}</button>
         </footer>
       </section>
     </div>
@@ -83,7 +83,7 @@ function CashWalletModal({ baseCurrency, onClose, onSave, t }) {
 }
 
 function CashWalletPrintModal({ companyInfo, filterLabel, onClose, records, t }) {
-  const [rowsPerPage, setRowsPerPage] = useState('10')
+  const [rowsPerPage, setRowsPerPage] = useState('25')
   const pageRows = records.slice(0, Number(rowsPerPage))
   let balance = 0
   const rows = pageRows.map((record, index) => {
@@ -110,9 +110,9 @@ function CashWalletPrintModal({ companyInfo, filterLabel, onClose, records, t })
         <header className="cash-print-toolbar">
           <strong>{t.printStatement ?? 'Print Statement'} - {filterLabel}</strong>
           <div className="cash-print-actions">
-            <label><span>{t.rowsPerPage ?? 'rowsPerPage'}</span><CustomSelect ariaLabel={t.rowsPerPage ?? 'rowsPerPage'} options={['10', '20', '50', '100'].map((value) => ({ value, label: value }))} value={rowsPerPage} onChange={setRowsPerPage} /></label>
+            <label><span>{t.rowsPerPage ?? 'rowsPerPage'}</span><CustomSelect ariaLabel={t.rowsPerPage ?? 'rowsPerPage'} options={['25', '50', '100'].map((value) => ({ value, label: value }))} value={rowsPerPage} onChange={setRowsPerPage} /></label>
             <button type="button"><Download size={16} /> {t.download ?? 'Download'}</button>
-            <button className="primary-btn" type="button" onClick={print}><ReceiptText size={16} /> {t.print ?? 'Print'}</button>
+            <button className="primary-btn" type="button" onClick={print}><Printer size={16} /> {t.print ?? 'Print'}</button>
             <button className="icon-only" type="button" onClick={onClose}><X size={16} /></button>
           </div>
         </header>
@@ -167,8 +167,9 @@ function CashWalletPage({ cashWallet, companyInfo, expenses = [], onBack, onCash
   const [dateFilter, setDateFilter] = useState('all')
   const [customRange, setCustomRange] = useState({ start: '', end: '' })
   const [search, setSearch] = useState('')
-  const [supplierFilter, setSupplierFilter] = useState('all')
-  const [categoryFilter, setCategoryFilter] = useState('all')
+  const [supplierFilter] = useState('all')
+  const [categoryFilter] = useState('all')
+  const [editingEntry, setEditingEntry] = useState(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [printOpen, setPrintOpen] = useState(false)
 
@@ -207,6 +208,7 @@ function CashWalletPage({ cashWallet, companyInfo, expenses = [], onBack, onCash
       direction: entry.type === 'deposit' ? 'in' : 'out',
       group: entry.type === 'deposit' ? 'deposit' : 'withdraw',
       id: entry.id,
+      source: entry,
       note: entry.note || (entry.type === 'deposit' ? t.deposit : t.withdraw),
       supplier: '',
       typeLabel: entry.type === 'deposit' ? (t.deposit ?? 'Deposit') : (t.withdraw ?? 'Withdraw'),
@@ -225,8 +227,6 @@ function CashWalletPage({ cashWallet, companyInfo, expenses = [], onBack, onCash
     ...cards.map((card) => ({ value: card.key, label: card.label })),
     { value: 'expenses', label: t.expenses ?? 'Expenses' },
   ]
-  const supplierOptions = [{ value: 'all', label: t.filterAllSuppliers ?? 'filter_all - suppliers' }, ...suppliers.map((supplier) => ({ value: supplier.name, label: supplier.name }))]
-  const categoryOptions = [{ value: 'all', label: t.filterAllCategory ?? 'filter_all - Category' }, ...[...new Set(records.map((record) => record.category).filter(Boolean))].map((category) => ({ value: category, label: category }))]
   const visibleRecords = filterByDate(records, dateFilter, customRange.start, customRange.end).filter((record) => {
     const byType = activeType === 'all' || (activeType === 'profit' ? ['paid', 'expenses'].includes(record.group) : record.group === activeType)
     const bySupplier = supplierFilter === 'all' || record.supplier === supplierFilter
@@ -237,10 +237,40 @@ function CashWalletPage({ cashWallet, companyInfo, expenses = [], onBack, onCash
   })
   const filterLabel = typeOptions.find((option) => option.value === activeType)?.label ?? (t.filterAll ?? 'filter_all')
 
+  const signedWalletAmount = (entry) => (entry.type === 'deposit' ? entry.amount : -entry.amount)
+
   const saveWalletEntry = (entry) => {
-    onWalletEntriesChange((current) => [entry, ...current])
-    onCashWalletChange((current) => Number(current || 0) + (entry.type === 'deposit' ? entry.amount : -entry.amount))
+    if (editingEntry) {
+      onWalletEntriesChange((current) => current.map((item) => (item.id === editingEntry.id ? entry : item)))
+      onCashWalletChange((current) => Number(current || 0) - signedWalletAmount(editingEntry) + signedWalletAmount(entry))
+      setEditingEntry(null)
+    } else {
+      onWalletEntriesChange((current) => [entry, ...current])
+      onCashWalletChange((current) => Number(current || 0) + signedWalletAmount(entry))
+    }
     setModalOpen(false)
+  }
+
+  const openEditEntry = (entry) => {
+    setEditingEntry(entry)
+    setModalOpen(true)
+  }
+
+  const deleteWalletEntry = (entry) => {
+    const ok = window.confirm(t.confirmDeleteWalletEntry ?? t.confirmDelete ?? 'Delete this wallet entry?')
+    if (!ok) return
+    onWalletEntriesChange((current) => current.filter((item) => item.id !== entry.id))
+    onCashWalletChange((current) => Number(current || 0) - signedWalletAmount(entry))
+  }
+
+  const closeWalletModal = () => {
+    setModalOpen(false)
+    setEditingEntry(null)
+  }
+
+  const resetDateFilter = () => {
+    setDateFilter('all')
+    setCustomRange({ start: '', end: '' })
   }
 
   return (
@@ -253,12 +283,21 @@ function CashWalletPage({ cashWallet, companyInfo, expenses = [], onBack, onCash
             <p>{t.cashWalletSubtitle ?? 'Includes pure profit - Owner cash deposits and withdrawals - expenses'}</p>
           </div>
         </div>
-        <div className="cash-wallet-top-actions">
-          <CustomSelect ariaLabel={t.filter ?? 'Filter'} options={typeOptions} value={activeType} onChange={setActiveType} />
-          <CustomSelect ariaLabel={t.allTime ?? 'All Time'} options={dateOptionsFor(t)} value={dateFilter} onChange={setDateFilter} />
-          {dateFilter === 'custom' && <DateRangePicker end={customRange.end} onChange={setCustomRange} start={customRange.start} t={t} />}
+        <div className={`cash-wallet-top-actions ${dateFilter === 'custom' ? 'has-custom-range' : ''}`.trim()}>
+          <div className="cash-wallet-action-select">
+            <CustomSelect ariaLabel={t.filter ?? 'Filter'} options={typeOptions} value={activeType} onChange={setActiveType} />
+          </div>
+          <div className="cash-wallet-action-select">
+            <CustomSelect ariaLabel={t.allTime ?? 'All Time'} options={dateOptionsFor(t)} value={dateFilter} onChange={setDateFilter} />
+          </div>
+          {dateFilter === 'custom' && (
+            <>
+              <DateRangePicker className="cash-wallet-date-range" end={customRange.end} onChange={setCustomRange} start={customRange.start} t={t} />
+              <button className="cash-wallet-reset-filter" title={t.clear ?? 'Clear'} type="button" onClick={resetDateFilter}><X size={16} /></button>
+            </>
+          )}
           <button className="cash-wallet-add-btn" title={t.cashWallet ?? 'Cash Wallet'} type="button" onClick={() => setModalOpen(true)}><Plus size={20} /></button>
-          <button type="button" onClick={() => setPrintOpen(true)}><ReceiptText size={16} /> {t.printStatement ?? 'Print Statement'}</button>
+          <button className="cash-wallet-print-btn" type="button" onClick={() => setPrintOpen(true)}><Printer size={16} /> {t.printStatement ?? 'Print Statement'}</button>
         </div>
       </div>
 
@@ -277,31 +316,59 @@ function CashWalletPage({ cashWallet, companyInfo, expenses = [], onBack, onCash
 
       <div className="filter-card cash-wallet-filters">
         <div className="search-field"><Search size={17} /><input placeholder={t.searchPlaceholder ?? 'Search...'} value={search} onChange={(event) => setSearch(event.target.value)} /></div>
-        <CustomSelect ariaLabel={t.suppliers ?? 'Suppliers'} options={supplierOptions} value={supplierFilter} onChange={setSupplierFilter} />
-        <CustomSelect ariaLabel={t.category ?? 'Category'} options={categoryOptions} value={categoryFilter} onChange={setCategoryFilter} />
       </div>
 
       <div className="data-panel cash-wallet-table-panel">
-        <h2><WalletCards size={20} /> {t.cashWallet ?? 'Cash Wallet'} ({visibleRecords.length})</h2>
-        <div className="metric-detail-table-wrap">
-          <table className="data-table cash-wallet-table">
-            <thead><tr><th>{t.date ?? 'Date'}</th><th>{t.type ?? 'Type'}</th><th>{t.amount ?? 'Amount'}</th><th>{t.reasonNote ?? 'Reason / Note'}</th><th>{t.actions ?? 'Actions'}</th></tr></thead>
-            <tbody>
-              {visibleRecords.length === 0 ? <tr><td className="empty-cell" colSpan="5">{t.noRecordsFound ?? 'No records found'}</td></tr> : visibleRecords.map((record) => (
-                <tr key={record.id}>
-                  <td>{dateLabel(record.date)}<br /><small>{shamsiLabel(record.date)}</small></td>
-                  <td><span className={`cash-type-pill ${record.direction === 'in' ? 'deposit' : 'withdraw'}`}>{record.typeLabel}</span></td>
-                  <td className={record.direction === 'in' ? 'success-text' : 'danger-text'}>{record.direction === 'in' ? '+ ' : '- '}{formatMoney(record.amount, record.currency)}</td>
-                  <td>{record.note}</td>
-                  <td>...</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <h2><WalletCards size={20} /> {filterLabel} ({visibleRecords.length})</h2>
+        {visibleRecords.length === 0 ? (
+          <div className="cash-wallet-empty-state">{t.noResultsFound ?? 'No results found'}</div>
+        ) : (
+          <div className="metric-detail-table-wrap">
+            <table className="data-table cash-wallet-table">
+              <thead><tr><th>{t.date ?? 'Date'}</th><th>{t.type ?? 'Type'}</th><th>{t.amount ?? 'Amount'}</th><th>{t.reasonNote ?? 'Reason / Note'}</th><th>{t.actions ?? 'Actions'}</th></tr></thead>
+              <tbody>
+                {visibleRecords.map((record) => (
+                  <tr key={record.id}>
+                    <td>{dateLabel(record.date)}<br /><small>{shamsiLabel(record.date)}</small></td>
+                    <td><span className={`cash-type-pill ${record.direction === 'in' ? 'deposit' : 'withdraw'}`}>{record.typeLabel}</span></td>
+                    <td className={record.direction === 'in' ? 'success-text' : 'danger-text'}>{record.direction === 'in' ? '+ ' : '- '}{formatMoney(record.amount, record.currency)}</td>
+                    <td>{record.note}</td>
+                    <td className="cash-wallet-actions-cell">
+  {record.source ? (
+    <div className="cash-wallet-row-actions">
+      <button
+        className="cash-wallet-edit-action"
+        type="button"
+        onClick={() => openEditEntry(record.source)}
+        aria-label={t.edit ?? 'Edit'}
+        title={t.edit ?? 'Edit'}
+      >
+        <SquareMenu size={14} />
+      </button>
+
+      <button
+        className="cash-wallet-delete-action"
+        type="button"
+        onClick={() => deleteWalletEntry(record.source)}
+        aria-label={t.delete ?? 'Delete'}
+        title={t.delete ?? 'Delete'}
+      >
+        <Trash2 size={14} />
+      </button>
+    </div>
+  ) : (
+    <span className="cash-wallet-derived-row">—</span>
+  )}
+</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
-      {modalOpen && <CashWalletModal baseCurrency="AFN" onClose={() => setModalOpen(false)} onSave={saveWalletEntry} t={t} />}
+      {modalOpen && <CashWalletModal baseCurrency="AFN" initialEntry={editingEntry} onClose={closeWalletModal} onSave={saveWalletEntry} t={t} />}
       {printOpen && <CashWalletPrintModal companyInfo={companyInfo} filterLabel={filterLabel} onClose={() => setPrintOpen(false)} records={visibleRecords} t={t} />}
     </section>
   )

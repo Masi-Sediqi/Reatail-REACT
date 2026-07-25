@@ -1,10 +1,23 @@
 import { useMemo, useState } from 'react'
 import PrintPreviewModal from '../components/PrintPreviewModal.jsx'
 import CustomSelect from '../components/CustomSelect.jsx'
+import CustomFieldInputs from '../components/CustomFieldInputs.jsx'
 import DateRangePicker from '../components/DateRangePicker.jsx'
 import FloatingActionMenu from '../components/FloatingActionMenu.jsx'
 import { currencies } from '../data/dashboardData.js'
-import { BriefcaseBusiness, ChevronLeft, CreditCard, DollarSign, Eye, Plus, Trash2, UserPlus } from '../components/Icons.jsx'
+import {
+  BriefcaseBusiness,
+  ChevronLeft,
+  CreditCard,
+  DollarSign,
+  Eye,
+  Plus,
+  ReceiptText,
+  SquareMenu,
+  Trash2,
+  UserPlus,
+  X,
+} from '../components/Icons.jsx'
 import './Staff.css'
 
 const employmentTypes = ['Full-time', 'Part-time', 'Contract']
@@ -22,6 +35,7 @@ const emptyStaff = {
   paid: '0',
   payable: '0',
   payrollHistory: [],
+  customFields: {},
 }
 
 const parseNumber = (value) => Number.parseFloat(value || 0) || 0
@@ -51,16 +65,24 @@ function StaffActionMenu({ onDelete, onEdit, onPaySalary, onViewProfile, staff, 
   return <FloatingActionMenu ariaLabel={t.actions} actions={[
     { icon: <Eye size={15} />, label: t.viewProfile ?? 'View profile', onClick: () => onViewProfile(staff) },
     { icon: <DollarSign size={15} />, label: t.paySalary ?? 'Pay Salary', onClick: () => onPaySalary(staff) },
-    { label: t.edit, onClick: onEdit },
+    {
+      icon: <SquareMenu size={15} />,
+      label: t.edit,
+      onClick: onEdit,
+    },
     { danger: true, icon: <Trash2 size={15} />, label: t.delete, onClick: () => onDelete(staff) },
   ]} />
 }
 
-function StaffModal({ initialStaff, onClose, onSave, t }) {
-  const [form, setForm] = useState(initialStaff ?? emptyStaff)
+function StaffModal({ customFields = [], initialStaff, onClose, onSave, t }) {
+  const [form, setForm] = useState(() => ({ ...emptyStaff, ...(initialStaff ?? {}), customFields: { ...(initialStaff?.customFields ?? {}) } }))
   const [submitted, setSubmitted] = useState(false)
   const [closing, setClosing] = useState(false)
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }))
+  const updateCustomField = (fieldId, value) => setForm((current) => ({
+    ...current,
+    customFields: { ...(current.customFields ?? {}), [fieldId]: value },
+  }))
   const requestClose = () => {
     if (closing) return
     setClosing(true)
@@ -77,16 +99,50 @@ function StaffModal({ initialStaff, onClose, onSave, t }) {
         onSubmit={(event) => {
           event.preventDefault()
           setSubmitted(true)
-          if (!form.name.trim() || !form.role.trim()) return
+          const missingCustomField = customFields.some((field) => field.required && !String(form.customFields?.[field.id] ?? '').trim())
+          if (!form.name.trim() || !form.role.trim() || missingCustomField) return
           onSave({ ...form, id: form.id ?? crypto.randomUUID(), status: 'Active', payrollHistory: form.payrollHistory || [] })
         }}
       >
-        <button className="modal-close" type="button" onClick={requestClose}>×</button>
+        <button
+  className="modal-close payroll-modal-close"
+  type="button"
+  onClick={onClose}
+  aria-label={t.close ?? 'Close'}
+  title={t.close ?? 'Close'}
+>
+  <X size={15} />
+</button>
         <h2>{initialStaff ? t.editStaff : t.addNewStaff}</h2>
-        <label className="wide"><span>{t.fullName} *</span><input autoFocus className={submitted && !form.name.trim() ? 'field-invalid' : ''} placeholder={t.staffNamePlaceholder} value={form.name} onChange={(event) => update('name', event.target.value)} /></label>
+        <label className="wide">
+          <span>
+            {t.fullName}
+            <em className="staff-required-star">*</em>
+          </span>
+
+          <input
+            autoFocus
+            className={submitted && !form.name.trim() ? 'field-invalid' : ''}
+            placeholder={t.staffNamePlaceholder}
+            value={form.name}
+            onChange={(event) => update('name', event.target.value)}
+          />
+        </label>
         <label><span>{t.phoneNumber}</span><input placeholder={t.phonePlaceholder} value={form.phone} onChange={(event) => update('phone', event.target.value)} /></label>
         <label><span>{t.email}</span><input placeholder={t.email} value={form.email} onChange={(event) => update('email', event.target.value)} /></label>
-        <label><span>{t.role} *</span><input className={submitted && !form.role.trim() ? 'field-invalid' : ''} placeholder={t.jobTitle} value={form.role} onChange={(event) => update('role', event.target.value)} /></label>
+        <label>
+          <span>
+            {t.role}
+            <em className="staff-required-star">*</em>
+          </span>
+
+          <input
+            className={submitted && !form.role.trim() ? 'field-invalid' : ''}
+            placeholder={t.jobTitle}
+            value={form.role}
+            onChange={(event) => update('role', event.target.value)}
+          />
+        </label>
         <label><span>{t.department}</span><input placeholder={t.department} value={form.department} onChange={(event) => update('department', event.target.value)} /></label>
         <label className="wide">
           <span>{t.employmentType}</span>
@@ -94,6 +150,7 @@ function StaffModal({ initialStaff, onClose, onSave, t }) {
         </label>
         <label><span>{t.monthlySalary}</span><input inputMode="decimal" placeholder="0" value={form.salary} onChange={(event) => update('salary', event.target.value)} /></label>
         <label><span>{t.baseCurrency}</span><CustomSelect ariaLabel={t.baseCurrency} options={currencyOptions} value={form.currency} onChange={(value) => update('currency', value)} /></label>
+        <CustomFieldInputs fields={customFields} onChange={updateCustomField} submitted={submitted} values={form.customFields} />
         <button className="primary-btn wide" type="submit">{initialStaff ? t.saveChanges : t.addStaffMember}</button>
       </form>
     </div>
@@ -227,10 +284,10 @@ function StaffProfile({ onBack, onDeletePayroll, onPaySalary, staff, t }) {
     <div className="entity-content staff-content">
       <div className="staff-profile-heading">
         <button type="button" onClick={onBack} aria-label={t.back ?? 'Back'}><ChevronLeft size={18} /></button>
-        <div><h1>{staff.name}</h1><p>{staff.role || '-'} · {staff.department || '-'} · {staff.employmentType || '-' } · {staff.phone || '-'}</p></div>
+        <div><h1>{staff.name}</h1><p>{staff.role || '-'} · {staff.department || '-'} · {staff.employmentType || '-'} · {staff.phone || '-'}</p></div>
         <button className="primary-btn" type="button" onClick={() => onPaySalary(staff)}><Plus size={16} /> {t.paySalary ?? 'Pay Salary'}</button>
       </div>
-      <div className="summary-grid four">
+      <div className="summary-grid four staff-profile-summary-grid">
         <article className="tone-blue"><span>{t.baseSalary ?? 'Base Salary'}</span><strong>{Number(staff.salary || 0).toFixed(2)} {staff.currency}</strong><UserPlus size={22} /></article>
         <article className="tone-green"><span>{t.staffPaid}</span><strong>{paid.toFixed(2)} {staff.currency}</strong><DollarSign size={22} /></article>
         <article className="tone-orange"><span>{t.staffPayable}</span><strong>{payable.toFixed(2)} {staff.currency}</strong><BriefcaseBusiness size={22} /></article>
@@ -272,6 +329,7 @@ function StaffPage({ companyInfo, onMoveToRecycle, onNotify, onStaffChange, prin
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [dateFilter, setDateFilter] = useState('all')
+  const staffCustomFields = companyInfo?.customFormFields?.staff ?? []
   const [customStartDate, setCustomStartDate] = useState('')
   const [customEndDate, setCustomEndDate] = useState('')
   const profileStaff = staffMembers.find((staff) => staff.id === profileStaffId)
@@ -373,38 +431,61 @@ function StaffPage({ companyInfo, onMoveToRecycle, onNotify, onStaffChange, prin
     <div className="entity-content staff-content">
       <div className="entity-heading">
         <div><h1>{t.staff}</h1><p>{t.staffOverview}</p></div>
-        <div className="entity-actions">
-          <button type="button" onClick={() => setPrintOpen(true)}>{t.printReport}</button>
-          <button type="button" className="payroll-btn" onClick={() => openPayroll()}>{t.payroll}</button>
-          <button className="primary-btn" type="button" onClick={() => setModalOpen(true)}>+ {t.addStaffMember}</button>
-        </div>
+        <div className="entity-actions staff-header-actions">
+  <button
+    className="staff-print-btn"
+    type="button"
+    onClick={() => setPrintOpen(true)}
+  >
+    <ReceiptText size={16} />
+    <span>{t.printReport}</span>
+  </button>
+
+  <button
+    className="payroll-btn staff-payroll-btn"
+    type="button"
+    onClick={() => openPayroll()}
+  >
+    <CreditCard size={16} />
+    <span>{t.payroll}</span>
+  </button>
+
+  <button
+    className="primary-btn staff-add-btn"
+    type="button"
+    onClick={() => setModalOpen(true)}
+  >
+    <UserPlus size={16} />
+    <span>{t.addStaffMember}</span>
+  </button>
+</div>
       </div>
 
       <div className="summary-grid four staff-summary-grid">
-  <article className="tone-blue">
-    <span>{t.totalStaff}</span>
-    <strong>{staffMembers.length}</strong>
-    <UserPlus size={22} />
-  </article>
+        <article className="tone-blue">
+          <span>{t.totalStaff}</span>
+          <strong>{staffMembers.length}</strong>
+          <UserPlus size={22} />
+        </article>
 
-  <article className="tone-orange">
-    <span>{t.monthlyPayroll}</span>
-    <strong>{monthlyPayroll.toFixed(2)} ؋</strong>
-    <DollarSign size={22} />
-  </article>
+        <article className="tone-orange">
+          <span>{t.monthlyPayroll}</span>
+          <strong>{monthlyPayroll.toFixed(2)} ؋</strong>
+          <DollarSign size={22} />
+        </article>
 
-  <article className="tone-green">
-    <span>{t.staffPaid}</span>
-    <strong>{staffPaid.toFixed(2)} ؋</strong>
-    <CreditCard size={22} />
-  </article>
+        <article className="tone-green">
+          <span>{t.staffPaid}</span>
+          <strong>{staffPaid.toFixed(2)} ؋</strong>
+          <CreditCard size={22} />
+        </article>
 
-  <article className="tone-orange">
-    <span>{t.staffPayable}</span>
-    <strong>{staffPayable.toFixed(2)} ؋</strong>
-    <BriefcaseBusiness size={22} />
-  </article>
-</div>
+        <article className="tone-orange">
+          <span>{t.staffPayable}</span>
+          <strong>{staffPayable.toFixed(2)} ؋</strong>
+          <BriefcaseBusiness size={22} />
+        </article>
+      </div>
 
       <div className="filter-card staff-filter">
         <input placeholder={t.searchStaff} value={search} onChange={(event) => setSearch(event.target.value)} />
@@ -460,7 +541,7 @@ function StaffPage({ companyInfo, onMoveToRecycle, onNotify, onStaffChange, prin
         )}
       </div>
 
-      {modalOpen && <StaffModal initialStaff={editingStaff} onClose={() => { setModalOpen(false); setEditingStaff(null) }} onSave={saveStaff} t={t} />}
+      {modalOpen && <StaffModal customFields={staffCustomFields} initialStaff={editingStaff} onClose={() => { setModalOpen(false); setEditingStaff(null) }} onSave={saveStaff} t={t} />}
       {payrollOpen && <PayrollModal initialStaff={payrollStaff} lockedStaff={Boolean(payrollStaff)} onClose={() => { setPayrollOpen(false); setPayrollStaff(null) }} onSave={savePayroll} staffMembers={staffMembers} t={t} />}
       {printOpen && <PrintPreviewModal companyInfo={companyInfo} onClose={() => setPrintOpen(false)} printSettings={printSettings} rows={filteredStaff} title={t.staffReport} columns={[{ key: 'name', label: t.name }, { key: 'phone', label: t.phoneNumber }, { key: 'role', label: t.role }, { key: 'department', label: t.department }, { key: 'salary', label: t.monthlySalary }]} t={t} />}
     </div>

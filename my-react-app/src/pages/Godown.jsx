@@ -8,6 +8,7 @@ import {
   BarChart3,
   CalendarDays,
   ChevronDown,
+  ChevronLeft,
   CreditCard,
   Download,
   Eye,
@@ -18,12 +19,14 @@ import {
   Trash2,
   Upload,
   WalletCards,
+  X,
 } from '../components/Icons.jsx'
+import { formatBusinessCurrencyAmount } from '../utils/currencyExchange.js'
 import './Godown.css'
 
 const parseNumber = (value) => Number.parseFloat(value || 0) || 0
-const formatMoney = (value) => `${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ؋`
-const formatCurrencyMoney = (value, currency = 'AFN') => `${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency === 'EUR' ? '€' : '؋'}`
+const formatMoney = (value) => formatBusinessCurrencyAmount(value, 'AFN')
+const formatCurrencyMoney = (value, currency = 'AFN') => formatBusinessCurrencyAmount(value, currency)
 const todayInput = () => new Date().toISOString().slice(0, 10)
 const parseDateInput = (value) => (value ? new Date(`${value}T12:00:00`) : null)
 
@@ -109,9 +112,30 @@ export function AdjustmentModal({ currencies, onClose, onSave, supplierName, t }
           onSave({ amount: parseNumber(amount), currency, linkWallet, rate: parseNumber(rate) || 1, reason: reason.trim(), type })
         }}
       >
-        <button className="modal-close" type="button" onClick={onClose}>×</button>
-        <h2>{t.addAdjustment ?? 'Add Adjustment'}</h2>
-        <p>{(t.adjustmentHint ?? 'Record a manual change to the supplier balance.').replace('{name}', supplierName)}</p>
+        <button
+  className="modal-close adjustment-modal-close"
+  type="button"
+  onClick={onClose}
+  aria-label={t.close ?? 'Close'}
+  title={t.close ?? 'Close'}
+>
+  <X size={15} />
+</button>
+        <header className="adjustment-modal-header">
+  <div className="adjustment-modal-icon">
+    <WalletCards size={18} />
+  </div>
+
+  <div>
+    <h2>{t.addAdjustment ?? 'Add Adjustment'}</h2>
+
+    <p>
+      {(t.adjustmentHint ??
+        'Record a manual change to the supplier balance.'
+      ).replace('{name}', supplierName)}
+    </p>
+  </div>
+</header>
         <label className="wide">
           <span>{t.adjustmentType ?? 'Adjustment Type'} *</span>
           <CustomSelect ariaLabel={t.adjustmentType ?? 'Adjustment Type'} options={typeOptions} value={type} onChange={setType} />
@@ -135,69 +159,421 @@ export function AdjustmentModal({ currencies, onClose, onSave, supplierName, t }
   )
 }
 
-export function SupplierStatementModal({ columns, companyInfo, onClose, rows, subtitle, title, t }) {
+export function SupplierStatementModal({
+  columns,
+  companyInfo,
+  onClose,
+  rows,
+  subtitle,
+  title,
+  t,
+}) {
+  const safeCompanyName =
+    companyInfo?.name ||
+    companyInfo?.companyName ||
+    'RetailPro'
+
+  const safeTagline =
+    companyInfo?.tagline ||
+    companyInfo?.systemSubtitle ||
+    'Retail Management System'
+
+  const safeSubtitle =
+    subtitle && !subtitle.startsWith('undefined')
+      ? subtitle
+      : `${t.account ?? 'Account'}: ${title || '-'}`
+
+  const printDate = new Date().toLocaleDateString('en-GB')
+
   const openPrintable = () => {
-    const preview = document.querySelector('.supplier-statement-paper')?.outerHTML
+    const preview =
+      document.querySelector(
+        '.supplier-statement-paper'
+      )?.outerHTML
+
     if (!preview) return
-    const printWindow = window.open('', '_blank', 'width=900,height=1100')
+
+    const printWindow = window.open(
+      '',
+      '_blank',
+      'width=980,height=1100'
+    )
+
     if (!printWindow) return
+
     printWindow.document.write(`
       <!doctype html>
       <html>
         <head>
-          <title>${title}</title>
+          <meta charset="utf-8" />
+          <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1"
+          />
+
+          <title>${title || 'Supplier Statement'}</title>
+
           <style>
-            * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            body { margin: 0; background: #fff; font-family: Arial, sans-serif; color: #0f172a; }
-            .supplier-statement-paper { width: 794px; margin: 0 auto; padding: 28px; background: #fff; }
-            .statement-brand { display: flex; justify-content: space-between; gap: 20px; align-items: center; padding: 18px; background: #142247; color: #fff; border-radius: 8px; }
-            .statement-brand img { width: 82px; height: 54px; object-fit: cover; border-radius: 6px; }
-            .statement-brand-left { display: flex; gap: 14px; align-items: center; }
-            .statement-brand h3, .statement-brand p { margin: 0; }
-            .statement-title { border: 1px solid rgba(255,255,255,.35); border-radius: 6px; padding: 10px 16px; text-align: end; font-weight: 800; }
-            .statement-title small { display: block; margin-top: 8px; font-weight: 500; opacity: .85; }
-            .statement-account { display: flex; justify-content: space-between; gap: 16px; margin: 14px 0; padding: 14px; border: 1px solid #dbe3ef; border-radius: 8px; }
-            table { width: 100%; border-collapse: collapse; }
-            th { background: #142247; color: #fff; }
-            th, td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; text-align: start; font-size: 12px; }
-            .empty { padding: 28px; text-align: center; color: #64748b; }
-            @media print { .supplier-statement-paper { width: 100%; margin: 0; } }
+            @page {
+              size: A4 portrait;
+              margin: 12mm;
+            }
+
+            * {
+              box-sizing: border-box;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+
+            html,
+            body {
+              margin: 0;
+              padding: 0;
+              background: #ffffff;
+              color: #0f172a;
+              font-family: Arial, Helvetica, sans-serif;
+            }
+
+            body {
+              width: 100%;
+            }
+
+            .supplier-statement-paper {
+              width: 100%;
+              max-width: 186mm;
+              min-height: auto;
+              margin: 0 auto;
+              padding: 0;
+              border: 0;
+              border-radius: 0;
+              background: #ffffff;
+              box-shadow: none;
+              overflow: visible;
+            }
+
+            .statement-brand {
+              width: 100%;
+              display: grid;
+              grid-template-columns: minmax(0, 1fr) auto;
+              align-items: center;
+              gap: 18px;
+
+              padding: 15px 17px;
+
+              border-radius: 8px;
+
+              background: #142247;
+              color: #ffffff;
+            }
+
+            .statement-brand-left {
+              min-width: 0;
+
+              display: flex;
+              align-items: center;
+              gap: 12px;
+            }
+
+            .statement-brand-logo {
+              width: 58px;
+              min-width: 58px;
+              height: 44px;
+
+              display: grid;
+              place-items: center;
+
+              overflow: hidden;
+
+              border-radius: 6px;
+              background: #ffffff;
+            }
+
+            .statement-brand-logo img {
+              display: block;
+
+              width: 100% !important;
+              max-width: 52px !important;
+
+              height: 100% !important;
+              max-height: 38px !important;
+
+              margin: 0 !important;
+
+              object-fit: contain !important;
+              object-position: center !important;
+            }
+
+            .statement-brand h3 {
+              margin: 0;
+
+              font-size: 17px;
+              line-height: 1.2;
+            }
+
+            .statement-brand p {
+              margin: 4px 0 0;
+
+              color: rgba(255, 255, 255, 0.78);
+
+              font-size: 10px;
+            }
+
+            .statement-title {
+              min-width: 190px;
+
+              padding: 10px 13px;
+
+              border: 1px solid rgba(255, 255, 255, 0.28);
+              border-radius: 7px;
+
+              color: #ffffff;
+
+              font-size: 13px;
+              font-weight: 700;
+              line-height: 1.3;
+
+              text-align: end;
+            }
+
+            .statement-title small {
+              display: block;
+
+              margin-top: 5px;
+
+              color: rgba(255, 255, 255, 0.78);
+
+              font-size: 9px;
+              font-weight: 500;
+            }
+
+            .statement-account {
+              width: 100%;
+
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 14px;
+
+              margin: 12px 0;
+              padding: 11px 12px;
+
+              border: 1px solid #dbe3ef;
+              border-radius: 7px;
+
+              background: #f8fafc;
+
+              font-size: 10px;
+            }
+
+            .statement-account strong {
+              min-width: 0;
+
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+
+            table {
+              width: 100%;
+
+              border-collapse: collapse;
+              table-layout: auto;
+
+              font-size: 9px;
+            }
+
+            thead {
+              display: table-header-group;
+            }
+
+            tr {
+              break-inside: avoid;
+              page-break-inside: avoid;
+            }
+
+            th {
+              padding: 8px 7px;
+
+              border: 1px solid #142247;
+
+              background: #142247;
+              color: #ffffff;
+
+              font-size: 9px;
+              font-weight: 700;
+
+              text-align: start;
+            }
+
+            td {
+              padding: 8px 7px;
+
+              border: 1px solid #e2e8f0;
+
+              color: #0f172a;
+
+              font-size: 9px;
+
+              text-align: start;
+              vertical-align: top;
+
+              overflow-wrap: anywhere;
+            }
+
+            tbody tr:nth-child(even) {
+              background: #f8fafc;
+            }
+
+            .empty {
+              padding: 25px;
+
+              color: #64748b;
+
+              text-align: center;
+            }
+
+            @media print {
+              html,
+              body {
+                width: 210mm;
+              }
+
+              .supplier-statement-paper {
+                max-width: none;
+              }
+            }
           </style>
         </head>
-        <body>${preview}</body>
+
+        <body>
+          ${preview}
+
+          <script>
+            window.addEventListener('load', () => {
+              setTimeout(() => {
+                window.focus()
+                window.print()
+              }, 250)
+            })
+          </script>
+        </body>
       </html>
     `)
+
     printWindow.document.close()
-    printWindow.focus()
-    setTimeout(() => printWindow.print(), 250)
   }
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="supplier-statement-modal" onClick={(event) => event.stopPropagation()}>
-        <header>
-          <h2>{title}</h2>
+      <div
+        className="supplier-statement-modal"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <header className="supplier-statement-modal-header">
           <div>
-            <button type="button" onClick={openPrintable}><Download size={16} /> {t.download ?? 'Download'}</button>
-            <button className="primary-btn" type="button" onClick={openPrintable}><ReceiptText size={16} /> {t.print}</button>
+            <h2>{title || 'Supplier Statement'}</h2>
+
+            <p>
+              {t.printPreview ?? 'Print preview'}
+            </p>
           </div>
-          <button className="modal-close" type="button" onClick={onClose}>×</button>
+
+          <div className="statement-actions">
+            <button
+              className="primary-btn statement-print-btn"
+              type="button"
+              onClick={openPrintable}
+            >
+              <ReceiptText size={16} />
+
+              <span>
+                {t.printPdf ?? 'Print / Save PDF'}
+              </span>
+            </button>
+          </div>
+
+          <button
+            className="modal-close statement-modal-close"
+            type="button"
+            onClick={onClose}
+            aria-label={t.close ?? 'Close'}
+            title={t.close ?? 'Close'}
+          >
+            <X size={15} />
+          </button>
         </header>
+
         <section className="supplier-statement-paper">
           <div className="statement-brand">
             <div className="statement-brand-left">
-              {companyInfo.logo && <img src={companyInfo.logo} alt="" />}
-              <div><h3>{companyInfo.name}</h3><p>{companyInfo.tagline}</p></div>
+              {companyInfo?.logo && (
+                <div className="statement-brand-logo">
+                  <img
+                    src={companyInfo.logo}
+                    alt={safeCompanyName}
+                  />
+                </div>
+              )}
+
+              <div>
+                <h3>{safeCompanyName}</h3>
+                <p>{safeTagline}</p>
+              </div>
             </div>
-            <div className="statement-title">{title}<small>{new Date().toLocaleDateString()}</small></div>
+
+            <div className="statement-title">
+              {title || 'Supplier Statement'}
+
+              <small>{printDate}</small>
+            </div>
           </div>
-          <div className="statement-account"><strong>{subtitle}</strong><span>{rows.length} {t.totalRecords}</span></div>
-          <table>
-            <thead><tr><th>#</th>{columns.map((column) => <th key={column.key}>{column.label}</th>)}</tr></thead>
+
+          <div className="statement-account">
+            <strong>{safeSubtitle}</strong>
+
+            <span>
+              {rows.length}{' '}
+              {t.totalRecords ?? 'Total Records'}
+            </span>
+          </div>
+
+          <table className="statement-table">
+            <thead>
+              <tr>
+                <th>#</th>
+
+                {columns.map((column) => (
+                  <th key={column.key}>
+                    {column.label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+
             <tbody>
-              {rows.length === 0 ? <tr><td className="empty" colSpan={columns.length + 1}>{t.noRecordsFound ?? 'No records found'}</td></tr> : rows.map((row, index) => (
-                <tr key={row.id || index}><td>{index + 1}</td>{columns.map((column) => <td key={column.key}>{row[column.key]}</td>)}</tr>
-              ))}
+              {rows.length === 0 ? (
+                <tr>
+                  <td
+                    className="empty"
+                    colSpan={columns.length + 1}
+                  >
+                    {t.noRecordsFound ??
+                      'No records found'}
+                  </td>
+                </tr>
+              ) : (
+                rows.map((row, index) => (
+                  <tr key={row.id || index}>
+                    <td>{index + 1}</td>
+
+                    {columns.map((column) => (
+                      <td key={column.key}>
+                        {row[column.key] ?? '-'}
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </section>
@@ -228,7 +604,21 @@ function PurchaseModal({ categories, onClose, onSave, products, suppliers, t }) 
     ...categories.map((category) => ({ value: category, label: category })),
   ], [categories, t.category])
   const unitOptions = ['pcs', 'kg', 'box', 'pack', 'meter', 'liter'].map((unit) => ({ value: unit, label: unit }))
-  const currencyOptions = ['AFN', 'USD', 'EUR', 'PKR'].map((item) => ({ value: item, label: item }))
+  const currencyOptions = [
+  'AFN',
+  'USD',
+  'EUR',
+  'GBP',
+  'SAR',
+  'PKR',
+  'INR',
+  'IRR',
+  'AED',
+  'CNY',
+].map((item) => ({
+  value: item,
+  label: item,
+}))
   const total = rows.reduce((sum, row) => sum + parseNumber(row.quantity) * parseNumber(row.purchase), 0)
   const remaining = Math.max(0, total - parseNumber(paid))
 
@@ -294,17 +684,55 @@ function PurchaseModal({ categories, onClose, onSave, products, suppliers, t }) 
   return (
     <div className={`modal-backdrop ${closing ? 'closing' : ''}`} onClick={requestClose}>
       <form className="godown-purchase-modal" onClick={(event) => event.stopPropagation()} onSubmit={submit}>
-        <button className="modal-close" type="button" onClick={requestClose}>×</button>
+        <button
+  className="modal-close godown-purchase-close"
+  type="button"
+  onClick={requestClose}
+  aria-label={t.close ?? 'Close'}
+  title={t.close ?? 'Close'}
+>
+  <X size={15} />
+</button>
         <header className="godown-modal-head">
           <Plus size={18} />
           <h2>{t.multiProductPurchaseBill}</h2>
         </header>
 
         <section className="purchase-meta-grid">
-          <label><span>{t.supplier}</span><CustomSelect ariaLabel={t.supplier} options={supplierOptions} value={supplierId} onChange={setSupplierId} /></label>
-          <label><span>{t.date}</span><input type="date" value={date} onChange={(event) => setDate(event.target.value)} /></label>
-          <label><span>{t.currency}</span><CustomSelect ariaLabel={t.currency} options={currencyOptions} value={currency} onChange={setCurrency} /></label>
-        </section>
+  <label className="purchase-supplier-field">
+    <span>{t.supplier}</span>
+
+    <CustomSelect
+      ariaLabel={t.supplier}
+      className="purchase-meta-select"
+      options={supplierOptions}
+      value={supplierId}
+      onChange={setSupplierId}
+    />
+  </label>
+
+  <label className="purchase-date-field">
+    <span>{t.date}</span>
+
+    <input
+      type="date"
+      value={date}
+      onChange={(event) => setDate(event.target.value)}
+    />
+  </label>
+
+  <label className="purchase-currency-field">
+    <span>{t.currency}</span>
+
+    <CustomSelect
+      ariaLabel={t.currency}
+      className="purchase-meta-select"
+      options={currencyOptions}
+      value={currency}
+      onChange={setCurrency}
+    />
+  </label>
+</section>
 
         <section className="purchase-lines">
           <div className="purchase-line purchase-line-head">
@@ -329,7 +757,16 @@ function PurchaseModal({ categories, onClose, onSave, products, suppliers, t }) 
               <input type="number" min="0" placeholder="0.00" value={row.purchase} onChange={(event) => updateRow(row.id, { purchase: event.target.value })} />
               <input type="number" min="0" placeholder="0.00" value={row.selling} onChange={(event) => updateRow(row.id, { selling: event.target.value })} />
               <input type="date" value={row.date} onChange={(event) => updateRow(row.id, { date: event.target.value })} />
-              <button className="line-delete" type="button" onClick={() => removeRow(row.id)} aria-label={t.delete}><Trash2 size={15} /></button>
+              <button
+  className="line-delete purchase-row-delete"
+  type="button"
+  onClick={() => removeRow(row.id)}
+  aria-label={t.delete}
+  title={t.delete}
+  disabled={rows.length === 1}
+>
+  <Trash2 size={14} />
+</button>
               <CustomSelect ariaLabel={t.category} className="line-category" options={categoryOptions} value={row.category} onChange={(value) => updateRow(row.id, { category: value })} />
               <textarea className="line-notes" placeholder={t.descriptionOptional} value={row.notes} onChange={(event) => updateRow(row.id, { notes: event.target.value })} />
               <span className="line-alert-caption">{t.alertsOptional ?? 'Alerts (optional)'}</span>
@@ -351,34 +788,6 @@ function PurchaseModal({ categories, onClose, onSave, products, suppliers, t }) 
           <button type="button" onClick={requestClose}>{t.cancel}</button>
           <button className="primary-btn" type="submit">{t.savePurchase}</button>
         </footer>
-      </form>
-    </div>
-  )
-}
-
-function PaymentModal({ entry, onClose, onSave, t }) {
-  const maxAmount = Math.max(0, parseNumber(entry.remaining))
-  const [amount, setAmount] = useState(String(maxAmount || ''))
-  const [currency, setCurrency] = useState(entry.currency || 'AFN')
-  const [method, setMethod] = useState('cash')
-  const [reference, setReference] = useState('')
-  const parsedAmount = parseNumber(amount)
-  const invalid = parsedAmount <= 0 || parsedAmount > maxAmount
-  const currencyOptions = ['AFN', 'EUR', 'USD'].map((item) => ({ value: item, label: item }))
-  const methodOptions = ['cash', 'bankTransfer', 'onlinePayment'].map((item) => ({ value: item, label: t[item] ?? item }))
-
-  return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <form className="godown-small-modal" onClick={(event) => event.stopPropagation()} onSubmit={(event) => { event.preventDefault(); if (!invalid) onSave({ amount: parsedAmount, currency, method, reference }) }}>
-        <button className="modal-close" type="button" onClick={onClose}>×</button>
-        <h2>{t.makePaymentForBill ?? 'Make Payment'} {entry.billNumber}</h2>
-        <label className="wide"><span>{t.amount} * <small>({t.max}: {formatCurrencyMoney(maxAmount, entry.currency)})</small></span><input className={invalid ? 'field-invalid' : ''} type="number" min="0" max={maxAmount} value={amount} onChange={(event) => setAmount(event.target.value)} /></label>
-        <label><span>{t.currency}</span><CustomSelect ariaLabel={t.currency} options={currencyOptions} value={currency} onChange={setCurrency} /></label>
-        <label><span>{t.exchangeRate ?? 'Exchange Rate'}</span><input defaultValue="1" /></label>
-        <label className="wide"><span>{t.paymentMethod}</span><CustomSelect ariaLabel={t.paymentMethod} options={methodOptions} value={method} onChange={setMethod} /></label>
-        <label className="wide"><span>{t.referenceNo ?? 'Reference No'}</span><input placeholder={t.optionalReference ?? 'Optional reference'} value={reference} onChange={(event) => setReference(event.target.value)} /></label>
-        {invalid && <small className="danger-text">{t.paymentAmountInvalid ?? 'Payment amount is invalid.'}</small>}
-        <footer className="modal-actions"><button type="button" onClick={onClose}>{t.cancel}</button><button className="primary-btn" type="submit">{t.saveChanges}</button></footer>
       </form>
     </div>
   )
@@ -406,7 +815,15 @@ function EditEntryModal({ categories, entry, onClose, onSave, suppliers, t }) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <form className="godown-purchase-modal edit-godown-modal" onClick={(event) => event.stopPropagation()} onSubmit={(event) => { event.preventDefault(); onSave(form) }}>
-        <button className="modal-close" type="button" onClick={onClose}>×</button>
+        <button
+  className="modal-close adjustment-modal-close"
+  type="button"
+  onClick={onClose}
+  aria-label={t.close ?? 'Close'}
+  title={t.close ?? 'Close'}
+>
+  <X size={15} />
+</button>
         <header className="godown-modal-head"><Plus size={18} /><h2>{t.editPurchaseBill ?? 'Edit Purchase Bill'}</h2></header>
         <section className="purchase-meta-grid">
           <label><span>{t.supplier}</span><CustomSelect ariaLabel={t.supplier} options={supplierOptions} value={form.supplierId || ''} onChange={(value) => update('supplierId', value)} /></label>
@@ -450,7 +867,6 @@ function GodownPage({ categories, companyInfo, godownEntries, onGodownChange, on
   const [detailTab, setDetailTab] = useState('product')
   const [supplierPortal, setSupplierPortal] = useState(null)
   const [supplierTab, setSupplierTab] = useState('ledger')
-  const [paymentEntry, setPaymentEntry] = useState(null)
   const [editEntry, setEditEntry] = useState(null)
   const [deleteEntry, setDeleteEntry] = useState(null)
   const [hideSoldOut, setHideSoldOut] = useState(true)
@@ -654,32 +1070,6 @@ function GodownPage({ categories, companyInfo, godownEntries, onGodownChange, on
     }))
   }
 
-  const savePayment = (payment) => {
-    if (!paymentEntry) return
-    const paymentRecord = { ...payment, id: crypto.randomUUID(), date: todayInput(), createdAt: new Date().toISOString() }
-    onGodownChange((current) => current.map((item) => {
-      if (item.id !== paymentEntry.entryId) return item
-      const rows = item.rows || []
-      const total = parseNumber(item.total) || rows.reduce((sum, row) => sum + parseNumber(row.quantity) * parseNumber(row.purchase), 0)
-      const paid = Math.min(total, parseNumber(item.paid) + parseNumber(payment.amount))
-      return {
-        ...item,
-        paid,
-        remaining: Math.max(0, total - paid),
-        paymentHistory: [...(item.paymentHistory || []), paymentRecord],
-      }
-    }))
-    const updateOpenEntry = (entry) => {
-      if (!entry || entry.entryId !== paymentEntry.entryId) return entry
-      const paid = Math.min(parseNumber(entry.total), parseNumber(entry.paid) + parseNumber(payment.amount))
-      return { ...entry, paid, remaining: Math.max(0, parseNumber(entry.total) - paid), paymentHistory: [...(entry.paymentHistory || []), paymentRecord] }
-    }
-    setDetailEntry(updateOpenEntry)
-    setSupplierPortal(updateOpenEntry)
-    setPaymentEntry(null)
-    onNotify?.(t.paymentRecorded)
-  }
-
   const saveEditedEntry = (form) => {
     const previousQuantity = parseNumber(editEntry?.quantity)
     const nextQuantity = parseNumber(form.quantity)
@@ -766,7 +1156,6 @@ function GodownPage({ categories, companyInfo, godownEntries, onGodownChange, on
 
   const sharedModals = (
     <>
-      {paymentEntry && <PaymentModal entry={paymentEntry} onClose={() => setPaymentEntry(null)} onSave={savePayment} t={t} />}
       {editEntry && <EditEntryModal categories={categories} entry={editEntry} onClose={() => setEditEntry(null)} onSave={saveEditedEntry} suppliers={suppliers} t={t} />}
       {deleteEntry && <ConfirmDeleteModal entry={deleteEntry} onClose={() => setDeleteEntry(null)} onConfirm={deleteEntryRecord} t={t} />}
       {adjustmentOpen && supplierPortal && <AdjustmentModal currencies={currencyList} onClose={() => setAdjustmentOpen(false)} onSave={saveAdjustment} supplierName={getSupplierName(supplierPortal.supplierId)} t={t} />}
@@ -795,14 +1184,28 @@ function GodownPage({ categories, companyInfo, godownEntries, onGodownChange, on
       <section className="entity-content godown-detail-page">
         <div className="godown-detail-head">
           <div className="back-title-row">
-            <button className="back-btn" type="button" onClick={() => setDetailEntry(null)}>‹</button>
+            <button
+  className="back-btn godown-detail-back-btn"
+  type="button"
+  onClick={() => setDetailEntry(null)}
+  aria-label={t.back ?? 'Back'}
+  title={t.back ?? 'Back'}
+>
+  <ChevronLeft size={18} />
+</button>
             <div><h1>{getEntryTitle(detailEntry)}</h1><p>{getSupplierName(detailEntry.supplierId)} · {getGregorianLabel(detailEntry.date)}</p></div>
             <span className="status-pill active">{t.import}</span>
           </div>
-          <div className="entity-actions">
-            <button className="primary-btn" type="button" onClick={() => setPaymentEntry(detailEntry)}><CreditCard size={16} /> {t.makePayment ?? 'Make Payment'}</button>
-            <button type="button" onClick={() => setPrintOpen(true)}><ReceiptText size={16} /> {t.printStatement ?? t.printReport}</button>
-          </div>
+          <div className="entity-actions godown-detail-actions">
+  <button
+    className="godown-detail-print-btn"
+    type="button"
+    onClick={() => setPrintOpen(true)}
+  >
+    <ReceiptText size={16} />
+    <span>{t.printStatement ?? t.printReport}</span>
+  </button>
+</div>
         </div>
         <div className="godown-detail-summary">
           <article><span>{t.totalValue}</span><strong>{formatCurrencyMoney(detailEntry.total, detailEntry.currency)}</strong></article>
@@ -810,14 +1213,32 @@ function GodownPage({ categories, companyInfo, godownEntries, onGodownChange, on
           <article><span>{t.remaining}</span><strong className="danger-text">{formatCurrencyMoney(detailEntry.remaining, detailEntry.currency)}</strong></article>
           <article><span>{t.currency}</span><strong>{detailEntry.currency}</strong></article>
         </div>
-        <div className="godown-tabs">
-          <button className={detailTab === 'product' ? 'active' : ''} type="button" onClick={() => setDetailTab('product')}><Archive size={16} /> {t.product}</button>
-          <button className={detailTab === 'history' ? 'active' : ''} type="button" onClick={() => setDetailTab('history')}><CreditCard size={16} /> {t.paymentHistory}</button>
-        </div>
+        <div className="godown-tabs godown-detail-tabs">
+  <button
+    className={detailTab === 'product' ? 'active' : ''}
+    type="button"
+    onClick={() => setDetailTab('product')}
+  >
+    <Archive size={15} />
+    <span>{t.product || 'Product'}</span>
+  </button>
+
+  <button
+    className={detailTab === 'history' ? 'active' : ''}
+    type="button"
+    onClick={() => setDetailTab('history')}
+  >
+    <CreditCard size={15} />
+    <span>{t.paymentHistory || 'Payment History'}</span>
+  </button>
+</div>
         <div className="godown-detail-card">
           {detailTab === 'product' ? (
             <>
-              <h2>{t.lineItems ?? 'Line Items'}</h2>
+              <h2 className="godown-product-table-title">
+  <Archive size={17} />
+  <span>{t.product || 'Product'}</span>
+</h2>
               <table className="data-table godown-table"><thead><tr><th>{t.product}</th><th>{t.code}</th><th>{t.quantity}</th><th>{t.purchase}</th><th>{t.totalValue}</th></tr></thead><tbody><tr><td>{detailEntry.name}</td><td>{detailEntry.code || '-'}</td><td>{detailEntry.quantity} {detailEntry.unit}</td><td>{formatCurrencyMoney(detailEntry.purchase, detailEntry.currency)}</td><td><strong>{formatCurrencyMoney(detailEntry.rowTotal, detailEntry.currency)}</strong></td></tr></tbody></table>
             </>
           ) : (
@@ -880,10 +1301,15 @@ function GodownPage({ categories, companyInfo, godownEntries, onGodownChange, on
       onNotify?.(t.entryDeleted ?? t.delete)
     }
     const printPdfButton = (tab = supplierTab) => (
-      <button className="print-pdf-btn" type="button" onClick={() => openSupplierStatement(tab)}>
-        <ReceiptText size={16} /> {t.printPdf ?? 'PRINT & PDF'}
-      </button>
-    )
+  <button
+    className="print-pdf-btn supplier-print-pdf-btn"
+    type="button"
+    onClick={() => openSupplierStatement(tab)}
+  >
+    <ReceiptText size={15} />
+    <span>{t.printPdf ?? 'Print & PDF'}</span>
+  </button>
+)
     const openSupplierStatement = (tab = supplierTab) => {
       const configs = {
         activity: {
@@ -940,25 +1366,122 @@ function GodownPage({ categories, companyInfo, godownEntries, onGodownChange, on
     return (
       <section className="entity-content supplier-portal-page">
         <div className="supplier-portal-head">
-          <div className="back-title-row">
-            <button className="back-btn" type="button" onClick={() => setSupplierPortal(null)}>‹</button>
-            <div><h1>{t.supplierPortal ?? 'Supplier Portal'}: {supplierName}</h1><p>{supplierName} · {supplierPortal.currency || 'AFN'} · {t.accountCreated ?? 'Account Created'}: {getGregorianLabel(supplierPortal.date)}</p></div>
-          </div>
-          <button type="button" onClick={() => openSupplierStatement('ledger')}><ReceiptText size={16} /> {t.printStatement ?? t.printReport}</button>
-        </div>
+  <div className="back-title-row">
+    <button
+      className="back-btn supplier-portal-back-btn"
+      type="button"
+      onClick={() => setSupplierPortal(null)}
+      aria-label={t.back ?? 'Back'}
+      title={t.back ?? 'Back'}
+    >
+      <ChevronLeft size={18} />
+    </button>
+
+    <div className="supplier-portal-title">
+      <h1>
+        {t.supplierPortal ?? 'Supplier Portal'}: {supplierName}
+      </h1>
+
+      <p>
+        {supplierName} · {supplierPortal.currency || 'AFN'} ·{' '}
+        {t.accountCreated ?? 'Account Created'}:{' '}
+        {getGregorianLabel(supplierPortal.date)}
+      </p>
+    </div>
+  </div>
+
+  <button
+    className="supplier-portal-statement-btn"
+    type="button"
+    onClick={() => openSupplierStatement('ledger')}
+  >
+    <ReceiptText size={16} />
+    <span>{t.printStatement ?? 'Print Statement'}</span>
+  </button>
+</div>
         <div className="supplier-account-card">
           <div><h2>{t.account}: {supplierName} — {supplierPortal.currency || 'AFN'}</h2><p>{t.printDate ?? 'Print Date'}: {new Date().toLocaleDateString('en-GB')}</p></div>
           <div className="supplier-balance-box"><span>{t.currentBalance ?? 'Current Balance'}</span><strong className="danger-text">{formatCurrencyMoney(currentBalance, supplierPortal.currency)}</strong><small>{t.payable}</small></div>
           <div className="supplier-balance-box"><span>{t.previousBalance ?? 'Previous Balance'}</span><strong>{formatCurrencyMoney(0, supplierPortal.currency)}</strong></div>
         </div>
-        <div className="supplier-controls">
-          <button type="button" onClick={() => setAdjustmentOpen(true)}>↻ {t.addAdjustment ?? 'Add Adjustment'}</button>
-          <CustomSelect ariaLabel={t.allTime} options={dateOptions} value={supplierDateFilter} onChange={setSupplierDateFilter} />
-          {supplierDateFilter === 'custom' && <DateRangePicker className="supplier-date-range" end={supplierCustomEnd} onChange={({ start, end }) => { setSupplierCustomStart(start); setSupplierCustomEnd(end) }} start={supplierCustomStart} t={t} />}
-        </div>
-        <div className="godown-tabs supplier-tabs">
-          {['ledger', 'goods', 'profit', 'activity'].map((tab) => <button key={tab} className={supplierTab === tab ? 'active' : ''} type="button" onClick={() => setSupplierTab(tab)}>{t[tab === 'ledger' ? 'supplierLedger' : tab === 'activity' ? 'activityLog' : tab] ?? tab}</button>)}
-        </div>
+        <div
+  className={`supplier-portal-controls ${
+    supplierDateFilter === 'custom' ? 'has-custom-range' : ''
+  }`}
+>
+  <button
+    className="supplier-add-adjustment-btn"
+    type="button"
+    onClick={() => setAdjustmentOpen(true)}
+  >
+    <Plus size={15} />
+    <span>{t.addAdjustment ?? 'Add Adjustment'}</span>
+  </button>
+
+  <div className="supplier-filter-control">
+  <CalendarDays
+    className="supplier-filter-calendar-icon"
+    size={15}
+  />
+
+  <CustomSelect
+    ariaLabel={t.allTime}
+    className="supplier-time-select"
+    options={dateOptions}
+    value={supplierDateFilter}
+    onChange={setSupplierDateFilter}
+  />
+</div>
+
+  {supplierDateFilter === 'custom' && (
+    <DateRangePicker
+      className="supplier-date-range supplier-portal-date-range"
+      end={supplierCustomEnd}
+      onChange={({ start, end }) => {
+        setSupplierCustomStart(start)
+        setSupplierCustomEnd(end)
+      }}
+      start={supplierCustomStart}
+      t={t}
+    />
+  )}
+</div>
+        <div className="supplier-tabs-container">
+  <div
+    className="godown-tabs supplier-tabs"
+    role="tablist"
+    aria-label={t.supplierPortal ?? 'Supplier Portal'}
+  >
+    {['ledger', 'goods', 'profit', 'activity'].map((tab) => {
+      const label =
+        t[
+          tab === 'ledger'
+            ? 'supplierLedger'
+            : tab === 'activity'
+              ? 'activityLog'
+              : tab
+        ] ??
+        (tab === 'ledger'
+          ? 'Supplier Ledger'
+          : tab === 'activity'
+            ? 'Activity Log'
+            : tab)
+
+      return (
+        <button
+          key={tab}
+          className={supplierTab === tab ? 'active' : ''}
+          type="button"
+          role="tab"
+          aria-selected={supplierTab === tab}
+          onClick={() => setSupplierTab(tab)}
+        >
+          <span>{label}</span>
+        </button>
+      )
+    })}
+  </div>
+</div>
         <div className="supplier-section-card">
           {supplierTab === 'ledger' && <><div className="supplier-card-head"><h2>{t.supplierLedger ?? 'Supplier Ledger'}</h2><div>{printPdfButton('ledger')}</div></div><table className="data-table godown-table"><thead><tr><th>{t.no}</th><th>{t.date}</th><th>{t.description}</th><th>{t.deposit}</th><th>{t.withdraw}</th><th>{t.balance}</th><th>{t.currency}</th><th>{t.actions}</th></tr></thead><tbody>{ledgerRows.length === 0 ? <tr><td className="empty-cell" colSpan="8">{t.noLedgerEntries ?? 'No ledger entries'}</td></tr> : ledgerRows.map((row, index) => <tr key={row.id}><td>{index + 1}</td><td>{row.date}<small>{getShamsiShortLabel(row.rawDate)}</small></td><td>{row.description}</td><td>{row.deposit}</td><td className="danger-text">{row.withdraw}</td><td>{row.balance}</td><td>{row.currency}</td><td><FloatingActionMenu ariaLabel={t.actions} actions={[{ icon: <SquareMenu size={15} />, label: t.edit, onClick: () => row.kind === 'purchase' && row.source ? setEditEntry(row.source) : onNotify?.(t.edit ?? 'Edit') }, { danger: true, icon: <Trash2 size={15} />, label: t.delete, onClick: () => deleteLedgerRow(row) }]} /></td></tr>)}</tbody></table></>}
           {supplierTab === 'goods' && <><div className="supplier-card-head"><h2>{t.goods ?? 'Goods'} ({visibleSupplierEntries.length})</h2><div>{printPdfButton('goods')}</div></div><table className="data-table godown-table"><thead><tr><th>{t.name}</th><th>{t.code}</th><th>{t.totalImported}</th><th>{t.totalSold}</th><th>{t.remaining}</th><th>{t.purchasePrice}</th><th>{t.sellingPrice}</th><th>{t.profitPerUnit}</th></tr></thead><tbody>{visibleSupplierEntries.length === 0 ? <tr><td className="empty-cell" colSpan="8">{t.noRecordsFound ?? 'No records found'}</td></tr> : visibleSupplierEntries.map((entry) => <tr key={entry.id}><td>{entry.name}</td><td>{entry.code || '-'}</td><td>{entry.quantity} {entry.unit}</td><td>0 {entry.unit}</td><td>{entry.quantity} {entry.unit}</td><td>{formatCurrencyMoney(entry.purchase, entry.currency)}</td><td>{formatCurrencyMoney(entry.selling, entry.currency)}</td><td className="success-text">{formatCurrencyMoney(parseNumber(entry.selling) - parseNumber(entry.purchase), entry.currency)}</td></tr>)}</tbody></table></>}
@@ -994,13 +1517,42 @@ function GodownPage({ categories, companyInfo, godownEntries, onGodownChange, on
         <CustomSelect ariaLabel={t.products} options={productOptions} value={productFilter} onChange={setProductFilter} />
         <CustomSelect ariaLabel={t.suppliers} options={supplierOptions} value={supplierFilter} onChange={setSupplierFilter} />
         <CustomSelect ariaLabel={t.stockStatus} options={stockOptions} value={stockFilter} onChange={setStockFilter} />
-        <div className="date-filter-shell"><CalendarDays size={16} /><CustomSelect ariaLabel={t.allTime} options={dateOptions} value={dateFilter} onChange={setDateFilter} /></div>
+        <div className="date-filter-shell godown-date-filter">
+  <CalendarDays className="godown-date-filter-icon" size={16} />
+
+  <CustomSelect
+    ariaLabel={t.allTime}
+    className="godown-date-select"
+    options={dateOptions}
+    value={dateFilter}
+    onChange={setDateFilter}
+  />
+</div>
         {dateFilter === 'custom' && <DateRangePicker className="godown-date-range" end={customEndDate} onChange={({ start, end }) => { setCustomStartDate(start); setCustomEndDate(end) }} start={customStartDate} t={t} />}
         <button className={`toggle-filter-btn ${hideSoldOut ? 'active' : ''}`} type="button" onClick={() => setHideSoldOut((current) => !current)}>{t.hideSoldOut}: {hideSoldOut ? (t.on ?? 'ON') : (t.off ?? 'OFF')}</button>
-        <div className="segmented-view">
-          <button className={viewMode === 'product' ? 'active' : ''} type="button" onClick={() => setViewMode('product')}>{t.byProduct}</button>
-          <button className={viewMode === 'entry' ? 'active' : ''} type="button" onClick={() => setViewMode('entry')}>{t.byEntry}</button>
-        </div>
+        <div
+  className="segmented-view godown-view-switch"
+  role="group"
+  aria-label={t.viewMode ?? 'View mode'}
+>
+  <button
+    className={viewMode === 'product' ? 'active' : ''}
+    type="button"
+    onClick={() => setViewMode('product')}
+  >
+    <Archive size={14} />
+    <span>{t.byProduct}</span>
+  </button>
+
+  <button
+    className={viewMode === 'entry' ? 'active' : ''}
+    type="button"
+    onClick={() => setViewMode('entry')}
+  >
+    <ReceiptText size={14} />
+    <span>{t.byEntry}</span>
+  </button>
+</div>
         </div>
       </div>
 
@@ -1067,7 +1619,6 @@ function GodownPage({ categories, companyInfo, godownEntries, onGodownChange, on
                         ariaLabel={t.actions}
                         actions={[
                           { icon: <Eye size={15} />, label: t.view, onClick: () => { setDetailEntry(entry); setDetailTab('product') } },
-                          { icon: <CreditCard size={15} />, label: t.makePayment ?? 'Make Payment', onClick: () => setPaymentEntry(entry) },
                           { icon: <Eye size={15} />, label: t.supplierPortal ?? t.view, onClick: () => { setSupplierPortal(entry); setSupplierTab('ledger') } },
                           { icon: <SquareMenu size={15} />, label: t.edit, onClick: () => setEditEntry(entry) },
                           { icon: <CalendarDays size={15} />, label: t.moveToExpired ?? 'Move to expired', onClick: () => moveToExpired(entry) },

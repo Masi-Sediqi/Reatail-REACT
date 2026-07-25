@@ -825,3 +825,291 @@
     border-inline: 0;
   }
 }
+/* =====================================================
+   AGENT CHAT ACTION TRIGGER
+===================================================== */
+
+#root .retail-shell .agent-history-menu-trigger,
+#root .retail-shell .agent-history-menu-trigger:hover,
+#root .retail-shell .agent-history-menu-trigger:focus,
+#root .retail-shell .agent-history-menu-trigger:active {
+  width: 30px !important;
+  min-width: 30px !important;
+  max-width: 30px !important;
+
+  height: 30px !important;
+  min-height: 30px !important;
+  max-height: 30px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+
+  background: transparent !important;
+  background-image: none !important;
+  color: var(--agent-muted) !important;
+
+  font-size: 0 !important;
+  line-height: 1 !important;
+
+  cursor: pointer !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    color 150ms ease !important;
+}
+
+#root .retail-shell .agent-history-menu-trigger:hover,
+#root .retail-shell .agent-history-menu-trigger.active {
+  border-color: var(--agent-border) !important;
+  background: var(--agent-panel-soft) !important;
+  color: var(--agent-text) !important;
+}
+
+#root .retail-shell .agent-history-menu-trigger:focus-visible {
+  outline: none !important;
+
+  border-color: var(--agent-muted) !important;
+
+  box-shadow:
+    0 0 0 3px
+    color-mix(
+      in srgb,
+      var(--agent-muted) 14%,
+      transparent
+    ) !important;
+}
+
+#root .retail-shell .agent-history-menu-trigger svg {
+  position: static !important;
+
+  width: 16px !important;
+  min-width: 16px !important;
+  height: 16px !important;
+  min-height: 16px !important;
+
+  display: block !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: currentColor !important;
+  stroke: currentColor !important;
+
+  transform: none !important;
+
+  pointer-events: none !important;
+}
+/* =====================================================
+   AGENT CHAT ACTION MENU
+===================================================== */
+
+#root .retail-shell .agent-history-menu {
+  min-width: 136px !important;
+
+  display: grid !important;
+  gap: 3px !important;
+
+  padding: 5px !important;
+
+  border: 1px solid var(--agent-border) !important;
+  border-radius: 10px !important;
+
+  background: var(--agent-panel) !important;
+
+  box-shadow:
+    0 14px 36px rgba(15, 23, 42, 0.16) !important;
+}
+
+#root .retail-shell .agent-history-menu button {
+  width: 100% !important;
+  min-height: 34px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+
+  gap: 8px !important;
+
+  margin: 0 !important;
+  padding: 0 10px !important;
+
+  border: 0 !important;
+  border-radius: 7px !important;
+
+  background: transparent !important;
+  color: var(--agent-text) !important;
+
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+
+  text-align: start !important;
+
+  cursor: pointer !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root .retail-shell .agent-history-menu button:hover {
+  background: var(--agent-panel-soft) !important;
+}
+
+#root .retail-shell .agent-history-menu button svg {
+  position: static !important;
+
+  width: 15px !important;
+  min-width: 15px !important;
+  height: 15px !important;
+  min-height: 15px !important;
+
+  display: block !important;
+  flex: 0 0 15px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: currentColor !important;
+  stroke: currentColor !important;
+
+  pointer-events: none !important;
+}
+
+#root .retail-shell .agent-history-menu button span {
+  display: inline-flex !important;
+  align-items: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: inherit !important;
+  line-height: 1 !important;
+}
+
+#root .retail-shell .agent-history-menu button.danger {
+  color: #dc2626 !important;
+}
+
+#root .retail-shell .agent-history-menu button.danger:hover {
+  background: rgba(239, 68, 68, 0.08) !important;
+  color: #dc2626 !important;
+}
+/* =====================================================
+   AGENT SUGGESTION SEARCH — SINGLE CONTAINER
+===================================================== */
+
+#root .retail-shell .agent-side .agent-search {
+  position: relative !important;
+
+  width: 100% !important;
+  height: 40px !important;
+  min-height: 40px !important;
+
+  display: flex !important;
+  align-items: center !important;
+
+  gap: 8px !important;
+
+  margin: 0 !important;
+  padding: 0 12px !important;
+
+  border: 1px solid var(--agent-border) !important;
+  border-radius: 9px !important;
+
+  background: var(--agent-panel) !important;
+  background-image: none !important;
+
+  overflow: hidden !important;
+
+  box-shadow: none !important;
+
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    box-shadow 150ms ease !important;
+}
+
+#root .retail-shell .agent-side .agent-search:focus-within {
+  border-color: #94a3b8 !important;
+  background: var(--agent-panel) !important;
+
+  box-shadow:
+    0 0 0 3px rgba(148, 163, 184, 0.14) !important;
+}#root .retail-shell .agent-side .agent-search > svg {
+  position: static !important;
+
+  width: 15px !important;
+  min-width: 15px !important;
+  height: 15px !important;
+  min-height: 15px !important;
+
+  display: block !important;
+  flex: 0 0 15px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: var(--agent-muted) !important;
+  stroke: currentColor !important;
+
+  transform: none !important;
+
+  pointer-events: none !important;
+}
+#root .retail-shell .agent-side .agent-search > input,
+#root .retail-shell .agent-side .agent-search > input:hover,
+#root .retail-shell .agent-side .agent-search > input:focus,
+#root .retail-shell .agent-side .agent-search > input:active {
+  position: static !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+
+  flex: 1 1 auto !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 0 !important;
+  border-width: 0 !important;
+  border-radius: 0 !important;
+
+  outline: 0 !important;
+
+  background: transparent !important;
+  background-image: none !important;
+  color: var(--agent-text) !important;
+
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+
+  appearance: none !important;
+  -webkit-appearance: none !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root .retail-shell .agent-side
+.agent-search > input::placeholder {
+  color: var(--agent-muted) !important;
+  opacity: 0.8 !important;
+}

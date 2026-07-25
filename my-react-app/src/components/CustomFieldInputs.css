@@ -1,0 +1,49 @@
+.custom-field-inputs {
+  border-top: 1px dashed #dbe4f0;
+  display: grid;
+  gap: 12px;
+  padding-top: 14px;
+}
+
+.custom-field-inputs h3 {
+  color: #5b6a83;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.custom-field-input {
+  display: grid;
+  gap: 7px;
+}
+
+.custom-field-input span {
+  align-items: center;
+  color: #172033;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 700;
+  gap: 4px;
+}
+
+.custom-field-input em {
+  color: #ef4444;
+  font-style: normal;
+}
+
+.custom-field-input input,
+.custom-field-input .smooth-select-btn {
+  background: #fff;
+  border: 1px solid #dbe4f0;
+  border-radius: 8px;
+  color: #172033;
+  min-height: 38px;
+  padding: 0 12px;
+  width: 100%;
+}
+
+.custom-field-input .smooth-select {
+  width: 100%;
+}

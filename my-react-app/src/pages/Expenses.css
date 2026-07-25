@@ -394,3 +394,250 @@
 [dir="rtl"] .expenses-filter .filter-search input {
   padding: 0 !important;
 }
+/* =====================================================
+   EXPENSE HEADER ACTIONS
+===================================================== */
+
+.expenses-content .expense-header-actions {
+  width: auto !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+
+  gap: 8px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.expenses-content
+.expense-header-actions
+> button,
+.expenses-content
+.expense-header-actions
+> button:hover,
+.expenses-content
+.expense-header-actions
+> button:focus,
+.expenses-content
+.expense-header-actions
+> button:active {
+  width: auto !important;
+  min-width: 0 !important;
+
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: 7px !important;
+
+  margin: 0 !important;
+  padding: 0 14px !important;
+
+  border-radius: 9px !important;
+
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+
+  white-space: nowrap !important;
+  cursor: pointer !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* آیکن دقیقاً در وسط و پهلوی متن */
+.expenses-content
+.expense-header-actions
+> button
+> svg {
+  position: static !important;
+
+  width: 15px !important;
+  min-width: 15px !important;
+  height: 15px !important;
+  min-height: 15px !important;
+
+  display: block !important;
+  flex: 0 0 15px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: currentColor !important;
+  stroke: currentColor !important;
+
+  transform: none !important;
+
+  pointer-events: none !important;
+}
+
+.expenses-content
+.expense-header-actions
+> button
+> span {
+  display: inline-flex !important;
+  align-items: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: inherit !important;
+
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  line-height: 1 !important;
+}
+/* =====================================================
+   EXPENSE HEADER ACTIONS
+===================================================== */
+
+.expenses-content .expense-header-actions {
+  width: auto !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+
+  gap: 8px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.expenses-content
+.expense-header-actions
+> button,
+.expenses-content
+.expense-header-actions
+> button:hover,
+.expenses-content
+.expense-header-actions
+> button:focus,
+.expenses-content
+.expense-header-actions
+> button:active {
+  width: auto !important;
+  min-width: 0 !important;
+
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: 7px !important;
+
+  margin: 0 !important;
+  padding: 0 14px !important;
+
+  border-radius: 9px !important;
+
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+
+  white-space: nowrap !important;
+  cursor: pointer !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* آیکن دقیقاً در وسط و پهلوی متن */
+.expenses-content
+.expense-header-actions
+> button
+> svg {
+  position: static !important;
+
+  width: 15px !important;
+  min-width: 15px !important;
+  height: 15px !important;
+  min-height: 15px !important;
+
+  display: block !important;
+  flex: 0 0 15px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: currentColor !important;
+  stroke: currentColor !important;
+
+  transform: none !important;
+
+  pointer-events: none !important;
+}
+
+.expenses-content
+.expense-header-actions
+> button
+> span {
+  display: inline-flex !important;
+  align-items: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: inherit !important;
+
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  line-height: 1 !important;
+}
+/* Expense action menu icons */
+.expenses-content
+.floating-action-menu
+button {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+}
+
+.expenses-content
+.floating-action-menu
+button
+svg {
+  position: static;
+
+  width: 15px;
+  height: 15px;
+
+  display: block;
+  flex: 0 0 15px;
+
+  margin: 0;
+  padding: 0;
+
+  color: currentColor;
+  stroke: currentColor;
+
+  pointer-events: none;
+}
+@media (max-width: 640px) {
+  .expenses-content .expense-header-actions {
+    width: 100% !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .expenses-content
+  .expense-header-actions
+  > button {
+    width: 100% !important;
+    padding-inline: 10px !important;
+  }
+}

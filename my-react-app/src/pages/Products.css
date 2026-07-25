@@ -731,8 +731,7 @@ body:has(.modal-backdrop) {
 }
 
 .barcode-modal h2,
-.barcode-preview,
-.barcode-print-btn {
+.barcode-preview {
   grid-column: 1 / -1;
 }
 
@@ -835,4 +834,1836 @@ body:has(.modal-backdrop) {
   background: #475569 !important;
   border-color: #64748b !important;
   color: #ffffff !important;
+}
+
+#root#root#root .retail-shell .products-content .filter-card {
+  grid-template-columns: minmax(260px, 1fr) minmax(170px, 180px) minmax(170px, 180px) minmax(170px, 180px) minmax(220px, 228px);
+  align-items: center;
+}
+
+#root#root#root .retail-shell .products-content .products-date-filter,
+#root#root#root .retail-shell .products-content .products-custom-date-controls,
+#root#root#root .retail-shell .products-content .product-date-range-picker,
+#root#root#root .retail-shell .products-content .products-date-filter .smooth-select,
+#root#root#root .retail-shell .products-content .products-date-filter .smooth-select-btn,
+#root#root#root .retail-shell .products-content .product-date-range-btn {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+}
+
+#root#root#root .retail-shell .products-content .products-custom-date-controls {
+  display: grid;
+  grid-template-columns: minmax(170px, 180px) 32px;
+  gap: 8px;
+  align-items: center;
+}
+
+#root#root#root .retail-shell .products-content .product-date-range-btn {
+  padding-inline-end: 12px;
+}
+
+#root#root#root .retail-shell .products-content .products-filter-reset,
+#root#root#root .retail-shell .products-content .products-filter-reset:hover {
+  width: 32px;
+  min-width: 32px;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-bg);
+  color: hsl(222 47% 20%);
+  box-shadow: none;
+}
+
+.retail-shell.theme-dark .products-content .products-filter-reset,
+.retail-shell.theme-dark .products-content .products-filter-reset:hover {
+  color: #e5e7eb;
+}
+
+.product-images-field {
+  display: grid;
+  gap: 8px;
+}
+
+.product-image-upload-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.product-modal .product-image-upload {
+  width: 74px;
+  min-height: 74px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 5px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  background: var(--panel-bg);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.product-modal .product-image-upload input {
+  display: none;
+}
+
+.product-modal .product-image-upload span {
+  font-size: 10px;
+  font-weight: 750;
+  color: var(--muted);
+}
+
+.product-image-preview,
+.product-detail-image-list figure {
+  position: relative;
+  width: 74px;
+  height: 74px;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.product-image-preview img,
+.product-detail-image-list img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+/* =====================================================
+   PRODUCT IMAGE REMOVE BUTTON
+===================================================== */
+
+.product-modal .product-image-preview {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+.product-modal .product-image-preview .product-image-remove,
+.product-modal .product-image-preview .product-image-remove:hover,
+.product-modal .product-image-preview .product-image-remove:focus,
+.product-modal .product-image-preview .product-image-remove:active {
+  position: absolute !important;
+
+  top: -6px !important;
+  right: -6px !important;
+  inset-inline-end: -6px !important;
+
+  z-index: 20 !important;
+
+  width: 22px !important;
+  min-width: 22px !important;
+  max-width: 22px !important;
+
+  height: 22px !important;
+  min-height: 22px !important;
+  max-height: 22px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 2px solid #ffffff !important;
+  border-radius: 50% !important;
+
+  background: #ef4444 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+
+  font-size: 0 !important;
+  line-height: 1 !important;
+
+  cursor: pointer !important;
+
+  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.22) !important;
+
+  opacity: 1 !important;
+  visibility: visible !important;
+
+  transform: none !important;
+  transition:
+    background 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms ease !important;
+}
+
+.product-modal .product-image-preview .product-image-remove:hover {
+  border-color: #ffffff !important;
+  background: #dc2626 !important;
+
+  box-shadow: 0 4px 10px rgba(220, 38, 38, 0.3) !important;
+  transform: scale(1.06) !important;
+}
+
+.product-modal .product-image-preview .product-image-remove:active {
+  background: #b91c1c !important;
+  transform: scale(0.94) !important;
+}
+
+.product-modal .product-image-preview .product-image-remove:focus-visible {
+  outline: 2px solid rgba(239, 68, 68, 0.35) !important;
+  outline-offset: 2px !important;
+}
+
+/* اندازه آیکن X داخل دکمه */
+.product-modal .product-image-preview .product-image-remove svg {
+  width: 12px !important;
+  height: 12px !important;
+
+  display: block !important;
+
+  color: #ffffff !important;
+  stroke: currentColor !important;
+  stroke-width: 2.8 !important;
+
+  pointer-events: none !important;
+}
+
+.product-image-preview figcaption,
+.product-detail-image-list figcaption {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  left: 4px;
+  display: grid;
+  place-items: center;
+  min-height: 17px;
+  border-radius: 5px;
+  background: rgba(15, 23, 42, 0.88);
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.product-detail-images {
+  align-content: start;
+}
+
+.product-detail-image-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.product-modal .custom-category-actions button,
+.product-modal .custom-category-actions button:hover {
+  min-width: 72px;
+  height: 42px;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  background: var(--panel-bg) !important;
+  color: hsl(222 47% 20%) !important;
+  box-shadow: none !important;
+}
+
+.retail-shell.theme-dark .product-modal .custom-category-actions button,
+.retail-shell.theme-dark .product-modal .custom-category-actions button:hover {
+  color: #e5e7eb !important;
+}
+
+.product-modal .inventory-line {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.product-modal .inventory-line label,
+.product-modal .inventory-line .col-4 {
+  grid-column: auto;
+  width: 100%;
+  min-width: 0;
+}
+
+.product-modal .inventory-line .smooth-select,
+.product-modal .inventory-line .smooth-select-btn,
+.product-modal .inventory-line input {
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+}
+
+@media (max-width: 980px) {
+  #root#root#root .retail-shell .products-content .filter-card {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  #root#root#root .retail-shell .products-content .products-search-field {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 560px) {
+  #root#root#root .retail-shell .products-content .filter-card,
+  #root#root#root .retail-shell .products-content .products-custom-date-controls,
+  .product-modal .inventory-line {
+    grid-template-columns: 1fr;
+  }
+}
+/* =====================================================
+   PRODUCT → ADD SUPPLIER MODAL
+===================================================== */
+
+.product-supplier-modal-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 30000;
+  pointer-events: none;
+}
+
+/*
+  خود SupplierModal دارای backdrop است.
+  آن را روی فورم Product قرار می‌دهیم.
+*/
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.modal-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 30001 !important;
+
+  width: 100vw !important;
+  height: 100dvh !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  padding: 18px !important;
+
+  background: rgba(15, 23, 42, 0.62) !important;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+
+  overflow-y: auto !important;
+  pointer-events: auto;
+}
+
+/* فورم تأمین‌کننده */
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal {
+  position: relative !important;
+
+  width: min(520px, calc(100vw - 32px)) !important;
+  max-width: 520px !important;
+  max-height: none !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+
+  column-gap: 12px !important;
+  row-gap: 10px !important;
+
+  margin: 0 !important;
+  padding: 20px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.26) !important;
+
+  /*
+    مهم:
+    منوی Currency به دلیل overflow-y:auto بریده می‌شد.
+  */
+  overflow: visible !important;
+}
+
+/* عنوان */
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.entity-modal h2 {
+  grid-column: 1 / -1 !important;
+
+  margin: 0 0 4px !important;
+  padding-inline-end: 38px !important;
+
+  color: var(--text) !important;
+  font-size: 19px !important;
+  font-weight: 850 !important;
+}
+
+/* فیلدها */
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.entity-modal label {
+  min-width: 0 !important;
+
+  display: grid !important;
+  gap: 7px !important;
+
+  margin: 0 !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.entity-modal label.wide,
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.entity-modal .wide {
+  grid-column: 1 / -1 !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.entity-modal label > span {
+  color: var(--text) !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.entity-modal
+:is(input, textarea, select) {
+  width: 100% !important;
+  min-width: 0 !important;
+
+  min-height: 40px !important;
+
+  padding: 0 11px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+
+  font-family: inherit !important;
+  font-size: 13px !important;
+
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.entity-modal textarea {
+  min-height: 82px !important;
+  padding: 10px 11px !important;
+  resize: vertical !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.entity-modal
+:is(input, textarea, select):focus {
+  border-color: #94a3b8 !important;
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.14) !important;
+}
+
+/* دکمه Close */
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.entity-modal
+.modal-close {
+  position: absolute !important;
+  top: 14px !important;
+  inset-inline-end: 14px !important;
+
+  width: 30px !important;
+  min-width: 30px !important;
+  max-width: 30px !important;
+
+  height: 30px !important;
+  min-height: 30px !important;
+  max-height: 30px !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+
+  background: transparent !important;
+  background-image: none !important;
+  color: var(--muted) !important;
+
+  font-size: 18px !important;
+  line-height: 1 !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.entity-modal
+.modal-close:hover {
+  border-color: var(--border) !important;
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* دکمه ثبت */
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.entity-modal
+.primary-btn {
+  grid-column: 1 / -1 !important;
+
+  width: 100% !important;
+  min-height: 42px !important;
+  height: 42px !important;
+
+  margin-top: 4px !important;
+
+  border: 1px solid var(--accent) !important;
+  border-radius: 8px !important;
+
+  background: var(--accent) !important;
+  color: var(--accent-contrast) !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* جلوگیری از افکت عمومی button */
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.entity-modal
+button::before,
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.entity-modal
+button::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* موبایل */
+
+@media (max-width: 560px) {
+  #root#root#root
+  .retail-shell
+  .product-supplier-modal-layer
+  .modal-backdrop {
+    padding: 10px !important;
+  }
+
+  #root#root#root
+  .retail-shell
+  .product-supplier-modal-layer
+  .entity-modal {
+    width: calc(100vw - 20px) !important;
+    max-height: calc(100dvh - 20px) !important;
+
+    grid-template-columns: 1fr !important;
+
+    padding: 20px 16px !important;
+  }
+
+  #root#root#root
+  .retail-shell
+  .product-supplier-modal-layer
+  .entity-modal label,
+  #root#root#root
+  .retail-shell
+  .product-supplier-modal-layer
+  .entity-modal label.wide,
+  #root#root#root
+  .retail-shell
+  .product-supplier-modal-layer
+  .entity-modal .wide {
+    grid-column: 1 !important;
+  }
+}
+/* =====================================================
+   COMPACT CREATE SUPPLIER ACCOUNT MODAL
+   Keeps the nested supplier form light, fast and inside the viewport.
+===================================================== */
+
+#root#root#root .retail-shell .product-supplier-modal-layer .modal-backdrop {
+  padding: 10px !important;
+  place-items: center !important;
+  overflow: hidden !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(15, 23, 42, 0.52) !important;
+}
+
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal {
+  position: relative !important;
+
+  width: min(520px, calc(100vw - 24px)) !important;
+  max-width: 520px !important;
+  max-height: calc(100dvh - 20px) !important;
+
+  padding: 18px 20px !important;
+  column-gap: 12px !important;
+  row-gap: 10px !important;
+
+  border-radius: 12px !important;
+
+  /*
+    overflow: hidden یا overflow-y: auto باعث می‌شد
+    منوی CustomSelect بریده شود.
+  */
+  overflow: visible !important;
+
+  scrollbar-width: thin;
+  box-shadow: 0 18px 52px rgba(15, 23, 42, 0.24) !important;
+}
+
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal::-webkit-scrollbar {
+  width: 5px;
+}
+
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #cbd5e1;
+}
+
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal h2 {
+  margin: 0 0 1px !important;
+  padding-inline-end: 32px !important;
+  font-size: 17px !important;
+  line-height: 1.3 !important;
+  font-weight: 800 !important;
+}
+
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal label {
+  gap: 4px !important;
+}
+
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal label > span,
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal .label-row {
+  font-size: 11px !important;
+  line-height: 1.25 !important;
+  font-weight: 750 !important;
+}
+
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal small {
+  font-size: 9px !important;
+  line-height: 1.35 !important;
+}
+
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal :is(input, textarea, select) {
+  min-height: 34px !important;
+  height: 34px !important;
+  padding: 0 10px !important;
+  border-radius: 7px !important;
+  font-size: 12px !important;
+}
+
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal textarea {
+  min-height: 56px !important;
+  height: 56px !important;
+  padding: 8px 10px !important;
+  resize: none !important;
+}
+
+/* Account type tabs and other grouped controls */
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal :is(.account-type-options, .account-type-tabs, .supplier-account-types, .segmented-control) {
+  gap: 7px !important;
+}
+
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal :is(.account-type-options, .account-type-tabs, .supplier-account-types, .segmented-control) button {
+  min-height: 34px !important;
+  height: 34px !important;
+  padding: 0 12px !important;
+  border-radius: 7px !important;
+  font-size: 12px !important;
+  box-shadow: none !important;
+}
+
+/* Compact inline rows such as Items They Supply */
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal .inline-field,
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal .supplier-item-row,
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal .items-input-row {
+  gap: 7px !important;
+}
+
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal .inline-field > button,
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal .supplier-item-row > button,
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal .items-input-row > button {
+  min-width: 52px !important;
+  min-height: 34px !important;
+  height: 34px !important;
+  padding: 0 11px !important;
+  border-radius: 7px !important;
+  box-shadow: none !important;
+}
+
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal .modal-close {
+  top: 10px !important;
+  inset-inline-end: 11px !important;
+  width: 26px !important;
+  min-width: 26px !important;
+  max-width: 26px !important;
+  height: 26px !important;
+  min-height: 26px !important;
+  max-height: 26px !important;
+  border-radius: 7px !important;
+  font-size: 16px !important;
+}
+
+/* Footer buttons */
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal .modal-actions,
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal .form-actions,
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal .entity-modal-actions {
+  gap: 8px !important;
+  margin-top: 2px !important;
+}
+
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal .primary-btn {
+  min-height: 36px !important;
+  height: 36px !important;
+  margin-top: 2px !important;
+  border-color: #2563eb !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  font-size: 12px !important;
+  font-weight: 750 !important;
+  box-shadow: none !important;
+}
+
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal .primary-btn:hover {
+  border-color: #1d4ed8 !important;
+  background: #1d4ed8 !important;
+  box-shadow: none !important;
+}
+
+/* Prevent expensive global hover effects inside this nested modal */
+#root#root#root .retail-shell .product-supplier-modal-layer .entity-modal button:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 560px) {
+  #root#root#root .retail-shell .product-supplier-modal-layer .entity-modal {
+    width: calc(100vw - 16px) !important;
+    max-height: calc(100dvh - 16px) !important;
+    padding: 15px 13px !important;
+    row-gap: 8px !important;
+  }
+}/* =====================================================
+   FIX SUPPLIER MODAL CUSTOM SELECT
+===================================================== */
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.entity-modal
+.smooth-select {
+  position: relative !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  z-index: 30 !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.entity-modal
+.smooth-select:has(.smooth-select-menu) {
+  z-index: 50000 !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.entity-modal
+.smooth-select-btn {
+  width: 100% !important;
+  min-height: 38px !important;
+  height: 38px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+
+  padding: 0 12px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+  cursor: pointer !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.entity-modal
+.smooth-select-menu {
+  position: absolute !important;
+  top: calc(100% + 5px) !important;
+  right: 0 !important;
+  left: 0 !important;
+
+  z-index: 50001 !important;
+
+  max-height: 190px !important;
+  overflow-y: auto !important;
+
+  padding: 5px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 9px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  box-shadow: 0 14px 36px rgba(15, 23, 42, 0.18) !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.entity-modal
+.smooth-select-option {
+  width: 100% !important;
+  min-height: 34px !important;
+
+  display: flex !important;
+  align-items: center !important;
+
+  padding: 0 10px !important;
+
+  border: 0 !important;
+  border-radius: 7px !important;
+
+  background: transparent !important;
+  color: var(--text) !important;
+
+  text-align: left !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.entity-modal
+.smooth-select-option:hover,
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.entity-modal
+.smooth-select-option.active,
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.entity-modal
+.smooth-select-option.selected {
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}/* =====================================================
+   PRODUCT PAGE → SUPPLIER MODAL DROPDOWN FIX
+===================================================== */
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal {
+  position: relative !important;
+
+  /*
+    برای اینکه منوی Currency بیرون از محدوده فیلد
+    قابل نمایش باشد.
+  */
+  overflow: visible !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.smooth-select {
+  position: relative !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.smooth-select:focus-within {
+  z-index: 50010 !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.smooth-select-menu {
+  position: absolute !important;
+  top: calc(100% + 5px) !important;
+  right: 0 !important;
+  left: 0 !important;
+
+  z-index: 50020 !important;
+
+  max-height: 180px !important;
+  overflow-y: auto !important;
+
+  padding: 5px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.18) !important;
+}/* =====================================================
+   PRODUCT PAGE → SUPPLIER ITEMS THEY SUPPLY
+===================================================== */
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-items-field {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+
+  display: grid !important;
+  gap: 7px !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-field-label {
+  color: var(--text) !important;
+  font-size: 12px !important;
+  font-weight: 750 !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-items-input-row {
+  width: 100% !important;
+  min-width: 0 !important;
+
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 56px !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-items-input-row input {
+  width: 100% !important;
+  min-width: 0 !important;
+
+  height: 38px !important;
+  min-height: 38px !important;
+
+  padding: 0 12px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  font-family: inherit !important;
+  font-size: 12px !important;
+
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-items-input-row input:focus {
+  border-color: #94a3b8 !important;
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.15) !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-item-add-btn,
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-item-add-btn:hover {
+  width: 56px !important;
+  min-width: 56px !important;
+
+  height: 38px !important;
+  min-height: 38px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 0 !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+
+  cursor: pointer !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-item-add-btn:hover {
+  background: var(--panel-soft) !important;
+  border-color: #94a3b8 !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-items-list {
+  width: 100% !important;
+
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 7px !important;
+
+  margin-top: 1px !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-item-chip {
+  min-height: 30px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+
+  padding: 3px 4px 3px 10px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-item-chip > span {
+  max-width: 180px !important;
+
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+
+  color: var(--text) !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-item-remove-btn,
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-item-remove-btn:hover {
+  width: 22px !important;
+  min-width: 22px !important;
+  max-width: 22px !important;
+
+  height: 22px !important;
+  min-height: 22px !important;
+  max-height: 22px !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 1px solid rgba(239, 68, 68, 0.28) !important;
+  border-radius: 6px !important;
+
+  background: rgba(239, 68, 68, 0.1) !important;
+  color: #dc2626 !important;
+
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+
+  cursor: pointer !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-item-remove-btn:hover {
+  border-color: #ef4444 !important;
+  background: #ef4444 !important;
+  color: #ffffff !important;
+}/* =====================================================
+   PRODUCT PAGE → CREATE SUPPLIER MODAL FINAL FIX
+===================================================== */
+
+/* مودال بالایی مسئول اسکرول صفحه باشد */
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.modal-backdrop {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+/* خود فورم نباید dropdown را قطع کند */
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal {
+  overflow: visible !important;
+}
+
+/* =====================================================
+   ACCOUNT TYPE BUTTONS
+===================================================== */
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.supplier-account-type-field {
+  gap: 6px !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.supplier-type-tabs {
+  width: 100% !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+
+  gap: 8px !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.supplier-type-tabs button,
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.supplier-type-tabs button:hover {
+  width: 100% !important;
+
+  min-height: 34px !important;
+  height: 34px !important;
+
+  padding: 0 10px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 750 !important;
+
+  cursor: pointer !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* حالت انتخاب‌شده */
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.supplier-type-tabs button.active,
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.supplier-type-tabs button.active:hover {
+  border-color: #cbd5e1 !important;
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.12) !important;
+}
+
+/* Dark mode */
+.retail-shell.theme-dark
+.product-supplier-modal-layer
+.supplier-modal
+.supplier-type-tabs button.active {
+  border-color: #475569 !important;
+  background: #334155 !important;
+  color: #f8fafc !important;
+}
+
+/* توضیح زیر Account Type */
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.supplier-account-type-field small {
+  margin-top: 0 !important;
+  font-size: 9px !important;
+  line-height: 1.35 !important;
+}
+
+/* =====================================================
+   CURRENCY CUSTOM SELECT FIX
+===================================================== */
+
+/* خود label ارز بالاتر از فیلدهای بعدی باشد */
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+label:has(.smooth-select) {
+  position: relative !important;
+  z-index: 100 !important;
+  overflow: visible !important;
+}
+
+/* ریشه CustomSelect */
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.smooth-select {
+  position: relative !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  overflow: visible !important;
+  z-index: 50000 !important;
+}
+
+/* دکمه Currency */
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.smooth-select-btn {
+  position: relative !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  height: 38px !important;
+  min-height: 38px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+
+  padding: 0 12px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  font-family: inherit !important;
+  font-size: 12px !important;
+
+  cursor: pointer !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* منوی Currency */
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.smooth-select-menu {
+  position: absolute !important;
+
+  top: calc(100% + 5px) !important;
+  right: 0 !important;
+  left: 0 !important;
+
+  z-index: 999999 !important;
+
+  width: 100% !important;
+  min-width: 100% !important;
+
+  max-height: 190px !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  display: grid !important;
+  gap: 3px !important;
+
+  padding: 5px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 9px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  box-shadow: 0 16px 38px rgba(15, 23, 42, 0.22) !important;
+}
+
+/* گزینه‌های ارز */
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.smooth-select-option,
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.smooth-select-option:hover {
+  width: 100% !important;
+
+  min-height: 34px !important;
+  height: auto !important;
+
+  display: flex !important;
+  align-items: center !important;
+
+  padding: 7px 10px !important;
+
+  border: 0 !important;
+  border-radius: 7px !important;
+
+  background: transparent !important;
+  color: var(--text) !important;
+
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 650 !important;
+
+  text-align: left !important;
+  cursor: pointer !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.smooth-select-option:hover {
+  background: var(--panel-soft) !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.smooth-select-option.active,
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.smooth-select-option.selected {
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+}
+
+/* =====================================================
+   FOOTER AND CANCEL BUTTON
+===================================================== */
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.modal-actions {
+  grid-column: 1 / -1 !important;
+
+  width: 100% !important;
+
+  display: grid !important;
+  grid-template-columns: 88px minmax(0, 1fr) !important;
+
+  align-items: center !important;
+  gap: 8px !important;
+
+  margin-top: 3px !important;
+}
+
+/* Cancel */
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.modal-actions
+button:first-child,
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.modal-actions
+button:first-child:hover {
+  width: 88px !important;
+  min-width: 88px !important;
+
+  height: 38px !important;
+  min-height: 38px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 0 14px !important;
+
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+
+  background: #ffffff !important;
+  color: #334155 !important;
+
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 750 !important;
+
+  cursor: pointer !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.modal-actions
+button:first-child:hover {
+  border-color: #94a3b8 !important;
+  background: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/* Create Supplier Account */
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.modal-actions
+.primary-btn,
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.modal-actions
+.primary-btn:hover {
+  width: 100% !important;
+  min-width: 0 !important;
+
+  height: 38px !important;
+  min-height: 38px !important;
+
+  margin: 0 !important;
+  padding: 0 16px !important;
+
+  border: 1px solid #2563eb !important;
+  border-radius: 8px !important;
+
+  background: #2563eb !important;
+  color: #ffffff !important;
+
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 750 !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.modal-actions
+.primary-btn:hover {
+  border-color: #1d4ed8 !important;
+  background: #1d4ed8 !important;
+}
+
+/* Dark mode Cancel */
+.retail-shell.theme-dark
+.product-supplier-modal-layer
+.supplier-modal
+.modal-actions
+button:first-child {
+  border-color: #475569 !important;
+  background: #1e293b !important;
+  color: #e2e8f0 !important;
+}
+
+.retail-shell.theme-dark
+.product-supplier-modal-layer
+.supplier-modal
+.modal-actions
+button:first-child:hover {
+  border-color: #64748b !important;
+  background: #334155 !important;
+  color: #ffffff !important;
+}
+/* Supplier modal footer buttons in one row */
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.modal-actions {
+  grid-column: 1 / -1 !important;
+
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+
+  gap: 8px !important;
+  margin-top: 4px !important;
+}
+
+/* Cancel button */
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.modal-actions
+button:not(.primary-btn) {
+  flex: 0 0 88px !important;
+
+  width: 88px !important;
+  min-width: 88px !important;
+  height: 38px !important;
+
+  margin: 0 !important;
+}
+
+/* Save/Create button */
+#root#root#root
+.retail-shell
+.product-supplier-modal-layer
+.supplier-modal
+.modal-actions
+.primary-btn {
+  flex: 1 1 auto !important;
+
+  width: auto !important;
+  min-width: 0 !important;
+  height: 38px !important;
+
+  margin: 0 !important;
+}/* جلوگیری از تأثیر استایل عمومی button روی دکمه حذف عکس */
+#root#root#root
+.retail-shell
+.product-modal
+.product-image-preview
+.product-image-remove,
+#root#root#root
+.retail-shell
+.product-modal
+.product-image-preview
+.product-image-remove:hover {
+  width: 22px !important;
+  min-width: 22px !important;
+  max-width: 22px !important;
+
+  height: 22px !important;
+  min-height: 22px !important;
+  max-height: 22px !important;
+
+  padding: 0 !important;
+
+  border: 2px solid #ffffff !important;
+  border-radius: 999px !important;
+
+  background: #ef4444 !important;
+  color: #ffffff !important;
+}
+
+#root#root#root
+.retail-shell
+.product-modal
+.product-image-preview
+.product-image-remove:hover {
+  background: #dc2626 !important;
+}/* =====================================================
+   BARCODE MODAL ACTION BUTTONS
+===================================================== */
+
+.barcode-modal {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+/* Print Barcode */
+.barcode-modal .barcode-print-btn {
+  grid-column: auto !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  height: 40px !important;
+  min-height: 40px !important;
+
+  margin: 0 !important;
+}
+
+/* Copy button */
+.barcode-modal > button:last-child {
+  grid-column: auto !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  height: 40px !important;
+  min-height: 40px !important;
+
+  margin: 0 !important;
+}/* =====================================================
+   PRODUCTS HEADER ACTION BUTTONS
+===================================================== */
+
+.products-content .products-header-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+
+  gap: 8px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* هر دو دکمه */
+.products-content .products-header-actions > button {
+  min-height: 40px !important;
+  height: 40px !important;
+
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: 7px !important;
+
+  margin: 0 !important;
+  padding: 0 14px !important;
+
+  border-radius: 8px !important;
+
+  font-family: inherit !important;
+  font-size: 13px !important;
+  font-weight: 750 !important;
+  line-height: 1 !important;
+
+  white-space: nowrap !important;
+  cursor: pointer !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* متن داخل دکمه */
+.products-content .products-header-actions > button > span {
+  display: inline-flex !important;
+  align-items: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  line-height: 1 !important;
+}
+
+/* آیکن داخل دکمه */
+.products-content .products-header-actions > button > svg {
+  width: 16px !important;
+  height: 16px !important;
+
+  display: block !important;
+  flex: 0 0 16px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  position: static !important;
+  transform: none !important;
+
+  stroke: currentColor !important;
+  pointer-events: none !important;
+}
+
+/* Print */
+.products-content .products-print-btn,
+.products-content .products-print-btn:hover {
+  min-width: 112px !important;
+
+  border: 1px solid var(--border) !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+}
+
+.products-content .products-print-btn:hover {
+  border-color: #94a3b8 !important;
+  background: var(--panel-soft) !important;
+
+  box-shadow: none !important;
+}
+
+/* Add Product */
+.products-content .products-add-btn,
+.products-content .products-add-btn:hover {
+  min-width: 132px !important;
+
+  border: 1px solid #2563eb !important;
+
+  background: #2563eb !important;
+  color: #ffffff !important;
+}
+
+.products-content .products-add-btn:hover {
+  border-color: #1d4ed8 !important;
+  background: #1d4ed8 !important;
+
+  box-shadow: none !important;
+}
+
+/* =====================================================
+   PRODUCT MODAL CUSTOM FIELDS
+===================================================== */
+
+.product-custom-fields-block {
+  display: grid !important;
+  gap: 10px !important;
+  margin-top: 4px !important;
+  padding-top: 14px !important;
+  border-top: 1px dashed var(--border) !important;
+}
+
+.product-custom-fields-block h3 {
+  margin: 0 !important;
+  color: var(--muted) !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0 !important;
+  text-transform: uppercase;
+}
+
+.product-custom-fields-block .product-custom-field {
+  display: grid !important;
+  grid-column: 1 / -1 !important;
+  gap: 7px !important;
+}
+
+.product-custom-fields-block .product-custom-field > span {
+  color: var(--text) !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+}
+
+.product-custom-fields-block .product-custom-field .required-star {
+  margin-inline-start: 4px;
+}
+
+.product-custom-fields-block input,
+.product-custom-fields-block .smooth-select-btn {
+  width: 100% !important;
+  min-height: 38px !important;
+  height: 38px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+  padding: 0 12px !important;
+  box-shadow: none !important;
+}
+
+.product-detail-custom-fields {
+  display: grid !important;
+  gap: 8px !important;
+}
+
+.product-detail-custom-fields > div {
+  display: grid;
+  gap: 6px;
+}
+
+.product-detail-custom-fields span {
+  color: var(--text);
+  font-size: 13px;
+}
+
+.product-detail-custom-fields b {
+  font-weight: 900;
 }

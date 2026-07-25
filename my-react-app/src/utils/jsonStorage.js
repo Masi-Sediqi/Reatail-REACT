@@ -27,6 +27,7 @@ export const legacyStorageKeys = [
   'retail-staff-members',
   'retail-sales-bills',
   'retail-godown-entries',
+  'retail-bundles',
   'retail-cash-wallet',
   'retail-cash-wallet-entries',
   'retail-recycle-bin',

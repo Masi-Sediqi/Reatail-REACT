@@ -1,8 +1,9 @@
+import { formatBusinessCurrencyAmount } from './currencyExchange.js'
+
 export const parseNumber = (value) => Number.parseFloat(value || 0) || 0
 
 export const formatMoney = (value, currency = 'AFN') => {
-  const symbol = currency === 'USD' ? '$' : currency === 'EUR' ? '\u20AC' : currency === 'PKR' ? 'Rs' : '\u060B'
-  return `${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${symbol}`
+  return formatBusinessCurrencyAmount(value, currency)
 }
 
 export const dateOptionsFor = (t) => [
@@ -83,6 +84,7 @@ export const calculateBusinessMetrics = ({
     pendingPayments,
     pureProfit,
     revenue,
+    refundTotal,
     staffPaid,
     staffPayable: Math.max(0, staffPayroll - staffPaid),
     stockQuantity,

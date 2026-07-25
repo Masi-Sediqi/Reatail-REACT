@@ -1,17 +1,31 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import PrintPreviewModal from '../components/PrintPreviewModal.jsx'
 import CustomSelect from '../components/CustomSelect.jsx'
 import FloatingActionMenu from '../components/FloatingActionMenu.jsx'
 import { SupplierModal } from './Suppliers.jsx'
 import { currencies, productUnits } from '../data/dashboardData.js'
-import { Box, CalendarDays, Eye, ReceiptText, Search, SquareMenu, Trash2 } from '../components/Icons.jsx'
+import {
+  Box,
+  CalendarDays,
+  Eye,
+  Plus,
+  ReceiptText,
+  Search,
+  SquareMenu,
+  Trash2,
+  Upload,
+  X,
+} from '../components/Icons.jsx'
+import { formatBusinessCurrencyAmount } from '../utils/currencyExchange.js'
 import './Products.css'
 
 const emptyProduct = {
   name: '',
   code: '',
   barcode: '',
-  category: 'Miscellaneous',
+  category: '',
+  images: [],
   purchase: '',
   selling: '',
   expiry: '',
@@ -21,11 +35,12 @@ const emptyProduct = {
   unit: 'Pieces (pcs)',
   currency: 'AFN',
   supplierId: '',
+  customFields: {},
 }
 
 const alertBeforeOptions = ['1 week', '2 weeks', '1 month', '3 months', '6 months', '1 year']
 const parseNumber = (value) => Number.parseFloat(value || 0) || 0
-const formatMoney = (value, currency = 'AFN') => `${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency === 'USD' ? '$' : currency === 'EUR' ? '€' : '؋'}`
+const formatMoney = (value, currency = 'AFN') => formatBusinessCurrencyAmount(value, currency)
 
 const formatDateInput = (date) => {
   const year = date.getFullYear()
@@ -37,6 +52,12 @@ const parseDateInput = (value) => (value ? new Date(`${value}T12:00:00`) : null)
 const formatShortDate = (value) => {
   const date = parseDateInput(value)
   return date ? date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : ''
+}
+
+const normalizeProductImages = (product) => {
+  const images = Array.isArray(product?.images) ? product.images : []
+  if (images.length) return images
+  return product?.image ? [{ id: 'legacy-image', name: product.name || 'Product image', src: product.image }] : []
 }
 
 function ProductActionMenu({ isOpen, onBarcode, onDelete, onEdit, onToggle, onView, product, t }) {
@@ -193,8 +214,10 @@ function ProductDateRangePicker({ end, onChange, start, t }) {
   )
 }
 
-function ProductDetailsModal({ onClose, product, t }) {
+function ProductDetailsModal({ customFields = [], onClose, product, t }) {
   const profit = parseNumber(product.selling) - parseNumber(product.purchase)
+  const images = normalizeProductImages(product)
+  const productCustomFields = product.customFields ?? {}
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="product-details-modal" onClick={(event) => event.stopPropagation()}>
@@ -202,6 +225,19 @@ function ProductDetailsModal({ onClose, product, t }) {
         <h2>{t.productDetails ?? 'Product Details'}</h2>
         <div className="product-detail-grid">
           <div className="wide"><strong>{t.productName}</strong><span>{product.name || '-'}</span></div>
+          <div className="wide product-detail-images">
+            <strong>{t.productImages ?? 'Product images'}</strong>
+            {images.length ? (
+              <div className="product-detail-image-list">
+                {images.map((image, index) => (
+                  <figure key={image.id || image.src || index}>
+                    <img alt={image.name || `${product.name || 'Product'} ${index + 1}`} src={image.src} />
+                    {index === 0 && <figcaption>{t.primary ?? 'Primary'}</figcaption>}
+                  </figure>
+                ))}
+              </div>
+            ) : <span>-</span>}
+          </div>
           <div><strong>{t.code}</strong><span>{product.code || '-'}</span></div>
           <div><strong>{t.barcode}</strong><span>{product.barcode || '-'}</span></div>
           <div className="wide"><strong>{t.category}</strong><span className="soft-pill">{product.category || '-'}</span></div>
@@ -214,6 +250,18 @@ function ProductDetailsModal({ onClose, product, t }) {
           <div><strong>{t.quantity}</strong><span>{product.quantity || 0} {product.unit}</span></div>
           <div><strong>{t.unit}</strong><span>{product.unit || '-'}</span></div>
           <div><strong>{t.currency}</strong><span>{product.currency || 'AFN'}</span></div>
+          {customFields.length > 0 && (
+            <div className="wide product-detail-custom-fields">
+              <strong>{t.customFields ?? 'Custom Fields'}</strong>
+              <div>
+                {customFields.map((field) => (
+                  <span key={field.id}>
+                    <b>{field.label}:</b> {productCustomFields[field.id] || '-'}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -272,8 +320,8 @@ function BarcodeModal({ onClose, onNotify, product, t }) {
   )
 }
 
-function ProductModal({ categories, initialProduct, onCategoryAdd, onClose, onProductSave, onSupplierSave, suppliers, t }) {
-  const [form, setForm] = useState(initialProduct ?? emptyProduct)
+function ProductModal({ categories, customFields = [], initialProduct, onCategoryAdd, onClose, onProductSave, onSupplierSave, suppliers, t }) {
+  const [form, setForm] = useState(() => ({ ...emptyProduct, ...(initialProduct ?? {}), customFields: { ...(initialProduct?.customFields ?? {}) }, images: normalizeProductImages(initialProduct ?? emptyProduct) }))
   const [marginPercent, setMarginPercent] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [categoryMode, setCategoryMode] = useState(false)
@@ -281,6 +329,31 @@ function ProductModal({ categories, initialProduct, onCategoryAdd, onClose, onPr
   const [supplierModalOpen, setSupplierModalOpen] = useState(false)
   const [closing, setClosing] = useState(false)
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }))
+  const updateCustomField = (fieldId, value) => {
+    setForm((current) => ({
+      ...current,
+      customFields: {
+        ...(current.customFields ?? {}),
+        [fieldId]: value,
+      },
+    }))
+  }
+  const updateImages = async (files) => {
+    const currentImages = normalizeProductImages(form)
+    const imageFiles = Array.from(files)
+      .filter((file) => file.type.startsWith('image/') && file.size <= 3 * 1024 * 1024)
+      .slice(0, Math.max(0, 8 - currentImages.length))
+    if (!imageFiles.length) return
+    const nextImages = await Promise.all(imageFiles.map((file) => new Promise((resolve) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve({ id: crypto.randomUUID(), name: file.name, src: reader.result })
+      reader.readAsDataURL(file)
+    })))
+    setForm((current) => ({ ...current, images: [...normalizeProductImages(current), ...nextImages].slice(0, 8) }))
+  }
+  const removeImage = (imageKey) => {
+    setForm((current) => ({ ...current, images: normalizeProductImages(current).filter((image) => (image.id || image.src) !== imageKey) }))
+  }
   const requestClose = () => {
     if (closing) return
     setClosing(true)
@@ -319,13 +392,35 @@ function ProductModal({ categories, initialProduct, onCategoryAdd, onClose, onPr
         onSubmit={(event) => {
           event.preventDefault()
           setSubmitted(true)
-          if (!form.name.trim() || !form.category.trim()) return
-          onProductSave({ ...form, createdAt: form.createdAt ?? new Date().toISOString(), id: form.id ?? crypto.randomUUID(), status: Number(form.quantity || 0) > 0 ? 'In Stock' : 'Out of Stock' })
+          const missingCustomField = customFields.some((field) => field.required && !String(form.customFields?.[field.id] ?? '').trim())
+          if (!form.name.trim() || !form.category.trim() || missingCustomField) return
+          const images = normalizeProductImages(form)
+          onProductSave({ ...form, customFields: form.customFields ?? {}, image: images[0]?.src ?? '', images, createdAt: form.createdAt ?? new Date().toISOString(), id: form.id ?? crypto.randomUUID(), status: Number(form.quantity || 0) > 0 ? 'In Stock' : 'Out of Stock' })
         }}
       >
         <button className="modal-close" type="button" onClick={requestClose}>×</button>
         <h2>{initialProduct ? t.editProduct : t.addNewProduct}</h2>
         <label className="wide"><span>{t.productName} <em className="required-star">*</em></span><input className={submitted && !form.name.trim() ? 'field-invalid' : ''} placeholder={t.productNamePlaceholder} value={form.name} onChange={(e) => update('name', e.target.value)} /></label>
+        <div className="product-images-field wide">
+          <span>{t.productImages ?? 'Product images'}</span>
+          <div className="product-image-upload-row">
+            <label className="product-image-upload">
+              <Upload size={18} />
+              <span>{t.upload ?? 'Upload'}</span>
+              <input accept="image/*" multiple type="file" onChange={(event) => { updateImages(event.target.files); event.target.value = '' }} />
+            </label>
+            {normalizeProductImages(form).map((image, index) => (
+              <figure className="product-image-preview" key={image.id || image.src || index}>
+                <img alt={image.name || `${form.name || 'Product'} ${index + 1}`} src={image.src} />
+                <button className="product-image-remove" aria-label={t.remove ?? 'Remove'} type="button" onClick={() => removeImage(image.id || image.src)}>
+                  <X size={13} />
+                </button>
+                {index === 0 && <figcaption>{t.primary ?? 'Primary'}</figcaption>}
+              </figure>
+            ))}
+          </div>
+          <small>{t.productImagesHint ?? 'Up to 8 images, max 3MB each. First image is used as the thumbnail across billing, godown and product lists.'}</small>
+        </div>
         <label className="wide"><span>{t.code}</span><input placeholder={t.codePlaceholder} value={form.code} onChange={(e) => update('code', e.target.value)} /></label>
         <label className="wide"><span>{t.barcode}</span><div className="inline-field"><input placeholder={t.barcodePlaceholder} value={form.barcode} onChange={(e) => update('barcode', e.target.value)} /><button className="barcode-generate-btn" type="button" onClick={generateBarcode}>⟳</button></div></label>
         <label className="wide">
@@ -341,7 +436,7 @@ function ProductModal({ categories, initialProduct, onCategoryAdd, onClose, onPr
             </button>
           </span>
           {categoryMode ? (
-            <div className="inline-field">
+            <div className="inline-field custom-category-actions">
               <input autoFocus placeholder={t.categoryName ?? 'Category name'} value={newCategory} onChange={(event) => setNewCategory(event.target.value)} />
               <button type="button" onClick={saveCategory}>{t.add}</button>
               <button type="button" onClick={() => { setCategoryMode(false); setNewCategory('') }}>{t.cancel}</button>
@@ -368,20 +463,70 @@ function ProductModal({ categories, initialProduct, onCategoryAdd, onClose, onPr
           <label className="col-4"><span>{t.unit}</span><CustomSelect ariaLabel={t.unit} options={unitOptions} value={form.unit} onChange={(value) => update('unit', value)} /></label>
           <label className="col-4"><span>{t.currency}</span><CustomSelect ariaLabel={t.currency} options={currencyOptions} value={form.currency} onChange={(value) => update('currency', value)} /></label>
         </div>
-        <label className="wide supplier-select-box"><span>{t.suppliers} <small>({t.optional})</small></span><div className="inline-field"><CustomSelect ariaLabel={t.suppliers} options={supplierOptions} value={form.supplierId} onChange={(value) => update('supplierId', value)} /><button className="supplier-custom-btn" type="button" onClick={(event) => { event.stopPropagation(); setSupplierModalOpen(true) }}>+</button></div></label>
+        <label className="wide supplier-select-box"><span>{t.suppliers} <small>({t.optional})</small></span><div className="inline-field"><CustomSelect ariaLabel={t.suppliers} options={supplierOptions} value={form.supplierId} onChange={(value) => update('supplierId', value)} /><button
+  aria-label={t.addSupplier ?? 'Add supplier'}
+  className="supplier-custom-btn"
+  title={t.addSupplier ?? 'Add supplier'}
+  type="button"
+  onClick={(event) => {
+    event.stopPropagation()
+    setSupplierModalOpen(true)
+  }}
+>
+  +
+</button></div></label>
+        {customFields.length > 0 && (
+          <div className="product-custom-fields-block wide">
+            <h3>{t.customFields ?? 'CUSTOM FIELDS'}</h3>
+            {customFields.map((field) => {
+              const value = form.customFields?.[field.id] ?? ''
+              const isInvalid = submitted && field.required && !String(value).trim()
+              const dropdownOptions = (field.options || []).map((option) => ({ value: option, label: option }))
+
+              return (
+                <label className="wide product-custom-field" key={field.id}>
+                  <span>
+                    {field.label}
+                    {field.required && <em className="required-star">*</em>}
+                  </span>
+                  {field.type === 'dropdown' && dropdownOptions.length ? (
+                    <CustomSelect
+                      ariaLabel={field.label}
+                      options={[{ value: '', label: field.placeholder || 'Select option' }, ...dropdownOptions]}
+                      value={value}
+                      onChange={(nextValue) => updateCustomField(field.id, nextValue)}
+                    />
+                  ) : (
+                    <input
+                      className={isInvalid ? 'field-invalid' : ''}
+                      type={field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text'}
+                      placeholder={field.placeholder}
+                      value={value}
+                      onChange={(event) => updateCustomField(field.id, event.target.value)}
+                    />
+                  )}
+                </label>
+              )
+            })}
+          </div>
+        )}
         <button className="primary-btn wide" type="submit">{initialProduct ? t.saveChanges : t.addProduct}</button>
       </form>
-      {supplierModalOpen && (
-        <SupplierModal
-          onClose={() => setSupplierModalOpen(false)}
-          onSave={(supplier) => {
-            onSupplierSave(supplier)
-            update('supplierId', supplier.id)
-            setSupplierModalOpen(false)
-          }}
-          t={t}
-        />
-      )}
+     {supplierModalOpen &&
+  createPortal(
+    <div className="product-supplier-modal-layer">
+      <SupplierModal
+        onClose={() => setSupplierModalOpen(false)}
+        onSave={(supplier) => {
+          onSupplierSave(supplier)
+          update('supplierId', supplier.id)
+          setSupplierModalOpen(false)
+        }}
+        t={t}
+      />
+    </div>,
+    document.querySelector('.retail-shell') ?? document.body,
+  )}
     </div>
   )
 }
@@ -398,6 +543,12 @@ function ProductsPage({ categories, companyInfo, onCategoryAdd, onMoveToRecycle,
   const [customEndDate, setCustomEndDate] = useState('')
   const [viewProduct, setViewProduct] = useState(null)
   const [barcodeProduct, setBarcodeProduct] = useState(null)
+  const productCustomFields = companyInfo?.customFormFields?.products ?? []
+  const resetDateFilter = () => {
+    setDateFilter('all')
+    setCustomStartDate('')
+    setCustomEndDate('')
+  }
 
   const categoryOptions = useMemo(() => {
     const usedCategories = [...new Set(products.map((product) => product.category).filter(Boolean))]
@@ -487,7 +638,25 @@ function ProductsPage({ categories, companyInfo, onCategoryAdd, onMoveToRecycle,
     <div className="entity-content products-content">
       <div className="entity-heading">
         <div><h1>{t.products}</h1><p>{t.manageProductInventory}</p></div>
-        <div className="entity-actions"><button type="button" onClick={() => setPrintOpen(true)}>{t.printReport}</button><button className="primary-btn" type="button" onClick={() => setModalOpen(true)}>+ {t.addProduct}</button></div>
+        <div className="entity-actions products-header-actions">
+  <button
+    className="products-print-btn"
+    type="button"
+    onClick={() => setPrintOpen(true)}
+  >
+    <ReceiptText size={16} />
+    <span>{t.printReport}</span>
+  </button>
+
+  <button
+    className="primary-btn products-add-btn"
+    type="button"
+    onClick={() => setModalOpen(true)}
+  >
+    <Plus size={16} />
+    <span>{t.addProduct}</span>
+  </button>
+</div>
       </div>
       <div className="filter-card">
         <div className="products-search-field"><Search size={17} />
@@ -497,15 +666,18 @@ function ProductsPage({ categories, companyInfo, onCategoryAdd, onMoveToRecycle,
         <CustomSelect ariaLabel={t.stock} className="stock-select" options={stockOptions} value={stockFilter} onChange={setStockFilter} />
         <div className="products-date-filter"><CalendarDays size={16} /><CustomSelect ariaLabel={t.allTime} options={dateOptions} value={dateFilter} onChange={setDateFilter} /></div>
         {dateFilter === 'custom' && (
-          <ProductDateRangePicker
-            end={customEndDate}
-            onChange={({ end: nextEnd, start: nextStart }) => {
-              setCustomStartDate(nextStart)
-              setCustomEndDate(nextEnd)
-            }}
-            start={customStartDate}
-            t={t}
-          />
+          <div className="products-custom-date-controls">
+            <ProductDateRangePicker
+              end={customEndDate}
+              onChange={({ end: nextEnd, start: nextStart }) => {
+                setCustomStartDate(nextStart)
+                setCustomEndDate(nextEnd)
+              }}
+              start={customStartDate}
+              t={t}
+            />
+            <button className="products-filter-reset" type="button" onClick={resetDateFilter} aria-label={t.cancel ?? 'Cancel'}><X size={13} /></button>
+          </div>
         )}
       </div>
       <div className="data-panel">
@@ -534,8 +706,8 @@ function ProductsPage({ categories, companyInfo, onCategoryAdd, onMoveToRecycle,
           </tbody>
         </table>
       </div>
-      {modalOpen && <ProductModal categories={categories} initialProduct={editingProduct} onCategoryAdd={onCategoryAdd} onClose={() => { setModalOpen(false); setEditingProduct(null) }} onProductSave={saveProduct} onSupplierSave={saveSupplier} suppliers={suppliers} t={t} />}
-      {viewProduct && <ProductDetailsModal onClose={() => setViewProduct(null)} product={viewProduct} t={t} />}
+      {modalOpen && <ProductModal categories={categories} customFields={productCustomFields} initialProduct={editingProduct} onCategoryAdd={onCategoryAdd} onClose={() => { setModalOpen(false); setEditingProduct(null) }} onProductSave={saveProduct} onSupplierSave={saveSupplier} suppliers={suppliers} t={t} />}
+      {viewProduct && <ProductDetailsModal customFields={productCustomFields} onClose={() => setViewProduct(null)} product={viewProduct} t={t} />}
       {barcodeProduct && <BarcodeModal onClose={() => setBarcodeProduct(null)} onNotify={onNotify} product={barcodeProduct} t={t} />}
       {printOpen && <PrintPreviewModal companyInfo={companyInfo} onClose={() => setPrintOpen(false)} printSettings={printSettings} rows={filteredProducts} title={t.productInventoryReport} columns={[{ key: 'name', label: t.name }, { key: 'code', label: t.code }, { key: 'category', label: t.category }, { key: 'purchase', label: t.purchase }, { key: 'selling', label: t.selling }, { key: 'quantity', label: t.stock }, { key: 'status', label: t.status }]} t={t} />}
     </div>

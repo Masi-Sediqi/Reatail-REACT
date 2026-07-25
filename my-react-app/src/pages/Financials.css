@@ -21,25 +21,10 @@
   margin-inline-end: 0;
 }
 
-.financial-date-control,
-.report-date-control {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
 .financial-date-control .smooth-select,
 .report-date-control .smooth-select {
   width: 140px;
   flex: 0 0 140px;
-}
-
-.financial-date-control .date-range-picker,
-.report-date-control .date-range-picker {
-  width: 176px;
-  min-width: 176px;
-  flex: 0 0 176px;
 }
 
 .financial-date-control .smooth-select-btn,
@@ -72,27 +57,189 @@
   position: relative;
 }
 
-.financial-date-range .date-range-calendar,
-.report-date-range .date-range-calendar {
-  position: absolute;
-  top: calc(100% + 8px);
-  inset-inline-end: 0;
-  inset-inline-start: auto;
-  z-index: 9999;
-  width: 278px;
-}
 
 .financial-date-control .date-range-btn svg,
 .report-date-control .date-range-btn svg {
   color: #111827;
 }
 
+/* =====================================================
+   FINANCIAL HEADER DATE FILTER — FINAL FIX
+===================================================== */
+
+.financial-actions,
+.report-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: nowrap;
+  position: relative;
+  z-index: 120;
+  margin: 0;
+}
+
+.financial-date-control,
+.report-date-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+  width: auto;
+  min-width: 0;
+}
+
+/* All Time select */
+.financial-date-control > .smooth-select,
+.report-date-control > .smooth-select {
+  width: 150px;
+  min-width: 150px;
+  flex: 0 0 150px;
+}
+
+/* Select Date Range */
+.financial-date-control .date-range-picker,
+.report-date-control .date-range-picker {
+  position: relative;
+  width: 190px;
+  min-width: 190px;
+  max-width: 190px;
+  flex: 0 0 190px;
+  margin: 0;
+}
+
+.financial-date-control .smooth-select-btn,
+.report-date-control .smooth-select-btn,
+.financial-date-control .date-range-btn,
+.report-date-control .date-range-btn {
+  width: 100%;
+  height: 40px;
+  min-height: 40px;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+
+/* Date Range button layout */
+.financial-date-control .date-range-btn,
+.report-date-control .date-range-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+
+.financial-date-control .date-range-btn svg,
+.report-date-control .date-range-btn svg {
+  position: static;
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+  margin: 0;
+  color: var(--muted);
+}
+
+/* Print button */
+.financial-actions > button,
+.report-actions > button {
+  width: auto;
+  min-width: 90px;
+  height: 40px;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin: 0;
+  padding: 0 14px;
+  border-radius: 9px;
+  white-space: nowrap;
+}
+
+.financial-actions > button svg,
+.report-actions > button svg {
+  position: static;
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+  margin: 0;
+}
 .financial-date-range .date-range-calendar,
 .report-date-range .date-range-calendar {
-  top: calc(100% + 8px);
-  inset-inline-start: 0;
-  inset-inline-end: auto;
-  width: 278px;
+  position: absolute !important;
+  top: calc(100% + 8px) !important;
+
+  inset-inline-start: auto !important;
+  inset-inline-end: 0 !important;
+
+  z-index: 9999 !important;
+
+  width: 278px !important;
+  max-width: calc(100vw - 32px) !important;
+
+  margin: 0 !important;
+}
+.financial-print-btn > span {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  line-height: 1;
+}
+@media (max-width: 760px) {
+  .financial-actions,
+  .report-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .financial-date-control,
+  .report-date-control {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .financial-date-control.has-custom-range,
+  .report-date-control.has-custom-range {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .financial-date-control > .smooth-select,
+  .report-date-control > .smooth-select,
+  .financial-date-control .date-range-picker,
+  .report-date-control .date-range-picker {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    flex: none;
+  }
+
+  .financial-actions > button,
+  .report-actions > button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .financial-date-control.has-custom-range,
+  .report-date-control.has-custom-range {
+    grid-template-columns: 1fr;
+  }
+
+  .financial-date-range .date-range-calendar,
+  .report-date-range .date-range-calendar {
+    inset-inline-start: 0 !important;
+    inset-inline-end: auto !important;
+    width: min(278px, calc(100vw - 32px)) !important;
+  }
 }
 
 .financial-metric-grid {

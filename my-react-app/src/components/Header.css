@@ -1,0 +1,3475 @@
+/* Extracted from App.css. Keep component/page styles out of App.css. */
+
+.collapse-btn,
+.icon-btn,
+.avatar-btn,
+.period-control,
+.close-filter,
+.quick-action,
+.side-nav button,
+.dropdown-menu button,
+.save-btn,
+.profile-avatar button,
+.settings-tabs button,
+.logo-actions button,
+.theme-choice {
+  border: 0;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 8px 12px 0;
+  padding: 0 26px 0 34px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--panel-bg) 72%, transparent);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(28px) saturate(1.35);
+  -webkit-backdrop-filter: blur(28px) saturate(1.35);
+}
+
+.main-area:has(.modal-backdrop) .app-header {
+  z-index: 0;
+  pointer-events: none;
+}
+
+[dir="rtl"] .app-header {
+  padding: 0 34px 0 26px;
+}
+
+.search-shell {
+  flex: 1;
+  min-width: 120px;
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  text-align: start;
+}
+
+.header-tools {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tool-wrap,
+.account-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.icon-btn {
+  position: relative;
+  min-width: 28px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-radius: 8px;
+  color: var(--text);
+  background: transparent;
+}
+
+.icon-btn:hover,
+.icon-btn.active {
+  background: var(--panel-soft);
+}
+
+.pill-mini {
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: #111827;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.business-currency-pill {
+  background: #f59e0b;
+  color: #111827;
+}
+
+.exchange-currency-pill {
+  background: #18264f;
+  color: #ffffff;
+  margin-inline-start: -5px;
+}
+
+.header-currency-menu,
+.account-menu {
+  z-index: 3600;
+}
+
+.header-currency-menu {
+  position: fixed;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-bg);
+  color: var(--text);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.16);
+  overflow: hidden;
+  animation: fadeSlideIn 140ms ease both;
+}
+
+.header-currency-title {
+  padding: 13px 13px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.header-currency-list {
+  padding: 4px 0 8px;
+}
+
+.header-currency-option {
+  width: 100%;
+  min-height: 33px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 18px;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  padding: 0 13px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  text-align: start;
+  cursor: pointer;
+}
+
+.header-currency-option:hover,
+.header-currency-option.is-selected {
+  background: var(--panel-soft);
+}
+
+.header-currency-option span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.header-currency-check {
+  color: #18264f;
+  font-weight: 900;
+  text-align: center;
+}
+
+.theme-dark .header-currency-check {
+  color: #ffffff;
+}
+/* Notification icon and badge */
+
+.retail-shell .notification-trigger {
+  position: relative;
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+  padding: 0;
+  overflow: visible !important;
+}
+
+.retail-shell .notification-trigger > svg {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+}
+
+.retail-shell .notification-trigger .notification-badge {
+  position: absolute;
+  top: 0;
+  inset-inline-end: 0;
+  z-index: 2;
+
+  min-width: 16px;
+  width: auto;
+  height: 16px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 4px;
+  border: 2px solid var(--panel-bg);
+  border-radius: 999px;
+
+  background: #ef4444;
+  color: #ffffff;
+
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+
+  transform: translate(28%, -28%);
+  pointer-events: none;
+}
+
+.avatar-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: #11224b;
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.theme-state {
+  display: none;
+}
+
+.dropdown-menu {
+  position: fixed;
+  width: 224px;
+  z-index: 1300;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--panel-bg);
+  color: var(--text);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.14);
+  overflow: hidden;
+  animation: fadeSlideIn 140ms ease both;
+}
+
+.dropdown-menu strong {
+  display: block;
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.dropdown-menu button {
+  width: 100%;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  background: transparent;
+  color: var(--text);
+  text-align: start;
+  font-size: 14px;
+}
+
+.dropdown-menu button:hover,
+.dropdown-menu button.selected {
+  background: var(--panel-soft);
+}
+
+.dropdown-menu button.divided {
+  border-top: 1px solid var(--border);
+}
+
+.dropdown-menu button.danger {
+  color: #ef4444;
+}
+
+
+.header-modal-backdrop {
+  z-index: 3200;
+  place-items: center;
+  padding: 18px;
+  background: rgba(0, 0, 0, 0.84);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.header-shared-modal {
+  position: relative;
+  width: min(440px, calc(100vw - 28px));
+  max-height: min(720px, calc(100dvh - 36px));
+  overflow-y: auto;
+  display: grid;
+  gap: 18px;
+  padding: 26px 26px 24px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-bg);
+  color: var(--text);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
+  animation: modalZoomIn 160ms ease both;
+}
+
+.header-shared-modal-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding-inline-end: 34px;
+}
+
+.header-shared-modal-icon {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  background: #eef2ff;
+  color: #2563eb;
+}
+
+.header-shared-modal h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 18px;
+  line-height: 1.25;
+  font-weight: 900;
+}
+
+.header-shared-modal p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+
+.global-search-modal {
+  width: min(440px, calc(100vw - 28px));
+}
+
+.header-shared-modal .modal-actions {
+  justify-content: flex-end;
+  margin-top: 2px;
+}
+
+.global-search-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel-soft);
+  padding: 0 14px;
+}
+
+.global-search-input input {
+  min-height: 46px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.search-suggestion-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+/* =========================================
+   SEARCH CATEGORY CARDS
+========================================= */
+
+.search-suggestion-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.retail-shell .header-shared-modal .search-suggestion-grid button {
+  position: relative;
+  min-width: 0;
+  min-height: 62px;
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 4px;
+  padding: 11px 13px;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  background: var(--panel-soft) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+
+  text-align: start;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: none !important;
+  overflow: hidden;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.retail-shell .header-shared-modal .search-suggestion-grid button::before {
+  content: "";
+  position: absolute;
+  inset-block: 10px;
+  inset-inline-start: 0;
+  width: 3px;
+  border-radius: 0 999px 999px 0;
+  background: #94a3b8;
+}
+
+[dir="rtl"] .header-shared-modal .search-suggestion-grid button::before {
+  border-radius: 999px 0 0 999px;
+}
+
+.retail-shell .header-shared-modal .search-suggestion-grid button:hover {
+  border-color: #cbd5e1 !important;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+  transform: translateY(-1px);
+  box-shadow: none !important;
+}
+
+.retail-shell .header-shared-modal .search-suggestion-grid button:active {
+  transform: translateY(0);
+}
+
+.retail-shell .header-shared-modal .search-suggestion-grid button span {
+  display: block;
+  min-width: 0;
+  color: var(--text) !important;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.retail-shell .header-shared-modal .search-suggestion-grid button small {
+  display: block;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .search-suggestion-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+
+.notification-item p {
+  margin: 3px 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.notification-item small {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.entity-actions button:not(.camera-icon-btn),
+.primary-btn,
+.save-btn,
+.scanner-active-btn,
+.payroll-btn,
+.print-pdf-btn,
+.wide-print-btn,
+.empty-bin-btn,
+.barcode-print-btn,
+.supplier-portal-page .supplier-portal-head > button {
+  min-width: 132px;
+  min-height: 42px;
+  height: 42px;
+  border-radius: 10px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.entity-actions button:not(.primary-btn):not(.camera-icon-btn),
+.print-pdf-btn,
+.wide-print-btn {
+  position: relative;
+  overflow: hidden;
+  border: 0;
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.22);
+}
+
+.entity-actions button:not(.primary-btn):not(.camera-icon-btn)::before,
+.print-pdf-btn::before,
+.wide-print-btn::before {
+  display: none;
+}
+
+.theme-dark .entity-actions button:not(.primary-btn):not(.camera-icon-btn),
+.theme-dark .print-pdf-btn,
+.theme-dark .wide-print-btn,
+.theme-dark .primary-btn,
+.theme-dark .save-btn,
+.theme-dark .scanner-active-btn,
+.theme-dark .payroll-btn,
+.theme-dark .barcode-print-btn {
+  color: #fff;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.32);
+}
+
+.retail-shell button:not(:disabled):not(.active):not(.modal-close):not(.icon-btn):not(.collapse-btn):not(.smooth-select-btn):not(.floating-action-trigger):not(.theme-choice):not(.dropdown-menu button):not(.notifications-panel button):not(.billing-panel button):not(.segmented-row button):not(.segmented-view button):not(.toggle-filter-btn):hover {
+  border-color: var(--border);
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.16);
+}
+
+.global-search-modal {
+  width: min(520px, calc(100vw - 28px));
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-bg);
+  color: var(--text);
+  box-shadow: 0 26px 72px rgba(15, 23, 42, 0.26);
+  animation: modalZoomIn 160ms ease both;
+}
+
+.global-search-head {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.global-search-head input {
+  min-height: 38px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  outline: none;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.global-search-head button {
+  min-width: 48px;
+  min-height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel-soft);
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.global-search-body {
+  padding: 24px 20px 28px;
+}
+
+.global-search-body h2 {
+  margin: 0 0 14px;
+  color: var(--text);
+  font-size: 17px;
+}
+
+.global-search-list {
+  display: grid;
+  gap: 12px;
+}
+
+.global-search-list button {
+  min-height: 52px;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) 20px;
+  gap: 14px;
+  align-items: center;
+  border: 0;
+  border-radius: 8px;
+  background: var(--panel-soft);
+  color: var(--text);
+  padding: 0 14px;
+  cursor: pointer;
+  text-align: start;
+  font-size: 15px;
+  font-weight: 800;
+  transition: background-color 140ms ease, transform 140ms ease;
+}
+
+.global-search-list button:hover {
+  background: var(--accent-soft);
+  transform: translateY(-1px);
+}
+
+.global-search-icon {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--accent);
+  background: var(--panel-bg);
+}
+
+.global-search-list strong {
+  color: var(--muted);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+@media (max-width: 980px) {
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    height: auto;
+  }
+
+  .brand-block {
+    min-height: 58px;
+  }
+
+  .side-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 10px 12px;
+  }
+
+  .side-nav button {
+    flex: 0 0 auto;
+    min-height: 38px;
+  }
+
+  .sidebar-footer {
+    display: none;
+  }
+
+  .app-header {
+    margin: 10px;
+    padding: 0 14px;
+  }
+
+  [dir="rtl"] .app-header {
+    padding: 0 14px;
+  }
+
+  .header-tools {
+    gap: 6px;
+  }
+
+  .metric-grid.financial,
+  .metric-grid.three {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filter-card,
+  .summary-grid.four {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .print-preview-body {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+
+  .print-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .header-modal-backdrop {
+    place-items: center;
+    padding: 12px;
+  }
+
+  .header-shared-modal {
+    width: min(100%, 420px);
+    max-height: calc(100dvh - 24px);
+    padding: 22px 18px 20px;
+    border-radius: 10px;
+  }
+
+  .wallet-form-grid,
+  .search-suggestion-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header-shared-modal .modal-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .content {
+    padding: 18px 10px 28px;
+  }
+
+  [dir="rtl"] .content {
+    padding: 18px 10px 28px;
+  }
+
+  .page-heading,
+  .profile-heading,
+  .settings-heading {
+    flex-direction: column;
+    margin-bottom: 24px;
+  }
+
+  .heading-actions,
+  .save-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .period-control {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .header-tools .tool-wrap:nth-child(-n + 3) {
+    display: none;
+  }
+
+  .metric-grid.financial,
+  .metric-grid.three,
+  .quick-grid,
+  .profile-form,
+  .account-stats,
+  .theme-grid,
+  .filter-card,
+  .filter-bar,
+  .summary-grid.four,
+  .exchange-grid,
+  .print-template-grid,
+  .print-config-grid,
+  .print-config-grid.two,
+  .print-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-form {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-form label,
+  .settings-form label:nth-of-type(4),
+  .settings-form label:nth-of-type(5),
+  .settings-form label:nth-of-type(6),
+  .settings-form label.wide {
+    grid-column: 1;
+  }
+
+.metric-card {
+  min-height: 86px;
+}
+
+  .trend-panel,
+  .quick-panel,
+  .activity-panel,
+  .profile-card,
+  .settings-card {
+    padding: 20px 16px;
+  }
+
+  .chart-wrap {
+    overflow-x: auto;
+  }
+
+  .chart-wrap svg {
+    min-width: 850px;
+  }
+
+  .activity-item {
+    grid-template-columns: 36px minmax(0, 1fr);
+  }
+
+  .activity-item time {
+    grid-column: 2;
+  }
+
+  .profile-content {
+    width: calc(100% - 20px);
+    margin-top: 18px;
+  }
+
+  .settings-content {
+    padding: 18px 10px 28px;
+  }
+
+  [dir="rtl"] .settings-content {
+    padding: 18px 10px 28px;
+  }
+
+  .entity-content,
+  [dir="rtl"] .entity-content {
+    padding: 18px 10px 28px;
+  }
+
+  .entity-heading,
+  .settings-card-head,
+  .print-mode-card,
+  .print-preview-top {
+    flex-direction: column;
+  }
+
+  .entity-actions,
+  .print-preview-top div {
+    width: 100%;
+  }
+
+  .entity-actions button,
+  .print-preview-top button,
+  .print-top-link {
+    flex: 1;
+  }
+
+  .entity-modal {
+    grid-template-columns: 1fr;
+    padding: 20px 16px max(30px, env(safe-area-inset-bottom));
+    max-height: calc(100dvh - 32px);
+    margin-bottom: max(14px, env(safe-area-inset-bottom));
+  }
+
+  .entity-modal label,
+  .entity-modal label.wide,
+  .margin-helper,
+  .margin-helper.wide,
+  .entity-modal .wide {
+    grid-column: 1;
+  }
+
+  .modal-backdrop {
+    padding: 14px 10px max(22px, env(safe-area-inset-bottom));
+  }
+
+  .search-backdrop {
+    place-items: center;
+    padding: 16px;
+  }
+
+  .global-search-modal {
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
+  }
+
+  .print-paper {
+    min-width: 700px;
+  }
+
+  .paper-header {
+    padding: 10px 20px;
+  }
+
+  .paper-stats,
+  .paper-date {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+
+  .paper-table {
+    width: calc(100% - 40px);
+    margin: 0 20px;
+  }
+
+  .profile-identity {
+    align-items: flex-start;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .notifications-panel {
+    position: fixed !important;
+    inset-inline: 10px !important;
+    top: max(72px, env(safe-area-inset-top)) !important;
+    width: auto !important;
+    max-height: calc(100dvh - 88px);
+    overflow-y: auto;
+    z-index: 10060 !important;
+  }
+}
+
+.retail-shell .entity-actions button:not(.primary-btn):not(.camera-icon-btn):not(.scanner-active-btn):not(.payroll-btn),
+.retail-shell .print-pdf-btn,
+.retail-shell .wide-print-btn,
+.retail-shell .cash-wallet-top-actions > button:not(.cash-wallet-add-btn) {
+  min-width: 150px;
+  min-height: 42px;
+  height: 42px;
+  border: 0 !important;
+  border-radius: 10px;
+  background: var(--accent) !important;
+  color: #fff !important;
+  font-weight: 900 !important;
+  white-space: nowrap;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.22);
+}
+
+.retail-shell .camera-icon-btn {
+  min-width: 42px;
+}
+
+.retail-shell .entity-actions button:not(.primary-btn):not(.camera-icon-btn):not(.scanner-active-btn):not(.payroll-btn):not(.date-range-btn),
+.retail-shell .print-pdf-btn,
+.retail-shell .wide-print-btn,
+.retail-shell .cash-wallet-top-actions > button:not(.cash-wallet-add-btn):not(.date-range-btn) {
+  position: relative;
+  overflow: hidden;
+  min-width: 150px;
+  min-height: 42px;
+  height: 42px;
+  border: 0 !important;
+  border-radius: 10px;
+  background: var(--accent) !important;
+  color: #fff !important;
+  font-weight: 900 !important;
+  white-space: nowrap;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.22);
+}
+
+.retail-shell .entity-actions button:not(.camera-icon-btn):not(.date-range-btn)::before,
+.retail-shell .primary-btn::before,
+.retail-shell .save-btn::before,
+.retail-shell .scanner-active-btn::before,
+.retail-shell .payroll-btn::before,
+.retail-shell .print-pdf-btn::before,
+.retail-shell .wide-print-btn::before,
+.retail-shell .cash-wallet-top-actions > button:not(.cash-wallet-add-btn):not(.date-range-btn)::before {
+  display: none;
+}
+
+.notification-sound-toolbar,
+.settings-form.two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.notification-sound-toolbar {
+  display: grid;
+  align-items: end;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.notification-sound-toolbar label {
+  display: grid;
+  gap: 8px;
+}
+
+.notification-sound-toolbar label > span {
+  font-size: 0.88rem;
+  font-weight: 850;
+}
+
+.notification-sound-toolbar > button {
+  justify-self: end;
+  min-height: 42px;
+}
+
+.notification-sound-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.notification-sound-option {
+  width: 100%;
+  min-height: 64px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-bg);
+  color: var(--text);
+  padding: 12px 14px;
+  text-align: start;
+}
+
+.notification-sound-option svg:first-child {
+  color: #2563eb;
+}
+
+.notification-sound-option > span {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.notification-sound-option strong,
+.notification-sound-option small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notification-sound-option strong {
+  font-size: 0.92rem;
+  font-weight: 950;
+}
+
+.notification-sound-option small {
+  color: var(--muted-text);
+  font-size: 0.8rem;
+}
+
+.notification-sound-option.active {
+  border-color: #94a3b8;
+  background: #f8fafc;
+  box-shadow: inset 0 0 0 1px #cbd5e1;
+}
+
+.financial-actions,
+.report-actions,
+.cash-wallet-top-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 18px !important;
+}
+
+.financial-actions > button,
+.report-actions > button,
+.cash-wallet-top-actions > button {
+  flex: 0 0 auto;
+}
+
+.retail-shell button:not(.quick-action):not(.dots-btn):not(.row-action-menu button):not(.tiny-plus):not(.barcode-generate-btn):not(.supplier-custom-btn):not(.margin-apply-btn):not(.product-date-range-btn):not(.sales-date-range-btn):not(.metric-card-clickable):not(.search-shell):not(.smooth-select-btn):not(.smooth-select-menu button):not(.floating-select-menu button):not(.category-search-menu button):not(.customer-search-btn):not(.customer-search-menu button):not(.currency-trigger):not(.currency-menu button):not(.global-search-list button):not(.dropdown-menu button):not(.notifications-panel button):not(.segmented-row button):not(.segmented-view button):not(.toggle-filter-btn):not(.billing-panel button):not(.godown-filter-bar button):not(.date-range-btn):not(.calendar-head button):not(.calendar-days button):not(.date-range-calendar button):not(.modal-close):not(.icon-btn):not(.collapse-btn):not(.avatar-btn):not(.dashboard-filter-reset):not(.cash-wallet-add-btn):not(.toggle):not(.theme-choice):not(.print-template):not(.notification-sound-option):not(.help-menu-trigger):not(.sidebar-help-menu button):not(.side-nav button):not(.settings-tabs button):not(.brand-language-tabs button):not(.terms-tabs button):not(:disabled) {
+  position: relative;
+  overflow: hidden;
+  min-height: 42px;
+  padding: 0 18px;
+  border: 0 !important;
+  border-radius: 12px;
+  color: #fff !important;
+  font-weight: 900;
+  white-space: nowrap;
+  background: var(--accent);
+  box-shadow: 0 10px 25px rgba(124, 58, 237, 0.28);
+}
+
+.retail-shell button:not(.quick-action):not(.dots-btn):not(.row-action-menu button):not(.tiny-plus):not(.barcode-generate-btn):not(.supplier-custom-btn):not(.margin-apply-btn):not(.product-date-range-btn):not(.sales-date-range-btn):not(.metric-card-clickable):not(.search-shell):not(.smooth-select-btn):not(.smooth-select-menu button):not(.floating-select-menu button):not(.category-search-menu button):not(.customer-search-btn):not(.customer-search-menu button):not(.currency-trigger):not(.currency-menu button):not(.global-search-list button):not(.dropdown-menu button):not(.notifications-panel button):not(.segmented-row button):not(.segmented-view button):not(.toggle-filter-btn):not(.billing-panel button):not(.godown-filter-bar button):not(.date-range-btn):not(.calendar-head button):not(.calendar-days button):not(.date-range-calendar button):not(.modal-close):not(.icon-btn):not(.collapse-btn):not(.avatar-btn):not(.dashboard-filter-reset):not(.cash-wallet-add-btn):not(.toggle):not(.theme-choice):not(.print-template):not(.help-menu-trigger):not(.sidebar-help-menu button):not(.side-nav button):not(.settings-tabs button):not(.brand-language-tabs button):not(.terms-tabs button):not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(37, 99, 235, 0.34);
+}
+
+.retail-shell button:not(.quick-action):not(.dots-btn):not(.row-action-menu button):not(.tiny-plus):not(.barcode-generate-btn):not(.supplier-custom-btn):not(.margin-apply-btn):not(.product-date-range-btn):not(.sales-date-range-btn):not(.metric-card-clickable):not(.search-shell):not(.smooth-select-btn):not(.smooth-select-menu button):not(.floating-select-menu button):not(.category-search-menu button):not(.customer-search-btn):not(.customer-search-menu button):not(.currency-trigger):not(.currency-menu button):not(.global-search-list button):not(.dropdown-menu button):not(.notifications-panel button):not(.segmented-row button):not(.segmented-view button):not(.toggle-filter-btn):not(.billing-panel button):not(.godown-filter-bar button):not(.date-range-btn):not(.calendar-head button):not(.calendar-days button):not(.date-range-calendar button):not(.modal-close):not(.icon-btn):not(.collapse-btn):not(.avatar-btn):not(.dashboard-filter-reset):not(.cash-wallet-add-btn):not(.toggle):not(.theme-choice):not(.print-template):not(.help-menu-trigger):not(.sidebar-help-menu button):not(.side-nav button):not(.settings-tabs button):not(.brand-language-tabs button):not(.terms-tabs button):not(:disabled)::before {
+  display: none;
+}
+
+.retail-shell :is(
+  .metric-card,
+  .metric-card-clickable,
+  .search-shell,
+  .filter-card,
+  .filter-bar,
+  .products-filter-card,
+  .sales-filter-card,
+  .search-field,
+  .products-search-field,
+  .global-search-input,
+  .global-search-head,
+  .smooth-select-btn,
+  .smooth-select-menu,
+  .smooth-select-menu button,
+  .date-range-btn,
+  .date-range-calendar,
+  .date-range-calendar button,
+  .calendar-head button,
+  .calendar-days button,
+  .theme-choice,
+  .print-template,
+  .notification-sound-option,
+  .settings-tabs button,
+  .terms-tabs button,
+  .brand-language-tabs button,
+  .backup-action-row,
+  .automatic-backup-card,
+  .kpi-route-row,
+  .quick-card,
+  .activity-item,
+  .data-panel,
+  .settings-card,
+  .trend-panel,
+  .quick-panel,
+  .activity-panel
+) {
+  background-image: none !important;
+  animation: none !important;
+}
+
+.retail-shell :is(
+  .metric-card-clickable,
+  .search-shell,
+  .smooth-select-menu button,
+  .date-range-btn,
+  .date-range-calendar button,
+  .calendar-head button,
+  .calendar-days button,
+  .theme-choice,
+  .print-template,
+  .notification-sound-option,
+  .settings-tabs button,
+  .terms-tabs button,
+  .brand-language-tabs button
+) {
+  color: var(--text) !important;
+}
+
+.retail-shell :is(
+  .metric-card-clickable,
+  .search-shell,
+  .smooth-select-menu button,
+  .date-range-btn,
+  .date-range-calendar button,
+  .calendar-head button,
+  .calendar-days button,
+  .theme-choice,
+  .print-template,
+  .notification-sound-option,
+  .settings-tabs button,
+  .terms-tabs button,
+  .brand-language-tabs button
+)::before {
+  display: none !important;
+}
+
+.retail-shell .search-shell {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.retail-shell :is(.smooth-select-btn, .date-range-btn, .theme-choice, .print-template, .notification-sound-option) {
+  background: var(--panel-bg) !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+.retail-shell :is(.smooth-select-menu button.selected, .settings-tabs button.active, .terms-tabs button.active, .brand-language-tabs button.active, .print-template.active, .theme-choice.active, .notification-sound-option.active) {
+  border-color: var(--border) !important;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+}
+
+.retail-shell :is(.primary-btn, .save-btn, .print-pdf-btn, .wide-print-btn, .barcode-print-btn, .scanner-active-btn, .payroll-btn),
+.retail-shell .entity-actions button:not(.camera-icon-btn):not(.date-range-btn):not(.dashboard-filter-reset),
+.retail-shell .backup-action-row > button,
+.retail-shell .automatic-backup-card > button,
+.retail-shell .cash-wallet-top-actions > button:not(.cash-wallet-add-btn):not(.date-range-btn) {
+  background: var(--accent) !important;
+  background-image: none !important;
+  background-size: auto !important;
+  color: #fff !important;
+  animation: none !important;
+}
+
+.retail-shell :is(.primary-btn, .save-btn, .print-pdf-btn, .wide-print-btn, .barcode-print-btn, .scanner-active-btn, .payroll-btn)::before,
+.retail-shell .entity-actions button:not(.camera-icon-btn):not(.date-range-btn):not(.dashboard-filter-reset)::before,
+.retail-shell .backup-action-row > button::before,
+.retail-shell .automatic-backup-card > button::before,
+.retail-shell .cash-wallet-top-actions > button:not(.cash-wallet-add-btn):not(.date-range-btn)::before {
+  display: none !important;
+}
+
+.retail-shell button:not(.primary-btn):not(.save-btn):not(.print-pdf-btn):not(.wide-print-btn):not(.barcode-print-btn):not(.scanner-active-btn):not(.payroll-btn):not(.cash-wallet-add-btn) {
+  color: var(--text) !important;
+}
+
+.retail-shell :is(.primary-btn, .save-btn, .print-pdf-btn, .wide-print-btn, .barcode-print-btn, .scanner-active-btn, .payroll-btn, .cash-wallet-add-btn),
+.retail-shell .entity-actions button:not(.camera-icon-btn):not(.date-range-btn):not(.dashboard-filter-reset),
+.retail-shell .backup-action-row > button,
+.retail-shell .automatic-backup-card > button,
+.retail-shell .cash-wallet-top-actions > button {
+  background: var(--accent) !important;
+  color: #fff !important;
+}
+
+.retail-shell .main-area :is(
+  .customer-search-btn,
+  .currency-trigger,
+  .smooth-select-btn,
+  .date-range-btn,
+  .dropdown-menu button,
+  .language-menu button,
+  .segmented-row button,
+  .segmented-view button,
+  .toggle-filter-btn,
+  .notification-sound-option,
+  .settings-tabs button,
+  .terms-tabs button,
+  .brand-language-tabs button
+) {
+  border-color: var(--border) !important;
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .main-area :is(
+  .customer-search-btn:hover,
+  .currency-trigger:hover,
+  .smooth-select-btn:hover,
+  .smooth-select-menu button:hover,
+  .smooth-select-menu button.selected,
+  .floating-select-menu button:hover,
+  .floating-select-menu button.selected,
+  .category-search-menu button:hover,
+  .category-search-menu .add-category-option,
+  .customer-search-menu > button:hover,
+  .customer-search-menu > button.selected,
+  .currency-menu button:hover,
+  .currency-menu button.selected,
+  .dropdown-menu button:hover,
+  .dropdown-menu button.selected,
+  .language-menu button:hover,
+  .language-menu button.selected,
+  .segmented-row button.active,
+  .segmented-view button:hover,
+  .toggle-filter-btn:not(.active):hover,
+  .settings-tabs button.active,
+  .terms-tabs button.active,
+  .brand-language-tabs button.active,
+  .notification-sound-option.active
+) {
+  border-color: var(--border) !important;
+  background: var(--panel-soft) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+  box-shadow: inset 0 0 0 1px var(--border) !important;
+}
+
+.retail-shell .main-area :is(
+  .customer-search-menu,
+  .currency-menu,
+  .smooth-select-menu,
+  .floating-select-menu,
+  .category-search-menu,
+  .dropdown-menu,
+  .language-menu
+) {
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+
+.retail-shell .main-area .notification-item > button {
+  width: 34px !important;
+  min-width: 34px !important;
+  padding: 0 !important;
+  background: color-mix(in srgb, #ef4444 12%, var(--panel-bg)) !important;
+  color: #ef4444 !important;
+}
+
+.retail-shell .main-area .notification-item > button:hover {
+  background: color-mix(in srgb, #ef4444 18%, var(--panel-bg)) !important;
+  color: #dc2626 !important;
+}
+
+.retail-shell .main-area .notification-symbol {
+  background: color-mix(in srgb, #2563eb 12%, var(--panel-bg)) !important;
+  color: #2563eb !important;
+}
+
+.retail-shell .main-area .notification-item.danger .notification-symbol {
+  background: color-mix(in srgb, #ef4444 14%, var(--panel-bg)) !important;
+  color: #dc2626 !important;
+}
+
+.retail-shell .main-area .notification-item.success .notification-symbol {
+  background: color-mix(in srgb, #22c55e 14%, var(--panel-bg)) !important;
+  color: #16a34a !important;
+}
+
+.retail-shell .main-area .notification-sound-option svg:first-child {
+  color: #2563eb !important;
+}
+
+.retail-shell .dropdown-menu,
+.retail-shell .account-menu,
+.retail-shell .language-menu,
+.retail-shell .notifications-panel {
+  background: var(--panel-bg) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+.retail-shell .dropdown-menu strong,
+.retail-shell .notifications-panel strong,
+.retail-shell .notifications-panel p,
+.retail-shell .notifications-panel small {
+  color: var(--text) !important;
+}
+
+.retail-shell .notifications-panel p,
+.retail-shell .notifications-panel small {
+  color: var(--muted) !important;
+}
+
+.retail-shell .dropdown-menu button,
+.retail-shell .language-menu button,
+.retail-shell .account-menu button {
+  min-height: 38px !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .dropdown-menu button:hover,
+.retail-shell .dropdown-menu button.selected,
+.retail-shell .language-menu button:hover,
+.retail-shell .language-menu button.selected,
+.retail-shell .account-menu button:hover {
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+}
+
+
+.retail-shell .notification-item > button {
+  width: 34px !important;
+  min-width: 34px !important;
+  min-height: 38px !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 0 !important;
+  border: 1px solid transparent !important;
+  border-radius: 9px !important;
+  background: color-mix(in srgb, #ef4444 12%, var(--panel-bg)) !important;
+  color: #ef4444 !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .notification-item > button:hover {
+  background: color-mix(in srgb, #ef4444 18%, var(--panel-bg)) !important;
+  color: #dc2626 !important;
+}
+
+.retail-shell .main-area :is(
+  .billing-panel button:not(.primary-btn):not(.active),
+  .segmented-row button:not(.active),
+  .segmented-view button:not(.active),
+  .toggle-filter-btn:not(.active),
+  .godown-tabs button:not(.active),
+  .supplier-tabs button:not(.active),
+  .wallet-mode-tabs button:not(.active),
+  .smooth-select-menu button,
+  .floating-select-menu button,
+  .customer-search-menu button,
+  .currency-menu button,
+  .category-search-menu button
+) {
+  background: transparent !important;
+  background-image: none !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .main-area :is(
+  .segmented-row button.active,
+  .segmented-view button.active,
+  .toggle-filter-btn.active,
+  .godown-tabs button.active,
+  .supplier-tabs button.active,
+  .wallet-mode-tabs button.active
+) {
+  border-color: #2563eb !important;
+  background: #2563eb !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.18) !important;
+}
+
+.retail-shell .main-area :is(
+  .primary-btn,
+  .save-btn,
+  .scanner-active-btn,
+  .print-pdf-btn,
+  .wide-print-btn,
+  .barcode-print-btn,
+  .payroll-btn,
+  .cash-wallet-add-btn
+) {
+  border-color: #2563eb !important;
+  background: #2563eb !important;
+  background-image: none !important;
+  color: #ffffff !important;
+}
+
+@media (max-width: 760px) {
+  .terms-privacy-page {
+    padding: 18px 12px 28px;
+  }
+
+  .terms-tabs,
+  .notification-sound-toolbar,
+  .settings-form.two {
+    grid-template-columns: 1fr;
+  }
+
+  .notification-sound-toolbar > button {
+    justify-self: stretch;
+  }
+
+  .notification-sound-list {
+    grid-template-columns: 1fr;
+  }
+
+  .backup-action-row,
+  .automatic-backup-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .backup-action-row > button,
+  .automatic-backup-card > button {
+    width: 100%;
+  }
+
+  .financial-actions,
+  .report-actions,
+  .cash-wallet-top-actions {
+    justify-content: stretch;
+  }
+}
+
+.retail-shell .main-area :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):focus,
+  textarea:focus,
+  select:focus,
+  .search-field:focus-within,
+  .products-search-field:focus-within,
+  .sales-search:focus-within,
+  .filter-search:focus-within,
+  .customer-search-input:focus-within,
+  .category-search:focus-within input,
+  .date-input-shell:focus-within,
+  .smooth-select-btn:focus,
+  .smooth-select-btn:focus-visible,
+  .smooth-select-btn.active,
+  .date-range-btn:focus
+) {
+  border-color: #93b4e8 !important;
+  box-shadow: var(--control-focus-ring) !important;
+  outline: none !important;
+}
+
+.retail-shell .main-area :is(
+  .search-field,
+  .products-search-field,
+  .sales-search,
+  .filter-search,
+  .global-search-input,
+  .customer-search-input
+) {
+  position: relative;
+  min-height: var(--control-height) !important;
+  height: var(--control-height) !important;
+  display: grid !important;
+  grid-template-columns: 18px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 9px !important;
+  padding: 0 var(--control-padding-x) !important;
+  border: 1px solid var(--control-border) !important;
+  border-radius: var(--control-radius) !important;
+  background: var(--control-bg) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+  overflow: hidden;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease !important;
+}
+
+.retail-shell .main-area :is(
+  .search-field,
+  .products-search-field,
+  .sales-search,
+  .filter-search,
+  .global-search-input,
+  .customer-search-input
+) > svg {
+  position: static !important;
+  width: 17px !important;
+  height: 17px !important;
+  transform: none !important;
+  color: var(--muted) !important;
+  pointer-events: none;
+}
+
+.retail-shell .main-area :is(
+  .search-field,
+  .products-search-field,
+  .sales-search,
+  .filter-search,
+  .global-search-input,
+  .customer-search-input
+) input {
+  min-width: 0 !important;
+  min-height: calc(var(--control-height) - 2px) !important;
+  height: calc(var(--control-height) - 2px) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .main-area :is(
+  .search-field,
+  .products-search-field,
+  .sales-search,
+  .filter-search,
+  .global-search-input,
+  .customer-search-input
+) input:focus {
+  box-shadow: none !important;
+}
+
+.retail-shell :is(
+  .dropdown-menu,
+  .language-menu,
+  .account-menu,
+  .notifications-panel,
+  .smooth-select-menu,
+  .floating-select-menu,
+  .customer-search-menu,
+  .currency-menu,
+  .category-search-menu,
+  .product-date-calendar,
+  .sales-date-calendar,
+  .date-range-calendar,
+  .sales-action-dropdown,
+  .sidebar-help-menu
+) {
+  border: 1px solid var(--control-border) !important;
+  border-radius: 12px !important;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+  box-shadow: var(--dropdown-shadow) !important;
+  transform-origin: top center;
+  animation: controlMenuIn 170ms cubic-bezier(0.16, 1, 0.3, 1) both !important;
+  will-change: opacity, transform;
+}
+
+.retail-shell :is(
+  .smooth-select-menu button,
+  .floating-select-menu button,
+  .customer-search-menu > button,
+  .currency-menu button,
+  .category-search-menu button,
+  .dropdown-menu button,
+  .language-menu button,
+  .account-menu button,
+  .sales-action-dropdown button
+) {
+  min-height: 36px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 9px !important;
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  color: var(--text) !important;
+  padding: 0 10px !important;
+  box-shadow: none !important;
+  text-align: start !important;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    transform 150ms ease !important;
+}
+
+.retail-shell :is(
+  .smooth-select-menu button:hover,
+  .floating-select-menu button:hover,
+  .customer-search-menu > button:hover,
+  .currency-menu button:hover,
+  .category-search-menu button:hover,
+  .dropdown-menu button:hover,
+  .language-menu button:hover,
+  .account-menu button:hover,
+  .sales-action-dropdown button:hover
+) {
+  border-color: transparent !important;
+  background: var(--control-hover-bg) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+
+.retail-shell :is(
+  .smooth-select-menu button.selected,
+  .floating-select-menu button.selected,
+  .customer-search-menu > button.selected,
+  .currency-menu button.selected,
+  .dropdown-menu button.selected,
+  .language-menu button.selected
+) {
+  border-color: color-mix(in srgb, #2563eb 24%, var(--control-border)) !important;
+  background: color-mix(in srgb, #2563eb 9%, var(--panel-bg)) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .main-area :is(
+  .filter-card,
+  .filter-bar,
+  .sales-filter-card,
+  .products-filter-card,
+  .godown-filter-bar,
+  .cash-wallet-filters,
+  .metric-detail-filter,
+  .customer-filter,
+  .customer-profile-filter,
+  .supplier-filter-row,
+  .staff-filter,
+  .expenses-filter,
+  .loans-filter-bar
+) {
+  overflow: visible !important;
+}
+/* =========================================
+   GLOBAL SEARCH INPUT — SINGLE CONTAINER
+========================================= */
+
+.retail-shell .header-shared-modal .global-search-input {
+  position: relative;
+  width: 100%;
+  min-height: 46px !important;
+  height: 46px !important;
+  display: grid !important;
+  grid-template-columns: 18px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 0 14px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+.retail-shell .header-shared-modal .global-search-input > svg {
+  position: static !important;
+  width: 17px !important;
+  height: 17px !important;
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+  color: var(--muted) !important;
+  transform: none !important;
+  pointer-events: none !important;
+}
+
+.retail-shell .header-shared-modal .global-search-input > input {
+  min-width: 0 !important;
+  width: 100% !important;
+  min-height: 44px !important;
+  height: 44px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  border-radius: 0 !important;
+
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+
+  color: var(--text) !important;
+  box-shadow: none !important;
+  outline: none !important;
+  appearance: none;
+}
+
+.retail-shell .header-shared-modal .global-search-input > input:hover,
+.retail-shell .header-shared-modal .global-search-input > input:focus,
+.retail-shell .header-shared-modal .global-search-input > input:focus-visible,
+.retail-shell .header-shared-modal .global-search-input > input:active {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.retail-shell .header-shared-modal .global-search-input:focus-within {
+  border-color: #94a3b8 !important;
+  background: var(--panel-bg) !important;
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.14) !important;
+}/* =========================================
+   HEADER NOTIFICATIONS
+========================================= */
+
+.retail-shell .notifications-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  inset-inline-end: 0;
+  z-index: 1500;
+
+  width: min(340px, calc(100vw - 24px));
+  max-height: min(520px, calc(100dvh - 88px));
+  overflow-y: auto;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.14) !important;
+  animation: fadeSlideIn 140ms ease both !important;
+}
+
+/* Header */
+
+.retail-shell .notifications-head {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+
+  padding: 0 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel-bg);
+}
+
+.retail-shell .notifications-head > strong {
+  color: var(--text) !important;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.retail-shell .notifications-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.retail-shell .notifications-head .notification-tool {
+  width: 30px !important;
+  min-width: 30px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+
+  display: grid !important;
+  place-items: center !important;
+  padding: 0 !important;
+
+  border: 0 !important;
+  border-radius: 6px !important;
+  background: transparent !important;
+  background-image: none !important;
+  color: var(--text) !important;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: none !important;
+}
+
+.retail-shell .notifications-head .notification-tool:hover {
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .notifications-head .notification-tool:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Group title */
+
+.retail-shell .notification-group-title {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 0 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel-bg);
+}
+
+.retail-shell .notification-group-title > span {
+  color: #f59e0b;
+  font-size: 12px;
+}
+
+.retail-shell .notification-group-title > strong {
+  color: var(--muted) !important;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Notification list */
+
+.retail-shell .notification-list {
+  display: grid;
+}
+
+.retail-shell .notification-item {
+  min-height: 78px;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 30px;
+  align-items: start;
+  gap: 10px;
+
+  padding: 13px 11px 12px 13px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel-bg) !important;
+  color: var(--text);
+}
+
+.retail-shell .notification-item:last-child {
+  border-bottom: 0;
+}
+
+.retail-shell .notification-item:hover {
+  background: var(--panel-soft) !important;
+}
+
+/* Icon */
+
+.retail-shell .notification-symbol {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+
+  margin-top: 1px;
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  border-radius: 999px;
+  background: rgba(245, 158, 11, 0.08) !important;
+  color: #f59e0b !important;
+}
+
+.retail-shell .notification-item.danger .notification-symbol {
+  border-color: rgba(239, 68, 68, 0.25);
+  background: rgba(239, 68, 68, 0.08) !important;
+  color: #ef4444 !important;
+}
+
+/* Content */
+
+.retail-shell .notification-content {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.retail-shell .notification-content strong {
+  display: block;
+  min-width: 0;
+
+  color: var(--text) !important;
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.3;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.retail-shell .notification-content p {
+  display: block;
+  min-width: 0;
+  margin: 0 !important;
+
+  color: var(--muted) !important;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.35;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.retail-shell .notification-item.danger .notification-content p {
+  color: #ef4444 !important;
+}
+
+.retail-shell .notification-content small {
+  display: block;
+  color: #94a3b8 !important;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+/* Delete button */
+
+.retail-shell .notification-item .notification-delete {
+  width: 28px !important;
+  min-width: 28px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+
+  display: grid !important;
+  place-items: center !important;
+  padding: 0 !important;
+
+  border: 0 !important;
+  border-radius: 6px !important;
+  background: transparent !important;
+  background-image: none !important;
+  color: var(--muted) !important;
+
+  cursor: pointer;
+  box-shadow: none !important;
+}
+
+.retail-shell .notification-item .notification-delete:hover {
+  background: var(--panel-soft) !important;
+  color: #ef4444 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Empty state */
+
+.retail-shell .notifications-empty {
+  min-height: 150px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 6px;
+  padding: 24px;
+  text-align: center;
+}
+
+.retail-shell .notifications-empty svg {
+  color: var(--muted);
+}
+
+.retail-shell .notifications-empty strong {
+  color: var(--text) !important;
+  font-size: 13px;
+}
+
+.retail-shell .notifications-empty span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* Dark mode */
+
+.retail-shell.theme-dark .notifications-panel {
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.34) !important;
+}
+
+/* Mobile */
+
+@media (max-width: 640px) {
+  .retail-shell .notifications-panel {
+    position: fixed !important;
+    inset-inline: 10px !important;
+    top: max(72px, env(safe-area-inset-top)) !important;
+    width: auto !important;
+    max-height: calc(100dvh - 88px);
+  }
+}/* Theme toggle icon */
+
+.retail-shell .theme-toggle-btn {
+  background: transparent !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .theme-toggle-btn:hover {
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .theme-toggle-btn svg {
+  color: currentColor !important;
+  stroke: currentColor !important;
+}
+/* =========================================
+   CLEAN HEADER LANGUAGE MENU
+========================================= */
+
+.retail-shell .language-tool-wrap {
+  position: relative;
+  z-index: 2000;
+}
+
+/* =========================================
+   HEADER LANGUAGE MENU — NEUTRAL COLORS
+========================================= */
+
+#root#root#root .retail-shell .header-language-menu {
+  position: fixed;
+  z-index: 10000;
+
+  width: 192px;
+  overflow: hidden;
+
+  padding: 0 !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 9px !important;
+
+  background: var(--panel-bg) !important;
+  background-color: var(--panel-bg) !important;
+  background-image: none !important;
+
+  color: var(--text) !important;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.14) !important;
+}
+
+#root#root#root .retail-shell .header-language-title {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+
+  padding: 0 13px;
+  border-bottom: 1px solid var(--border);
+
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* All language rows */
+
+#root#root#root .retail-shell .header-language-options {
+  display: grid;
+  gap: 2px;
+  padding: 6px;
+  background: var(--panel-bg) !important;
+}
+
+#root#root#root .retail-shell .header-language-option {
+  position: static !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 38px !important;
+  height: 38px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+
+  padding: 0 9px !important;
+
+  border: 0 !important;
+  border-color: transparent !important;
+  border-radius: 7px !important;
+
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+
+  color: var(--text) !important;
+
+  font-family: inherit !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+  text-align: start !important;
+
+  cursor: pointer;
+  overflow: visible !important;
+
+  box-shadow: none !important;
+  outline: none !important;
+  transform: none !important;
+  animation: none !important;
+}
+
+/* Remove global button decorative layer */
+
+#root#root#root .retail-shell .header-language-option::before,
+#root#root#root .retail-shell .header-language-option::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Hover */
+
+#root#root#root .retail-shell .header-language-option:hover {
+  border: 0 !important;
+  background: var(--panel-soft) !important;
+  background-color: var(--panel-soft) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Selected language must remain neutral */
+
+#root#root#root
+.retail-shell
+.header-language-option.is-selected {
+  border: 0 !important;
+  border-color: transparent !important;
+
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+
+  color: var(--text) !important;
+  font-weight: 600 !important;
+
+  box-shadow: none !important;
+  outline: none !important;
+  transform: none !important;
+}
+
+/* Selected language hover */
+
+#root#root#root
+.retail-shell
+.header-language-option.is-selected:hover {
+  border: 0 !important;
+  background: var(--panel-soft) !important;
+  background-color: var(--panel-soft) !important;
+  background-image: none !important;
+
+  color: var(--text) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Focus */
+
+#root#root#root
+.retail-shell
+.header-language-option:focus,
+#root#root#root
+.retail-shell
+.header-language-option:focus-visible,
+#root#root#root
+.retail-shell
+.header-language-option:active {
+  border: 0 !important;
+  background: var(--panel-soft) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+  outline: none !important;
+  transform: none !important;
+}
+
+/* Text and check */
+
+#root#root#root
+.retail-shell
+.header-language-option > span {
+  color: inherit !important;
+}
+
+#root#root#root .retail-shell .header-language-check {
+  width: 18px;
+  min-width: 18px;
+  height: 18px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background: transparent !important;
+  color: var(--text) !important;
+
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+
+  box-shadow: none !important;
+}
+
+/* Dark mode */
+
+#root#root#root
+.retail-shell.theme-dark
+.header-language-menu {
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.32) !important;
+}
+
+#root#root#root
+.retail-shell.theme-dark
+.header-language-option,
+#root#root#root
+.retail-shell.theme-dark
+.header-language-option.is-selected {
+  background: transparent !important;
+  color: var(--text) !important;
+}
+
+#root#root#root
+.retail-shell.theme-dark
+.header-language-option:hover,
+#root#root#root
+.retail-shell.theme-dark
+.header-language-option.is-selected:hover {
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+}
+
+/* RTL */
+
+#root#root#root
+.retail-shell[dir="rtl"]
+.header-language-option {
+  text-align: right !important;
+}
+
+.retail-shell .header-language-title {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+
+  padding: 0 13px;
+  border-bottom: 1px solid var(--border);
+
+  background: var(--panel-bg);
+  color: var(--text);
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.retail-shell .header-language-options {
+  display: grid;
+  gap: 2px;
+  padding: 6px;
+}
+
+.retail-shell .header-language-option {
+  width: 100%;
+  min-height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  padding: 0 9px;
+  border: 0;
+  border-radius: 7px;
+
+  background: transparent;
+  color: var(--text);
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: start;
+
+  cursor: pointer;
+  box-shadow: none;
+  transform: none;
+}
+
+.retail-shell .header-language-option:hover {
+  border: 0;
+  background: var(--panel-soft);
+  color: var(--text);
+  box-shadow: none;
+  transform: none;
+}
+
+.retail-shell .header-language-check {
+  width: 18px;
+  min-width: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.retail-shell[dir="rtl"] .header-language-option {
+  text-align: right;
+}
+
+@keyframes headerLanguageMenuIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Theme icon */
+
+.retail-shell .theme-toggle-btn {
+  background: transparent !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .theme-toggle-btn:hover {
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .theme-toggle-btn svg {
+  color: currentColor !important;
+  stroke: currentColor !important;
+}
+/* =========================================
+   HEADER CASH WALLET MODAL
+========================================= */
+
+#root#root#root .retail-shell .cash-wallet-header-modal {
+  width: min(396px, calc(100vw - 28px)) !important;
+  max-height: calc(100dvh - 36px) !important;
+
+  display: grid !important;
+  gap: 14px !important;
+
+  padding: 20px 22px 22px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28) !important;
+  overflow-y: auto !important;
+}
+
+/* Header */
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.header-shared-modal-head {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 9px !important;
+
+  padding-inline-end: 28px !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.header-shared-modal-icon {
+  width: 22px !important;
+  min-width: 22px !important;
+  height: 22px !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  margin-top: 1px !important;
+
+  border: 0 !important;
+  border-radius: 0 !important;
+
+  background: transparent !important;
+  color: var(--text) !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.header-shared-modal-icon svg {
+  width: 19px !important;
+  height: 19px !important;
+  color: currentColor !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.header-shared-modal-head h2 {
+  margin: 0 !important;
+
+  color: var(--text) !important;
+  font-size: 17px !important;
+  font-weight: 800 !important;
+  line-height: 1.25 !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.header-shared-modal-head p {
+  margin: 4px 0 0 !important;
+
+  color: var(--muted) !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 1.4 !important;
+}
+
+/* Close button */
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.modal-close {
+  position: absolute !important;
+  top: 13px !important;
+  inset-inline-end: 13px !important;
+
+  width: 28px !important;
+  min-width: 28px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 6px !important;
+
+  background: transparent !important;
+  color: var(--muted) !important;
+
+  font-size: 20px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.modal-close:hover {
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Modal body */
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.header-shared-modal-body {
+  display: block !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-modal-body {
+  display: grid !important;
+  gap: 16px !important;
+}
+
+/* Deposit / Withdraw tabs */
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-mode-tabs {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 4px !important;
+
+  padding: 4px !important;
+
+  border: 0 !important;
+  border-radius: 9px !important;
+  background: var(--panel-soft) !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-mode-tabs button {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 38px !important;
+  height: 38px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+
+  padding: 0 10px !important;
+
+  border: 0 !important;
+  border-radius: 7px !important;
+
+  background: transparent !important;
+  background-image: none !important;
+  color: var(--muted) !important;
+
+  font-family: inherit !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-mode-tabs button:hover {
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-mode-tabs
+.deposit-mode.active {
+  background: #22c55e !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 10px rgba(34, 197, 94, 0.18) !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-mode-tabs
+.withdraw-mode.active {
+  background: #ef4444 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.18) !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-mode-tabs button svg,
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-mode-tabs button span {
+  color: inherit !important;
+}
+
+/* Form */
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-form-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: 14px 10px !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-form-grid label {
+  min-width: 0 !important;
+
+  display: grid !important;
+  gap: 7px !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-form-grid label.wide {
+  grid-column: 1 / -1 !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-form-grid label > span {
+  color: var(--text) !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+/* Amount */
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-form-grid input {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 40px !important;
+  min-height: 40px !important;
+
+  padding: 0 11px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+
+  font-family: inherit !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Currency select */
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-currency-select,
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-currency-select
+.smooth-select {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-currency-select
+.smooth-select-btn {
+  width: 100% !important;
+  height: 40px !important;
+  min-height: 40px !important;
+
+  padding: 0 11px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-form-grid input:focus,
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-currency-select
+.smooth-select-btn.active,
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-currency-select
+.smooth-select-btn:focus-visible {
+  border-color: #64748b !important;
+  box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.12) !important;
+  outline: none !important;
+}
+
+/* Note */
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-form-grid textarea {
+  width: 100% !important;
+  min-height: 76px !important;
+
+  padding: 11px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+
+  font-family: inherit !important;
+  font-size: 13px !important;
+  line-height: 1.45 !important;
+
+  resize: vertical !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-form-grid textarea:focus {
+  border-color: #64748b !important;
+  box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.12) !important;
+}
+
+/* Footer */
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-modal-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+
+  margin-top: 2px !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-modal-actions button {
+  min-width: auto !important;
+  min-height: 38px !important;
+  height: 38px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 0 14px !important;
+
+  border-radius: 8px !important;
+
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-cancel-btn {
+  border: 1px solid var(--border) !important;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-cancel-btn:hover {
+  border-color: #cbd5e1 !important;
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-save-btn.deposit {
+  border: 1px solid #22c55e !important;
+  background: #22c55e !important;
+  color: #ffffff !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-save-btn.deposit:hover {
+  border-color: #16a34a !important;
+  background: #16a34a !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-save-btn.withdraw {
+  border: 1px solid #ef4444 !important;
+  background: #ef4444 !important;
+  color: #ffffff !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-save-btn.withdraw:hover {
+  border-color: #dc2626 !important;
+  background: #dc2626 !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-save-btn:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+/* Dark mode */
+
+#root#root#root
+.retail-shell.theme-dark
+.cash-wallet-header-modal {
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.46) !important;
+}
+
+/* Mobile */
+
+@media (max-width: 520px) {
+  #root#root#root .retail-shell .cash-wallet-header-modal {
+    width: calc(100vw - 20px) !important;
+    padding: 18px 16px 20px !important;
+  }
+
+  #root#root#root
+  .retail-shell
+  .cash-wallet-header-modal
+  .wallet-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  #root#root#root
+  .retail-shell
+  .cash-wallet-header-modal
+  .wallet-form-grid label.wide {
+    grid-column: 1 !important;
+  }
+
+  #root#root#root
+  .retail-shell
+  .cash-wallet-header-modal
+  .wallet-modal-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  #root#root#root
+  .retail-shell
+  .cash-wallet-header-modal
+  .wallet-modal-actions button {
+    width: 100% !important;
+  }
+}/* =====================================================
+   HEADER FINAL FIX
+   Search container + modal spacing + close button
+===================================================== */
+
+/* =====================================================
+   HEADER SEARCH — REMOVE DOUBLE CONTAINER
+===================================================== */
+
+#root#root#root
+.retail-shell
+.app-header {
+  overflow: visible;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 14px !important;
+
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+
+  box-shadow: var(--shadow-soft) !important;
+}
+
+/*
+  Search shell باید فقط فضای داخلی Header باشد،
+  نه یک container جداگانه.
+*/
+
+#root#root#root
+.retail-shell
+.app-header
+.search-shell {
+  position: static !important;
+
+  flex: 1 1 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 0 !important;
+  border-width: 0 !important;
+  border-radius: 0 !important;
+
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+  outline: none !important;
+  transform: none !important;
+
+  overflow: visible !important;
+}
+
+/* حذف هر نوع لایه اضافی */
+
+#root#root#root
+.retail-shell
+.app-header
+.search-shell::before,
+#root#root#root
+.retail-shell
+.app-header
+.search-shell::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Hover نباید container جدید بسازد */
+
+#root#root#root
+.retail-shell
+.app-header
+.search-shell:hover,
+#root#root#root
+.retail-shell
+.app-header
+.search-shell:focus,
+#root#root#root
+.retail-shell
+.app-header
+.search-shell:focus-visible,
+#root#root#root
+.retail-shell
+.app-header
+.search-shell:active {
+  border: 0 !important;
+  border-radius: 0 !important;
+
+  background: transparent !important;
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+  outline: none !important;
+  transform: none !important;
+}
+
+#root#root#root
+.retail-shell
+.app-header
+.search-shell svg {
+  flex: 0 0 auto;
+
+  width: 20px !important;
+  height: 20px !important;
+
+  margin: 0 !important;
+
+  color: var(--text) !important;
+  stroke: currentColor !important;
+
+  transform: none !important;
+  filter: none !important;
+}
+
+/* ابزارهای سمت راست Header */
+
+#root#root#root
+.retail-shell
+.app-header
+.header-tools {
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin: 0;
+  padding: 0;
+
+  border: 0;
+  background: transparent;
+}
+
+/* =====================================================
+   SHARED HEADER MODAL
+===================================================== */
+
+#root#root#root
+.retail-shell
+.header-shared-modal {
+  position: relative;
+
+  width: min(420px, calc(100vw - 28px)) !important;
+
+  display: grid !important;
+  gap: 0 !important;
+
+  padding: 22px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.26) !important;
+}
+
+/* Header Modal */
+
+#root#root#root
+.retail-shell
+.header-shared-modal
+.header-shared-modal-head {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 10px !important;
+
+  margin: 0 0 18px !important;
+  padding: 0 36px 0 0 !important;
+}
+
+[dir="rtl"]
+#root#root#root
+.retail-shell
+.header-shared-modal
+.header-shared-modal-head {
+  padding: 0 0 0 36px !important;
+}
+
+#root#root#root
+.retail-shell
+.header-shared-modal
+.header-shared-modal-body {
+  display: block !important;
+  min-width: 0;
+}
+
+/* =====================================================
+   MODAL CLOSE BUTTON
+===================================================== */
+
+#root#root#root
+.retail-shell
+.header-shared-modal
+.header-modal-close {
+  position: absolute !important;
+  top: 14px !important;
+  inset-inline-end: 14px !important;
+  z-index: 4;
+
+  width: 30px !important;
+  min-width: 30px !important;
+  max-width: 30px !important;
+
+  height: 30px !important;
+  min-height: 30px !important;
+  max-height: 30px !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+
+  color: var(--muted) !important;
+
+  box-shadow: none !important;
+  outline: none !important;
+  transform: none !important;
+
+  cursor: pointer;
+}
+
+#root#root#root
+.retail-shell
+.header-shared-modal
+.header-modal-close:hover {
+  border-color: var(--border) !important;
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root
+.retail-shell
+.header-shared-modal
+.header-modal-close:active {
+  background: color-mix(
+    in srgb,
+    var(--panel-soft) 78%,
+    var(--border)
+  ) !important;
+
+  transform: scale(0.96) !important;
+}
+
+#root#root#root
+.retail-shell
+.header-shared-modal
+.header-modal-close svg {
+  display: block !important;
+
+  width: 16px !important;
+  height: 16px !important;
+
+  margin: 0 !important;
+
+  color: currentColor !important;
+  stroke: currentColor !important;
+  stroke-width: 2 !important;
+
+  transform: none !important;
+  filter: none !important;
+}
+
+#root#root#root
+.retail-shell
+.header-shared-modal
+.header-modal-close::before,
+#root#root#root
+.retail-shell
+.header-shared-modal
+.header-modal-close::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* =====================================================
+   SEARCH MODAL — SINGLE INPUT CONTAINER
+===================================================== */
+
+#root#root#root
+.retail-shell
+.header-shared-modal
+.search-modal-body {
+  display: grid !important;
+  gap: 18px !important;
+}
+
+#root#root#root
+.retail-shell
+.header-shared-modal
+.global-search-input {
+  width: 100% !important;
+  min-width: 0 !important;
+
+  height: 44px !important;
+  min-height: 44px !important;
+
+  display: grid !important;
+  grid-template-columns: 18px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 10px !important;
+
+  margin: 0 !important;
+  padding: 0 13px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 9px !important;
+
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+#root#root#root
+.retail-shell
+.header-shared-modal
+.global-search-input
+input {
+  width: 100% !important;
+  min-width: 0 !important;
+
+  height: 42px !important;
+  min-height: 42px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 0 !important;
+  border-width: 0 !important;
+  border-radius: 0 !important;
+
+  background: transparent !important;
+  background-image: none !important;
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+#root#root#root
+.retail-shell
+.header-shared-modal
+.global-search-input
+input:hover,
+#root#root#root
+.retail-shell
+.header-shared-modal
+.global-search-input
+input:focus,
+#root#root#root
+.retail-shell
+.header-shared-modal
+.global-search-input
+input:focus-visible {
+  border: 0 !important;
+  background: transparent !important;
+
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+#root#root#root
+.retail-shell
+.header-shared-modal
+.global-search-input:focus-within {
+  border-color: #94a3b8 !important;
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.14) !important;
+}
+
+/* =====================================================
+   WALLET FORM SPACING
+===================================================== */
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-modal-body {
+  display: grid !important;
+  gap: 18px !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-form-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+
+  column-gap: 12px !important;
+  row-gap: 16px !important;
+
+  margin: 2px 0 0 !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-form-grid
+label {
+  display: grid !important;
+  gap: 8px !important;
+
+  min-width: 0;
+  margin: 0 !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-form-grid
+label.wide {
+  grid-column: 1 / -1 !important;
+}
+
+/*
+  فاصله پس از آخرین ورودی؛
+  دکمه‌های Cancel و Save دیگر به textarea نمی‌چسبند.
+*/
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-modal-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+
+  margin: 4px 0 0 !important;
+  padding: 16px 0 0 !important;
+
+  border-top: 1px solid var(--border) !important;
+}
+
+/* Cancel */
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-cancel-btn {
+  min-width: 82px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+
+  padding: 0 14px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+
+  font-size: 12px !important;
+  font-weight: 700 !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+.wallet-cancel-btn:hover {
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* جلوگیری از افکت عمومی دکمه‌ها */
+
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+:is(
+  .header-modal-close,
+  .wallet-cancel-btn,
+  .wallet-mode-tabs button
+)::before,
+#root#root#root
+.retail-shell
+.cash-wallet-header-modal
+:is(
+  .header-modal-close,
+  .wallet-cancel-btn,
+  .wallet-mode-tabs button
+)::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* =====================================================
+   DARK MODE
+===================================================== */
+
+.retail-shell.theme-dark
+.header-shared-modal {
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  box-shadow: 0 26px 76px rgba(0, 0, 0, 0.48) !important;
+}
+
+.retail-shell.theme-dark
+.global-search-input,
+.retail-shell.theme-dark
+.wallet-cancel-btn {
+  border-color: var(--border) !important;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 520px) {
+  #root#root#root
+  .retail-shell
+  .header-shared-modal {
+    width: calc(100vw - 20px) !important;
+    padding: 18px 16px !important;
+  }
+
+  #root#root#root
+  .retail-shell
+  .cash-wallet-header-modal
+  .wallet-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  #root#root#root
+  .retail-shell
+  .cash-wallet-header-modal
+  .wallet-form-grid
+  label.wide {
+    grid-column: 1 !important;
+  }
+
+  #root#root#root
+  .retail-shell
+  .cash-wallet-header-modal
+  .wallet-modal-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  #root#root#root
+  .retail-shell
+  .cash-wallet-header-modal
+  .wallet-modal-actions
+  button {
+    width: 100% !important;
+  }
+}

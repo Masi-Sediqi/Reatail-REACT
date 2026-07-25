@@ -147,16 +147,763 @@
 }
 
 .loan-modal .modal-close {
-  position: absolute;
-  top: 16px;
-  inset-inline-end: 18px;
-  width: 28px;
-  height: 28px;
-  border: 0;
-  background: transparent;
+  display: none;
+}
+/* =====================================================
+   LOAN MODALS — V2
+===================================================== */
+
+.loan-modal-v2,
+.loan-payment-modal-v2 {
+  position: relative;
+
+  width: min(460px, calc(100vw - 28px));
+  max-height: calc(100dvh - 34px);
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+
+  gap: 0;
+
+  margin: 0;
+  padding: 0;
+
+  border: 1px solid var(--border);
+  border-radius: 14px;
+
+  background: var(--panel-bg);
+  color: var(--text);
+
+  overflow: hidden;
+
+  box-shadow:
+    0 28px 80px rgba(15, 23, 42, 0.3);
+
+  animation: modalZoomIn 160ms ease both;
+}
+
+/* Header */
+.loan-modal-v2-header {
+  position: relative;
+
+  min-height: 68px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding: 15px 52px 15px 18px;
+
+  border-bottom: 1px solid var(--border);
+
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(
+        in srgb,
+        var(--panel-soft) 58%,
+        var(--panel-bg)
+      ),
+      var(--panel-bg)
+    );
+}
+
+.loan-modal-v2-title {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+}
+
+.loan-modal-v2-icon {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 10px;
+
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.loan-modal-v2-icon.payment {
+  background:
+    color-mix(
+      in srgb,
+      var(--success) 12%,
+      var(--panel-bg)
+    );
+
+  color: var(--success);
+}
+
+.loan-modal-v2-icon svg {
+  width: 18px;
+  height: 18px;
+
+  color: currentColor;
+  stroke: currentColor;
+}
+
+.loan-modal-v2-title h2 {
+  margin: 0;
+
+  color: var(--text);
+
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.loan-modal-v2-title p {
+  margin: 3px 0 0;
+
   color: var(--muted);
+
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+/* Close button */
+.loan-modal-v2-close,
+.loan-modal-v2-close:hover,
+.loan-modal-v2-close:focus,
+.loan-modal-v2-close:active {
+  position: absolute;
+
+  top: 50%;
+  inset-inline-end: 15px;
+
+  z-index: 10;
+
+  width: 30px;
+  min-width: 30px;
+  max-width: 30px;
+
+  height: 30px;
+  min-height: 30px;
+  max-height: 30px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0;
+  padding: 0;
+
+  border: 1px solid var(--border);
+  border-radius: 50%;
+
+  background: var(--panel-bg);
+  color: var(--muted);
+
   cursor: pointer;
-  font-size: 18px;
+
+  transform: translateY(-50%);
+
+  box-shadow: none;
+
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease,
+    color 140ms ease;
+}
+
+.loan-modal-v2-close:hover {
+  border-color: rgba(239, 68, 68, 0.38);
+
+  background: rgba(239, 68, 68, 0.08);
+  color: #dc2626;
+}
+
+.loan-modal-v2-close:focus-visible {
+  outline: none;
+
+  box-shadow:
+    0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.loan-modal-v2-close svg {
+  width: 15px;
+  height: 15px;
+
+  display: block;
+
+  margin: 0;
+  padding: 0;
+
+  color: currentColor;
+  stroke: currentColor;
+  stroke-width: 2.4;
+
+  pointer-events: none;
+}
+.loan-modal-v2-body {
+  min-height: 0;
+
+  display: grid;
+  gap: 14px;
+
+  padding: 16px 18px;
+
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Invoice and customer */
+.loan-info-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 10px;
+}
+
+.loan-info-card {
+  min-width: 0;
+
+  display: grid;
+  gap: 5px;
+
+  padding: 12px;
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  background: var(--panel-soft);
+}
+
+.loan-info-card span {
+  color: var(--muted);
+
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.loan-info-card strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  color: var(--text);
+
+  font-size: 12px;
+  font-weight: 750;
+}
+
+/* Progress */
+.loan-progress-card {
+  display: grid;
+  gap: 9px;
+
+  padding: 12px;
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  background: var(--panel-bg);
+}
+
+.loan-progress-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+}
+
+.loan-progress-head span {
+  color: var(--muted);
+
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.loan-progress-head strong {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.loan-progress-card .loan-progress-track {
+  height: 8px;
+
+  border-radius: 999px;
+
+  background: var(--panel-soft);
+}
+
+.loan-progress-card
+.loan-progress-track
+> span {
+  height: 100%;
+
+  display: block;
+
+  border-radius: inherit;
+
+  background: var(--navy);
+}
+
+/* Amounts */
+.loan-amount-card {
+  display: grid;
+  gap: 0;
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  background: var(--panel-bg);
+
+  overflow: hidden;
+}
+
+.loan-amount-card > div {
+  min-height: 43px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 14px;
+
+  padding: 0 12px;
+
+  border-bottom: 1px solid var(--border);
+}
+
+.loan-amount-card > div:last-child {
+  border-bottom: 0;
+}
+
+.loan-amount-card span {
+  color: var(--muted);
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.loan-amount-card strong {
+  color: var(--text);
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* Created */
+.loan-created-card {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 11px 12px;
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  background: var(--panel-soft);
+}
+
+.loan-created-card > svg {
+  width: 16px;
+  height: 16px;
+
+  color: var(--muted);
+}
+
+.loan-created-card > div {
+  display: grid;
+  gap: 3px;
+}
+
+.loan-created-card span {
+  color: var(--muted);
+
+  font-size: 10px;
+}
+
+.loan-created-card strong {
+  color: var(--text);
+
+  font-size: 11px;
+  font-weight: 750;
+}
+.loan-modal-v2-footer {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 8px;
+
+  padding: 13px 18px;
+
+  border-top: 1px solid var(--border);
+
+  background: var(--panel-bg);
+}
+
+.loan-modal-v2-footer button {
+  height: 40px;
+  min-height: 40px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  margin: 0;
+  padding: 0 13px;
+
+  border-radius: 9px;
+
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1;
+
+  cursor: pointer;
+
+  box-shadow: none;
+  transform: none;
+}
+
+.loan-modal-v2-footer button svg {
+  width: 15px;
+  height: 15px;
+
+  flex: 0 0 15px;
+
+  color: currentColor;
+  stroke: currentColor;
+}
+
+.loan-record-payment-btn {
+  border: 1px solid var(--border);
+
+  background: var(--panel-bg);
+  color: var(--text);
+}
+
+.loan-record-payment-btn:hover {
+  border-color: var(--accent);
+
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.loan-mark-paid-btn {
+  border: 1px solid var(--navy);
+
+  background: var(--navy);
+  color: #ffffff;
+}
+
+.loan-mark-paid-btn:disabled {
+  border-color: var(--border);
+
+  background: var(--panel-soft);
+  color: var(--muted);
+
+  cursor: not-allowed;
+}
+
+.loan-delete-record-btn {
+  grid-column: 1 / -1;
+
+  border: 1px solid rgba(239, 68, 68, 0.3);
+
+  background: rgba(239, 68, 68, 0.07);
+  color: #dc2626;
+}
+
+.loan-delete-record-btn:hover {
+  border-color: #dc2626;
+
+  background: #dc2626;
+  color: #ffffff;
+}/* =====================================================
+   RECORD PAYMENT MODAL
+===================================================== */
+
+.loan-payment-modal-v2-body {
+  min-height: 0;
+
+  display: grid;
+  gap: 14px;
+
+  padding: 16px 18px;
+
+  overflow-y: auto;
+}
+
+.loan-payment-summary-card {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 1px;
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  background: var(--border);
+
+  overflow: hidden;
+}
+
+.loan-payment-summary-card > div {
+  min-width: 0;
+
+  display: grid;
+  gap: 4px;
+
+  padding: 11px 12px;
+
+  background: var(--panel-bg);
+}
+
+.loan-payment-summary-card span {
+  color: var(--muted);
+
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.loan-payment-summary-card strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  color: var(--text);
+
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.loan-payment-field {
+  min-width: 0;
+
+  display: grid;
+  gap: 7px;
+}
+
+.loan-payment-field > span {
+  color: var(--text);
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.loan-payment-input-shell {
+  position: relative;
+
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+
+  border: 1px solid var(--border);
+  border-radius: 9px;
+
+  background: var(--panel-soft);
+
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.loan-payment-input-shell:focus-within {
+  border-color: var(--accent);
+
+  background: var(--panel-bg);
+
+  box-shadow:
+    0 0 0 3px var(--accent-soft);
+}
+
+.loan-payment-input-shell > svg {
+  position: absolute;
+
+  top: 50%;
+  inset-inline-start: 12px;
+
+  width: 15px;
+  height: 15px;
+
+  color: var(--muted);
+
+  transform: translateY(-50%);
+
+  pointer-events: none;
+}
+
+.loan-payment-input-shell input {
+  width: 100%;
+  height: 38px;
+  min-height: 38px;
+
+  margin: 0;
+
+  padding-inline-start: 36px;
+  padding-inline-end: 12px;
+
+  border: 0;
+  border-radius: 8px;
+
+  background: transparent;
+  color: var(--text);
+
+  font-family: inherit;
+  font-size: 12px;
+
+  outline: none;
+  box-shadow: none;
+}
+
+.loan-payment-field textarea {
+  width: 100%;
+  min-height: 78px;
+
+  padding: 11px 12px;
+
+  border: 1px solid var(--border);
+  border-radius: 9px;
+
+  background: var(--panel-soft);
+  color: var(--text);
+
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.5;
+
+  outline: none;
+  resize: vertical;
+}
+
+.loan-payment-field textarea:focus {
+  border-color: var(--accent);
+
+  background: var(--panel-bg);
+
+  box-shadow:
+    0 0 0 3px var(--accent-soft);
+}
+
+.loan-payment-error {
+  color: #dc2626;
+
+  font-size: 9px;
+  font-weight: 600;
+}
+
+/* Footer */
+.loan-payment-footer {
+  display: grid;
+  grid-template-columns:
+    100px minmax(0, 1fr);
+
+  gap: 8px;
+
+  padding: 13px 18px;
+
+  border-top: 1px solid var(--border);
+
+  background: var(--panel-bg);
+}
+
+.loan-payment-footer button {
+  height: 40px;
+  min-height: 40px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  margin: 0;
+  padding: 0 14px;
+
+  border-radius: 9px;
+
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1;
+
+  cursor: pointer;
+
+  box-shadow: none;
+  transform: none;
+}
+
+.loan-payment-cancel-btn {
+  border: 1px solid var(--border);
+
+  background: var(--panel-bg);
+  color: var(--text);
+}
+
+.loan-payment-cancel-btn:hover {
+  background: var(--panel-soft);
+}
+
+.loan-payment-submit-btn {
+  border: 1px solid var(--navy);
+
+  background: var(--navy);
+  color: #ffffff;
+}
+
+.loan-payment-submit-btn:disabled {
+  border-color: var(--border);
+
+  background: var(--panel-soft);
+  color: var(--muted);
+
+  cursor: not-allowed;
+}
+
+.loan-payment-submit-btn svg {
+  width: 15px;
+  height: 15px;
+
+  color: currentColor;
+  stroke: currentColor;
+}
+@media (max-width: 520px) {
+  .loan-modal-v2,
+  .loan-payment-modal-v2 {
+    width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+  }
+
+  .loan-info-grid,
+  .loan-payment-summary-card {
+    grid-template-columns: 1fr;
+  }
+
+  .loan-modal-v2-footer {
+    grid-template-columns: 1fr;
+  }
+
+  .loan-delete-record-btn {
+    grid-column: auto;
+  }
+
+  .loan-payment-footer {
+    grid-template-columns: 90px minmax(0, 1fr);
+  }
 }
 
 .loan-modal header {
@@ -314,15 +1061,14 @@
   gap: 8px;
 }
 
-.loan-payment-modal input,
 .loan-payment-modal textarea {
   width: 100%;
-  min-height: 42px;
+  min-height: 80px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--panel-soft);
   color: var(--text);
-  padding: 0 12px;
+  padding: 12px;
   font: inherit;
   outline: none;
 }
@@ -333,7 +1079,6 @@
   resize: vertical;
 }
 
-.loan-payment-modal input:focus,
 .loan-payment-modal textarea:focus {
   border-color: var(--accent);
   background: var(--panel-bg);
@@ -376,4 +1121,300 @@
   .loan-detail-pair > div:last-child {
     text-align: start;
   }
+}
+/* =====================================================
+   LOAN MODAL CLOSE — FINAL FIX
+===================================================== */
+
+#root .retail-shell .loan-modal-v2-header {
+  position: relative !important;
+  padding-inline-end: 60px !important;
+}
+
+#root .retail-shell .loan-modal-v2-close,
+#root .retail-shell .loan-modal-v2-close:hover,
+#root .retail-shell .loan-modal-v2-close:focus,
+#root .retail-shell .loan-modal-v2-close:active {
+  position: absolute !important;
+
+  top: 50% !important;
+  inset-inline-end: 16px !important;
+
+  z-index: 50 !important;
+
+  width: 30px !important;
+  min-width: 30px !important;
+  max-width: 30px !important;
+
+  height: 30px !important;
+  min-height: 30px !important;
+  max-height: 30px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  flex: 0 0 30px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 50% !important;
+
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  color: var(--muted) !important;
+
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 19px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+
+  cursor: pointer !important;
+
+  opacity: 1 !important;
+  visibility: visible !important;
+
+  transform: translateY(-50%) !important;
+
+  box-shadow: none !important;
+}
+
+#root .retail-shell .loan-modal-v2-close:hover {
+  border-color: rgba(239, 68, 68, 0.38) !important;
+  background: rgba(239, 68, 68, 0.08) !important;
+  color: #dc2626 !important;
+}
+
+#root .retail-shell .loan-modal-v2-close:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+/* خود علامت × */
+#root .retail-shell .loan-modal-v2-close > span {
+  position: static !important;
+
+  width: auto !important;
+  height: auto !important;
+
+  display: block !important;
+
+  margin: -1px 0 0 !important;
+  padding: 0 !important;
+
+  color: currentColor !important;
+
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 19px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+
+  opacity: 1 !important;
+  visibility: visible !important;
+
+  pointer-events: none !important;
+}
+/* =====================================================
+   LOAN MODAL CLOSE — FINAL FIX
+===================================================== */
+
+#root .retail-shell .loan-modal-v2-header {
+  position: relative !important;
+  padding-inline-end: 60px !important;
+}
+
+#root .retail-shell .loan-modal-v2-close,
+#root .retail-shell .loan-modal-v2-close:hover,
+#root .retail-shell .loan-modal-v2-close:focus,
+#root .retail-shell .loan-modal-v2-close:active {
+  position: absolute !important;
+
+  top: 50% !important;
+  inset-inline-end: 16px !important;
+
+  z-index: 50 !important;
+
+  width: 30px !important;
+  min-width: 30px !important;
+  max-width: 30px !important;
+
+  height: 30px !important;
+  min-height: 30px !important;
+  max-height: 30px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  flex: 0 0 30px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 50% !important;
+
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  color: var(--muted) !important;
+
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 19px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+
+  cursor: pointer !important;
+
+  opacity: 1 !important;
+  visibility: visible !important;
+
+  transform: translateY(-50%) !important;
+
+  box-shadow: none !important;
+}
+
+#root .retail-shell .loan-modal-v2-close:hover {
+  border-color: rgba(239, 68, 68, 0.38) !important;
+  background: rgba(239, 68, 68, 0.08) !important;
+  color: #dc2626 !important;
+}
+
+#root .retail-shell .loan-modal-v2-close:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+/* خود علامت × */
+#root .retail-shell .loan-modal-v2-close > span {
+  position: static !important;
+
+  width: auto !important;
+  height: auto !important;
+
+  display: block !important;
+
+  margin: -1px 0 0 !important;
+  padding: 0 !important;
+
+  color: currentColor !important;
+
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 19px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+
+  opacity: 1 !important;
+  visibility: visible !important;
+
+  pointer-events: none !important;
+}
+
+#root .retail-shell .loan-payment-modal-v2
+.loan-payment-input-shell > input,
+#root .retail-shell .loan-payment-modal
+.loan-payment-input-shell > input {
+  position: relative !important;
+  z-index: 1 !important;
+
+  width: 100% !important;
+  height: 38px !important;
+  min-height: 38px !important;
+
+  margin: 0 !important;
+  padding: 0 12px !important;
+
+  border: 0 !important;
+  border-radius: 8px !important;
+
+  background: transparent !important;
+  color: var(--text) !important;
+
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+
+  outline: none !important;
+  box-shadow: none !important;
+}
+/* =====================================================
+   LOAN DETAILS HEADER STATUS ALIGNMENT
+===================================================== */
+
+#root .retail-shell .loan-details-modal
+.loan-modal-v2-header {
+  display: grid !important;
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto !important;
+
+  align-items: center !important;
+
+  gap: 12px !important;
+
+  padding:
+    14px
+    58px
+    14px
+    18px !important;
+}
+
+#root .retail-shell .loan-details-modal
+.loan-modal-v2-title {
+  min-width: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+
+  gap: 11px !important;
+}
+
+#root .retail-shell .loan-details-modal
+.loan-header-status {
+  position: static !important;
+
+  min-width: 0 !important;
+  min-height: 24px !important;
+  height: 24px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  align-self: center !important;
+
+  margin: 0 !important;
+  padding: 0 10px !important;
+
+  border-radius: 999px !important;
+
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+
+  white-space: nowrap !important;
+
+  transform: none !important;
+}
+#root .retail-shell .loan-details-modal
+.loan-modal-v2-icon {
+  align-self: center !important;
+}
+
+#root .retail-shell .loan-details-modal
+.loan-modal-v2-title > div:last-child {
+  min-width: 0 !important;
+
+  display: grid !important;
+  align-content: center !important;
+
+  gap: 2px !important;
+}
+
+#root .retail-shell .loan-details-modal
+.loan-modal-v2-title h2,
+#root .retail-shell .loan-details-modal
+.loan-modal-v2-title p {
+  line-height: 1.2 !important;
 }

@@ -17,23 +17,6 @@
   z-index: 120;
 }
 
-.report-date-control {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.report-date-control .smooth-select {
-  width: 140px;
-  flex: 0 0 140px;
-}
-
-.report-date-control .date-range-picker {
-  width: 176px;
-  min-width: 176px;
-  flex: 0 0 176px;
-}
 
 .report-date-control .smooth-select-btn,
 .report-date-control .date-range-btn,
@@ -62,25 +45,288 @@
   position: relative;
 }
 
-.financial-date-range .date-range-calendar,
-.report-date-range .date-range-calendar {
-  position: absolute;
-  top: calc(100% + 8px);
-  inset-inline-end: 0;
-  inset-inline-start: auto;
-  z-index: 9999;
-  width: 278px;
-}
-
 .report-date-control .date-range-btn svg {
   color: #111827;
 }
 
-.report-date-range .date-range-calendar {
-  top: calc(100% + 8px);
-  inset-inline-start: 0;
-  inset-inline-end: auto;
-  width: 278px;
+/* =====================================================
+   REPORT HEADER FILTERS — FINAL FIX
+===================================================== */
+
+.reports-content .report-actions {
+  width: auto !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+
+  gap: 10px !important;
+  flex-wrap: nowrap !important;
+
+  position: relative;
+  z-index: 120;
+
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.reports-content .report-date-control {
+  width: auto !important;
+  min-width: 0 !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+
+  gap: 10px !important;
+  flex-wrap: nowrap !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* All Time */
+.reports-content
+.report-date-control
+> .smooth-select {
+  width: 150px !important;
+  min-width: 150px !important;
+  max-width: 150px !important;
+
+  flex: 0 0 150px !important;
+
+  margin: 0 !important;
+}
+
+/* Select Date Range */
+.reports-content
+.report-date-control
+.date-range-picker {
+  position: relative !important;
+
+  width: 190px !important;
+  min-width: 190px !important;
+  max-width: 190px !important;
+
+  flex: 0 0 190px !important;
+
+  margin: 0 !important;
+}
+
+/* Equal control height */
+.reports-content
+.report-date-control
+.smooth-select-btn,
+.reports-content
+.report-date-control
+.date-range-btn {
+  width: 100% !important;
+
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+
+  margin: 0 !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 9px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+  animation: none !important;
+}
+
+/* Date range button content */
+.reports-content
+.report-date-control
+.date-range-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+
+  gap: 8px !important;
+
+  padding: 0 12px !important;
+
+  white-space: nowrap !important;
+}
+
+.reports-content
+.report-date-control
+.date-range-btn
+svg {
+  position: static !important;
+
+  width: 15px !important;
+  min-width: 15px !important;
+  height: 15px !important;
+  min-height: 15px !important;
+
+  display: block !important;
+  flex: 0 0 15px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: var(--muted) !important;
+
+  transform: none !important;
+}
+
+.reports-content
+.report-date-range
+.date-range-calendar {
+  position: absolute !important;
+
+  top: calc(100% + 8px) !important;
+
+  inset-inline-start: auto !important;
+  inset-inline-end: 0 !important;
+
+  z-index: 9999 !important;
+
+  width: 278px !important;
+  max-width: calc(100vw - 32px) !important;
+
+  margin: 0 !important;
+}
+
+.reports-content .report-print-btn,
+.reports-content .report-print-btn:hover,
+.reports-content .report-print-btn:focus,
+.reports-content .report-print-btn:active {
+  width: auto !important;
+  min-width: 90px !important;
+
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: 7px !important;
+
+  margin: 0 !important;
+  padding: 0 14px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 9px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+
+  white-space: nowrap !important;
+  cursor: pointer !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.reports-content .report-print-btn:hover {
+  border-color: var(--accent) !important;
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
+}
+
+.reports-content .report-print-btn svg {
+  position: static !important;
+
+  width: 15px !important;
+  min-width: 15px !important;
+  height: 15px !important;
+  min-height: 15px !important;
+
+  display: block !important;
+  flex: 0 0 15px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: currentColor !important;
+  stroke: currentColor !important;
+
+  transform: none !important;
+}
+
+.reports-content .report-print-btn span {
+  display: inline-flex !important;
+  align-items: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: inherit !important;
+  line-height: 1 !important;
+}
+
+@media (max-width: 760px) {
+  .reports-content .report-actions {
+    width: 100% !important;
+
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+
+    gap: 8px !important;
+  }
+
+  .reports-content .report-date-control {
+    width: 100% !important;
+
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+
+    gap: 8px !important;
+  }
+
+  .reports-content
+  .report-date-control.has-custom-range {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .reports-content
+  .report-date-control
+  > .smooth-select,
+  .reports-content
+  .report-date-control
+  .date-range-picker {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    flex: none !important;
+  }
+
+  .reports-content .report-print-btn {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .reports-content
+  .report-date-control.has-custom-range {
+    grid-template-columns: 1fr !important;
+  }
+
+  .reports-content
+  .report-date-range
+  .date-range-calendar {
+    inset-inline-start: 0 !important;
+    inset-inline-end: auto !important;
+
+    width: min(
+      278px,
+      calc(100vw - 32px)
+    ) !important;
+  }
 }
 
 .report-metric-grid {

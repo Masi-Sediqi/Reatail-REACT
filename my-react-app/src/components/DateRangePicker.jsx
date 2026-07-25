@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { CalendarDays } from './Icons.jsx'
+import './DateRangePicker.css'
 
 const formatDateInput = (date) => {
   const year = date.getFullYear()

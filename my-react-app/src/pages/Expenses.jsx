@@ -1,10 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
 import PrintPreviewModal from '../components/PrintPreviewModal.jsx'
 import CustomSelect from '../components/CustomSelect.jsx'
+import CustomFieldInputs from '../components/CustomFieldInputs.jsx'
 import FloatingActionMenu from '../components/FloatingActionMenu.jsx'
 import DateRangePicker from '../components/DateRangePicker.jsx'
 import { currencies } from '../data/dashboardData.js'
-import { Search, WalletCards } from '../components/Icons.jsx'
+import {
+  Plus,
+  Printer,
+  Search,
+  Trash2,
+  WalletCards,
+} from '../components/Icons.jsx'
 import './Expenses.css'
 
 const defaultExpenseCategories = ['Miscellaneous', 'Rent', 'Utilities', 'Transport', 'Salary', 'Inventory', 'Maintenance', 'Marketing', 'Food', 'Office Supplies']
@@ -18,6 +25,26 @@ const emptyExpense = {
   method: 'Cash',
   notes: '',
   date: '',
+  customFields: {},
+}
+
+function EditIcon({ size = 15 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </svg>
+  )
 }
 
 const getCategoryLabel = (category, t) => t.expenseCategories?.[category] ?? category
@@ -46,22 +73,48 @@ const getDateMatches = (dateValue, filter, customStartDate, customEndDate) => {
     || (filter === 'custom' && (!rangeStart || date >= rangeStart) && (!rangeEnd || date <= rangeEnd))
 }
 
-function ExpenseActionMenu({ expense, isOpen, onDelete, onEdit, onToggle, t }) {
+function ExpenseActionMenu({
+  expense,
+  isOpen,
+  onDelete,
+  onEdit,
+  onToggle,
+  t,
+}) {
   void isOpen
   void onToggle
-  return <FloatingActionMenu ariaLabel={t.actions} actions={[
-    { label: t.edit, onClick: onEdit },
-    { danger: true, label: t.delete, onClick: () => onDelete(expense) },
-  ]} />
+
+  return (
+    <FloatingActionMenu
+      ariaLabel={t.actions}
+      actions={[
+        {
+          icon: <EditIcon size={15} />,
+          label: t.edit ?? 'Edit',
+          onClick: onEdit,
+        },
+        {
+          danger: true,
+          icon: <Trash2 size={15} />,
+          label: t.delete ?? 'Delete',
+          onClick: () => onDelete(expense),
+        },
+      ]}
+    />
+  )
 }
 
-function ExpenseModal({ categories, initialExpense, onCategoryAdd, onClose, onSave, t }) {
-  const [form, setForm] = useState(initialExpense ?? emptyExpense)
+function ExpenseModal({ categories, customFields = [], initialExpense, onCategoryAdd, onClose, onSave, t }) {
+  const [form, setForm] = useState(() => ({ ...emptyExpense, ...(initialExpense ?? {}), customFields: { ...(initialExpense?.customFields ?? {}) } }))
   const [categoryMode, setCategoryMode] = useState(false)
   const [newCategory, setNewCategory] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [closing, setClosing] = useState(false)
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }))
+  const updateCustomField = (fieldId, value) => setForm((current) => ({
+    ...current,
+    customFields: { ...(current.customFields ?? {}), [fieldId]: value },
+  }))
   const requestClose = () => {
     if (closing) return
     setClosing(true)
@@ -87,7 +140,8 @@ function ExpenseModal({ categories, initialExpense, onCategoryAdd, onClose, onSa
         onSubmit={(event) => {
           event.preventDefault()
           setSubmitted(true)
-          if (!form.description.trim() || !String(form.amount).trim()) return
+          const missingCustomField = customFields.some((field) => field.required && !String(form.customFields?.[field.id] ?? '').trim())
+          if (!form.description.trim() || !String(form.amount).trim() || missingCustomField) return
           onSave({ ...form, id: form.id ?? crypto.randomUUID(), date: form.date || new Date().toISOString() })
         }}
       >
@@ -108,6 +162,7 @@ function ExpenseModal({ categories, initialExpense, onCategoryAdd, onClose, onSa
         <label><span>{t.currency}</span><CustomSelect ariaLabel={t.currency} options={currencyOptions} value={form.currency} onChange={(value) => update('currency', value)} /></label>
         <label className="wide"><span>{t.paymentMethod}</span><CustomSelect ariaLabel={t.paymentMethod} options={methodOptions} value={form.method} onChange={(value) => update('method', value)} /></label>
         <label className="wide"><span>{t.notes}</span><textarea placeholder={t.additionalNotes} value={form.notes} onChange={(event) => update('notes', event.target.value)} /></label>
+        <CustomFieldInputs fields={customFields} onChange={updateCustomField} submitted={submitted} values={form.customFields} />
         <button className="primary-btn wide" type="submit">{initialExpense ? t.saveChanges : t.addExpense}</button>
       </form>
     </div>
@@ -124,6 +179,7 @@ function ExpensesPage({ companyInfo, expenseCategories = defaultExpenseCategorie
   const [dateFilter, setDateFilter] = useState('all')
   const [customStartDate, setCustomStartDate] = useState('')
   const [customEndDate, setCustomEndDate] = useState('')
+  const expenseCustomFields = companyInfo?.customFormFields?.expenses ?? []
 
   const usedExpenseCategories = useMemo(() => (
     [...new Set(expenses.map((expense) => expense.category).filter(Boolean))]
@@ -191,10 +247,34 @@ function ExpensesPage({ companyInfo, expenseCategories = defaultExpenseCategorie
     <div className="entity-content expenses-content">
       <div className="entity-heading">
         <div><h1>{t.expensesManagement}</h1><p>{t.trackBusinessExpenses}</p></div>
-        <div className="entity-actions">
-          <button type="button" onClick={() => setPrintOpen(true)}>{t.printReport}</button>
-          <button className="primary-btn" type="button" onClick={() => setModalOpen(true)}>+ {t.addExpense}</button>
-        </div>
+        <div className="entity-actions expense-header-actions">
+  <button
+    className="expense-print-report-btn"
+    type="button"
+    onClick={() => setPrintOpen(true)}
+  >
+    <Printer size={15} />
+
+    <span>
+      {t.printReport ?? 'Print Report'}
+    </span>
+  </button>
+
+  <button
+    className="primary-btn expense-add-btn"
+    type="button"
+    onClick={() => {
+      setEditingExpense(null)
+      setModalOpen(true)
+    }}
+  >
+    <Plus size={15} />
+
+    <span>
+      {t.addExpense ?? 'Add Expense'}
+    </span>
+  </button>
+</div>
       </div>
 
       <div className="summary-grid three expenses-summary">
@@ -261,7 +341,7 @@ function ExpensesPage({ companyInfo, expenseCategories = defaultExpenseCategorie
         )}
       </div>
 
-      {modalOpen && <ExpenseModal categories={expenseCategories} initialExpense={editingExpense} onCategoryAdd={addCategory} onClose={() => { setModalOpen(false); setEditingExpense(null) }} onSave={saveExpense} t={t} />}
+      {modalOpen && <ExpenseModal categories={expenseCategories} customFields={expenseCustomFields} initialExpense={editingExpense} onCategoryAdd={addCategory} onClose={() => { setModalOpen(false); setEditingExpense(null) }} onSave={saveExpense} t={t} />}
       {printOpen && <PrintPreviewModal companyInfo={companyInfo} onClose={() => setPrintOpen(false)} printSettings={printSettings} rows={printableExpenses} title={t.expenseReport} columns={[{ key: 'category', label: t.category }, { key: 'description', label: t.description }, { key: 'amount', label: t.amount }, { key: 'currency', label: t.currency }, { key: 'method', label: t.paymentMethod }]} t={t} />}
     </div>
   )

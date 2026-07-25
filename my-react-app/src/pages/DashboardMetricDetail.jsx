@@ -2,7 +2,15 @@ import { useMemo, useState } from 'react'
 import CustomSelect from '../components/CustomSelect.jsx'
 import DateRangePicker from '../components/DateRangePicker.jsx'
 import PrintPreviewModal from '../components/PrintPreviewModal.jsx'
-import { ChevronLeft, DollarSign, ReceiptText, Search, WalletCards } from '../components/Icons.jsx'
+import {
+  ChevronLeft,
+  DollarSign,
+  Printer,
+  ReceiptText,
+  Search,
+  WalletCards,
+  X,
+} from '../components/Icons.jsx'
 import { dateOptionsFor, filterByDate, formatMoney, parseNumber } from '../utils/businessMetrics.js'
 import './DashboardMetricDetail.css'
 
@@ -195,6 +203,11 @@ function DashboardMetricDetail({ cashWallet, companyInfo, customers = [], expens
     { key: 'totalLabel', label: t.total ?? 'Total' },
     { key: 'dateLabel', label: t.date ?? 'Date' },
   ]
+  const isRevenueView = config.panel === 'revenue'
+  const resetDateFilter = () => {
+    setDateFilter('all')
+    setCustomRange({ start: '', end: '' })
+  }
 
   if (config.panel === 'customers') {
     const customerStatusOptions = [
@@ -217,7 +230,11 @@ function DashboardMetricDetail({ cashWallet, companyInfo, customers = [], expens
     const customerPrintRows = visibleCustomers.map((customer, index) => ({ ...customer, number: index + 1 }))
 
     return (
-      <section className="entity-content metric-detail-content">
+  <section
+    className={`entity-content metric-detail-content ${
+      config.panel === 'revenue' ? 'revenue-view-page' : ''
+    }`}
+  >
         <div className="entity-heading metric-detail-heading">
           <div className="metric-detail-title">
             <button className="back-icon-btn" type="button" onClick={onBack}><ChevronLeft size={18} /></button>
@@ -227,35 +244,145 @@ function DashboardMetricDetail({ cashWallet, companyInfo, customers = [], expens
         </div>
 
         <div className="summary-grid three metric-detail-summary">
-          <SummaryCard icon={WalletCards} label={t.active ?? 'Active'} value={customerRows.filter((customer) => customer.status !== 'inactive').length} />
-          <SummaryCard icon={DollarSign} label="VIP" tone="green" value={customerRows.filter((customer) => customer.vip).length} />
-          <SummaryCard icon={DollarSign} label={t.total ?? 'Total'} tone="navy" value={formatMoney(customerRows.reduce((sum, customer) => sum + customer.total, 0))} />
-        </div>
+  <SummaryCard
+    icon={DollarSign}
+    label={t.revenue ?? 'Revenue'}
+    tone="green"
+    value={formatMoney(totalValue)}
+  />
 
-        <div className="filter-card metric-detail-filter customer-view-filter">
-          <div className="search-field"><Search size={17} /><input placeholder={t.searchPlaceholder ?? 'Search...'} value={search} onChange={(event) => setSearch(event.target.value)} /></div>
-          <CustomSelect ariaLabel={t.allStatuses ?? 'All Statuses'} options={customerStatusOptions} value={customerStatusFilter} onChange={setCustomerStatusFilter} />
-          <CustomSelect ariaLabel={t.paymentStatus ?? 'Payment Status'} options={customerPaymentOptions} value={customerPaymentFilter} onChange={setCustomerPaymentFilter} />
-        </div>
+  <SummaryCard
+    icon={DollarSign}
+    label={t.records ?? 'Records'}
+    tone="blue"
+    value={rows.length}
+  />
+
+  <SummaryCard
+    icon={DollarSign}
+    label={t.average ?? 'Average'}
+    tone="navy"
+    value={average}
+  />
+</div>
+
+        <div
+  className={`filter-card metric-detail-filter customer-view-filter ${
+    dateFilter === 'custom' ? 'has-custom-range' : ''
+  }`}
+>
+  <div className="search-field">
+    <Search size={17} />
+
+    <input
+      placeholder={t.searchPlaceholder ?? 'Search...'}
+      value={search}
+      onChange={(event) => setSearch(event.target.value)}
+    />
+  </div>
+
+  <CustomSelect
+    ariaLabel={t.allTime}
+    options={options}
+    value={dateFilter}
+    onChange={(value) => {
+      setDateFilter(value)
+
+      if (value !== 'custom') {
+        setCustomRange({
+          start: '',
+          end: '',
+        })
+      }
+    }}
+  />
+
+  {dateFilter === 'custom' && (
+    <>
+      <DateRangePicker
+        className="metric-detail-date-range"
+        end={customRange.end}
+        onChange={setCustomRange}
+        start={customRange.start}
+        t={t}
+      />
+
+      <button
+        className="metric-filter-reset"
+        type="button"
+        aria-label={t.resetFilter ?? 'Reset filter'}
+        title={t.resetFilter ?? 'Reset filter'}
+        onClick={() => {
+          setDateFilter('all')
+          setCustomRange({
+            start: '',
+            end: '',
+          })
+        }}
+      >
+        <X size={16} />
+      </button>
+    </>
+  )}
+</div>
 
         <div className="data-panel metric-detail-panel">
           <h2><WalletCards size={20} /> {t.customers ?? 'Customers'} ({visibleCustomers.length})</h2>
-          <div className="metric-detail-table-wrap">
-            <table className="data-table metric-detail-table customer-view-table">
-              <thead><tr><th>{t.name ?? 'Name'}</th><th>{t.phone ?? 'Phone'}</th><th>{t.total ?? 'Total'}</th><th>{t.status ?? 'Status'}</th><th>{t.actions ?? 'Actions'}</th></tr></thead>
-              <tbody>
-                {visibleCustomers.length === 0 ? <tr><td className="empty-cell" colSpan="5">{t.noRecordsFound}</td></tr> : visibleCustomers.map((customer) => (
-                  <tr key={customer.id}>
-                    <td><strong>{customer.invoice}</strong></td>
-                    <td>{customer.phone}</td>
-                    <td>{customer.totalLabel}</td>
-                    <td><span className={customer.status === 'inactive' ? 'status-pill warning' : 'status-pill active'}>{customer.statusLabel}</span></td>
-                    <td><button className="table-link-btn" type="button" onClick={() => onNavigate?.(`customerProfile:${customer.id}`)}>{t.view ?? 'View'}</button></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+         {rows.length === 0 ? (
+  <div className="revenue-empty-state">
+    <DollarSign size={46} />
+
+    <strong>
+      {activeTab === 'sales'
+        ? (t.noPaidSalesInRange ??
+          'No paid sales in this range.')
+        : activeTab === 'refunds'
+          ? (t.noRefundsInRange ??
+            'No refunds in this range.')
+          : (t.noCashWalletTransactionsInRange ??
+            'No cash wallet transactions in this range.')}
+    </strong>
+  </div>
+) : (
+  <div className="metric-detail-table-wrap">
+    <table className="data-table metric-detail-table">
+      <thead>
+        <tr>
+          <th>{t.invoice ?? 'Invoice'}</th>
+          <th>{t.customer ?? 'Customer'}</th>
+          <th>{t.total ?? 'Total'}</th>
+          <th>{t.date ?? 'Date'}</th>
+          <th>{t.actions}</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {rows.map((row) => (
+          <tr key={row.id}>
+            <td>
+              <strong>{row.invoice}</strong>
+            </td>
+
+            <td>{row.customer}</td>
+
+            <td
+              className={
+                row.total >= 0
+                  ? 'success-text'
+                  : 'danger-text'
+              }
+            >
+              {row.totalLabel}
+            </td>
+
+            <td>{row.dateLabel}</td>
+            <td>...</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
         </div>
 
         {printOpen && <PrintPreviewModal columns={[{ key: 'invoice', label: t.name ?? 'Name' }, { key: 'phone', label: t.phone ?? 'Phone' }, { key: 'totalLabel', label: t.total ?? 'Total' }, { key: 'statusLabel', label: t.status ?? 'Status' }]} companyInfo={companyInfo} onClose={() => setPrintOpen(false)} printSettings={printSettings} rows={customerPrintRows} title={t.customersView ?? 'Customers View'} t={t} />}
@@ -297,7 +424,16 @@ function DashboardMetricDetail({ cashWallet, companyInfo, customers = [], expens
             <button className="back-icon-btn" type="button" onClick={onBack}><ChevronLeft size={18} /></button>
             <div><h1>{t.expensesView ?? 'Expenses View'}</h1><p>{t.allExpenses ?? 'All expenses'}</p></div>
           </div>
-          <div className="entity-actions"><button type="button" onClick={() => setPrintOpen(true)}><ReceiptText size={16} /> {t.printReport}</button></div>
+          <div className="entity-actions">
+  <button
+    className="revenue-print-btn"
+    type="button"
+    onClick={() => setPrintOpen(true)}
+  >
+    <ReceiptText size={16} />
+    <span>{t.printReport ?? 'Print Report'}</span>
+  </button>
+</div>
         </div>
 
         <div className="summary-grid three metric-detail-summary">
@@ -308,10 +444,23 @@ function DashboardMetricDetail({ cashWallet, companyInfo, customers = [], expens
 
         <div className="filter-card metric-detail-filter expenses-view-filter">
           <div className="search-field"><Search size={17} /><input placeholder={t.searchPlaceholder ?? 'Search...'} value={search} onChange={(event) => setSearch(event.target.value)} /></div>
-          <CustomSelect ariaLabel={t.allTime} options={options} value={dateFilter} onChange={setDateFilter} />
+          <CustomSelect
+            ariaLabel={t.allTime}
+            options={options}
+            value={dateFilter}
+            onChange={(value) => {
+              setDateFilter(value)
+              if (value !== 'custom') setCustomRange({ start: '', end: '' })
+            }}
+          />
+          {dateFilter === 'custom' && (
+            <>
+              <DateRangePicker className="metric-detail-date-range" end={customRange.end} onChange={setCustomRange} start={customRange.start} t={t} />
+              <button className="metric-filter-reset" type="button" aria-label={t.resetFilter ?? 'Reset filter'} title={t.resetFilter ?? 'Reset filter'} onClick={resetDateFilter}><X size={16} /></button>
+            </>
+          )}
           <CustomSelect ariaLabel={t.category ?? 'Category'} options={expenseCategoryOptions} value={expenseCategoryFilter} onChange={setExpenseCategoryFilter} />
           <CustomSelect ariaLabel={t.paymentMethod ?? 'Payment Method'} options={expenseMethodOptions} value={expenseMethodFilter} onChange={setExpenseMethodFilter} />
-          {dateFilter === 'custom' && <DateRangePicker className="metric-detail-date-range" end={customRange.end} onChange={setCustomRange} start={customRange.start} t={t} />}
         </div>
 
         <div className="data-panel metric-detail-panel">
@@ -421,11 +570,6 @@ function DashboardMetricDetail({ cashWallet, companyInfo, customers = [], expens
           <SummaryCard icon={DollarSign} label={t.netProfit ?? 'Net Profit'} tone="green" value={formatMoney(netProfit)} />
         </div>
 
-        <div className="filter-card metric-detail-filter net-profit-date-filter">
-          <CustomSelect ariaLabel={t.allTime} options={options} value={dateFilter} onChange={setDateFilter} />
-          {dateFilter === 'custom' && <DateRangePicker className="metric-detail-date-range" end={customRange.end} onChange={setCustomRange} start={customRange.start} t={t} />}
-        </div>
-
         <div className="data-panel net-profit-breakdown">
           <h2>{t.howNetProfitCalculated ?? 'How Net Profit is Calculated'}</h2>
           <div className="net-profit-rows">
@@ -465,25 +609,49 @@ function DashboardMetricDetail({ cashWallet, companyInfo, customers = [], expens
   }
 
   return (
-    <section className="entity-content metric-detail-content">
+    <section className={`entity-content metric-detail-content ${isRevenueView ? 'revenue-view-page' : ''}`.trim()}>
       <div className="entity-heading metric-detail-heading">
         <div className="metric-detail-title">
           <button className="back-icon-btn" type="button" onClick={onBack}><ChevronLeft size={18} /></button>
           <div><h1>{title}</h1><p>{subtitle}</p></div>
         </div>
-        <div className="entity-actions"><button type="button" onClick={() => setPrintOpen(true)}><ReceiptText size={16} /> {t.printReport}</button></div>
+        <div className="entity-actions">
+          <button className={isRevenueView ? 'revenue-print-btn' : ''} type="button" onClick={() => setPrintOpen(true)}>
+            {isRevenueView ? <Printer size={16} /> : <ReceiptText size={16} />}
+            <span>{t.printReport ?? 'Print Report'}</span>
+          </button>
+        </div>
       </div>
 
       <div className="summary-grid three metric-detail-summary">
-        <SummaryCard icon={WalletCards} label={title} tone="red" value={formatMoney(totalValue)} />
-        <SummaryCard icon={DollarSign} label={t.records ?? 'Records'} value={rows.length} />
+        <SummaryCard icon={DollarSign} label={isRevenueView ? (t.revenue ?? 'Revenue') : title} tone={isRevenueView ? 'green' : 'red'} value={formatMoney(totalValue)} />
+        <SummaryCard icon={DollarSign} label={t.records ?? 'Records'} tone="blue" value={rows.length} />
         <SummaryCard icon={DollarSign} label={t.average ?? 'Average'} tone="navy" value={average} />
       </div>
 
-      <div className="filter-card metric-detail-filter">
+      <div className={`filter-card metric-detail-filter ${isRevenueView ? 'revenue-view-filter' : ''} ${dateFilter === 'custom' ? 'has-custom-range' : ''}`.trim()}>
         <div className="search-field"><Search size={17} /><input placeholder={t.searchPlaceholder ?? 'Search...'} value={search} onChange={(event) => setSearch(event.target.value)} /></div>
-        <CustomSelect ariaLabel={t.allTime} options={options} value={dateFilter} onChange={setDateFilter} />
+        <CustomSelect
+          ariaLabel={t.allTime}
+          options={options}
+          value={dateFilter}
+          onChange={(value) => {
+            setDateFilter(value)
+            if (value !== 'custom') setCustomRange({ start: '', end: '' })
+          }}
+        />
         {dateFilter === 'custom' && <DateRangePicker className="metric-detail-date-range" end={customRange.end} onChange={setCustomRange} start={customRange.start} t={t} />}
+        {dateFilter === 'custom' && (
+          <button
+            className={isRevenueView ? 'revenue-filter-reset' : 'metric-filter-reset'}
+            type="button"
+            aria-label={t.resetFilter ?? 'Reset filter'}
+            title={t.resetFilter ?? 'Reset filter'}
+            onClick={resetDateFilter}
+          >
+            <X size={16} />
+          </button>
+        )}
       </div>
 
       <div className="data-panel metric-detail-panel">
@@ -493,7 +661,13 @@ function DashboardMetricDetail({ cashWallet, companyInfo, customers = [], expens
             {tabs.map((tab) => <button className={activeTab === tab.key ? 'active' : ''} key={tab.key} type="button" onClick={() => setActiveTab(tab.key)}>{tab.label}</button>)}
           </div>
         )}
-        <div className="metric-detail-table-wrap">
+        {isRevenueView && rows.length === 0 ? (
+          <div className="revenue-empty-state">
+            <DollarSign size={46} />
+            <strong>{t.noResultsFound ?? 'No results found'}</strong>
+          </div>
+        ) : (
+          <div className="metric-detail-table-wrap">
           <table className="data-table metric-detail-table">
             <thead><tr><th>{t.invoice ?? 'Invoice'}</th><th>{t.customer ?? 'Customer'}</th><th>{t.total ?? 'Total'}</th><th>{t.date ?? 'Date'}</th><th>{t.actions}</th></tr></thead>
             <tbody>
@@ -508,7 +682,8 @@ function DashboardMetricDetail({ cashWallet, companyInfo, customers = [], expens
               ))}
             </tbody>
           </table>
-        </div>
+          </div>
+        )}
       </div>
 
       {printOpen && <PrintPreviewModal columns={printColumns} companyInfo={companyInfo} onClose={() => setPrintOpen(false)} printSettings={printSettings} rows={printRows} title={`${title} ${t.printReport}`} t={t} />}

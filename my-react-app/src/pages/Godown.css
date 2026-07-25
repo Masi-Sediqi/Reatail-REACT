@@ -84,18 +84,39 @@
     align-items:center;
 }
 
-.search-field,
-.date-filter-shell {
+.search-field {
   display: flex;
   align-items: center;
   gap: 10px;
+
   min-height: 40px;
+
   border: 1px solid var(--border);
   border-radius: 10px;
-  background: var(--panel-soft);
+
+  background: var(--panel-bg);
+
   padding: 0 12px;
 }
 
+.date-filter-shell {
+  position: relative;
+
+  min-width: 0;
+  min-height: 40px;
+
+  display: flex;
+  align-items: center;
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  background: var(--panel-bg);
+
+  padding: 0;
+
+  overflow: visible;
+}
 .search-field{
 
     height:44px;
@@ -124,11 +145,100 @@
     font-size:14px;
 }
 
-.date-filter-shell .smooth-select-btn {
-  border: 0;
-  background: transparent;
-  box-shadow: none;
+/* =====================================================
+   GODOWN DATE FILTER — SINGLE CONTAINER
+===================================================== */
+
+.godown-filter-bar .godown-date-filter {
+  position: relative;
+
+  width: 100%;
+  min-width: 0;
+
+  height: 40px;
+  min-height: 40px;
+
+  display: flex;
+  align-items: center;
+
+  border: 1px solid var(--border);
+  border-radius: 9px;
+
+  background: var(--panel-bg);
+
   padding: 0;
+
+  box-shadow: none;
+
+  overflow: visible;
+}
+
+.godown-filter-bar .godown-date-filter-icon {
+  position: absolute;
+
+  top: 50%;
+  inset-inline-start: 12px;
+
+  z-index: 2;
+
+  width: 16px;
+  height: 16px;
+
+  color: var(--muted);
+
+  transform: translateY(-50%);
+
+  pointer-events: none;
+}
+
+.godown-filter-bar .godown-date-select {
+  width: 100%;
+  min-width: 0;
+}
+
+.godown-filter-bar
+.godown-date-filter
+.godown-date-select
+.smooth-select-btn,
+.godown-filter-bar
+.godown-date-filter
+.godown-date-select
+.smooth-select-btn:hover,
+.godown-filter-bar
+.godown-date-filter
+.godown-date-select
+.smooth-select-btn:focus,
+.godown-filter-bar
+.godown-date-filter
+.godown-date-select
+.smooth-select-btn.active {
+  width: 100%;
+
+  height: 38px !important;
+  min-height: 38px !important;
+
+  margin: 0;
+  padding-inline-start: 38px !important;
+  padding-inline-end: 11px !important;
+
+  border: 0 !important;
+  border-radius: 8px !important;
+
+  background: transparent !important;
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+  outline: none !important;
+  transform: none !important;
+}
+
+/* Focus فقط روی Container بیرونی دیده شود */
+.godown-filter-bar
+.godown-date-filter:focus-within {
+  border-color: var(--accent);
+
+  box-shadow:
+    0 0 0 3px var(--accent-soft);
 }
 
 .godown-date-range,
@@ -136,46 +246,133 @@
   min-width: 0;
   width: 100%;
 }
+/* =====================================================
+   GODOWN VIEW MODE SWITCH
+===================================================== */
 
-.toggle-filter-btn,
-.segmented-view button {
-  min-height: 40px;
+.godown-view-switch {
+  width: fit-content;
+  min-width: 176px;
+
+  height: 40px;
+
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+
+  gap: 3px;
+
+  padding: 3px;
+
   border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--panel-bg);
-  color: var(--text);
-  padding: 0 14px;
-  cursor: pointer;
-  font-weight: 800;
-  white-space: nowrap;
-}
+  border-radius: 10px;
 
-.toggle-filter-btn.active,
-.segmented-view button.active {
-  border-color: #2563eb;
-  background: #2563eb;
-  color: #fff;
-}
+  background: var(--panel-soft);
 
-.toggle-filter-btn:not(.active),
-.segmented-view button:not(.active) {
-  background: var(--panel-bg);
-  color: var(--text);
-}
-
-.segmented-view {
-  display: inline-flex;
   overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+
+  box-shadow:
+    inset 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
-.segmented-view button {
+.godown-view-switch > button,
+.godown-view-switch > button:hover,
+.godown-view-switch > button:focus,
+.godown-view-switch > button:active {
+  min-width: 84px;
+
+  height: 32px;
+  min-height: 32px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  margin: 0;
+  padding: 0 10px;
+
   border: 0;
-  border-radius: 0;
+  border-radius: 7px;
+
+  background: transparent;
+  color: var(--muted);
+
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+
+  white-space: nowrap;
+  cursor: pointer;
+
   box-shadow: none;
+  transform: none;
+
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    box-shadow 150ms ease;
 }
 
+.godown-view-switch > button:hover:not(.active) {
+  background:
+    color-mix(
+      in srgb,
+      var(--panel-bg) 65%,
+      transparent
+    );
+
+  color: var(--text);
+}
+
+/* حالت انتخاب‌شده */
+.godown-view-switch > button.active,
+.godown-view-switch > button.active:hover {
+  background: var(--panel-bg);
+  color: var(--accent);
+
+  box-shadow:
+    0 2px 7px rgba(15, 23, 42, 0.1),
+    inset 0 0 0 1px var(--border);
+}
+
+/* آیکن */
+.godown-view-switch > button > svg {
+  position: static;
+
+  width: 14px;
+  height: 14px;
+
+  display: block;
+  flex: 0 0 14px;
+
+  margin: 0;
+  padding: 0;
+
+  color: currentColor;
+  stroke: currentColor;
+
+  transform: none;
+
+  pointer-events: none;
+}
+
+/* متن */
+.godown-view-switch > button > span {
+  display: inline-flex;
+  align-items: center;
+
+  margin: 0;
+  padding: 0;
+
+  color: inherit;
+
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: 1;
+}
 .godown-panel {
   overflow: visible;
 }
@@ -206,24 +403,102 @@
   font-size: 11px;
 }
 
-.expand-row-btn {
-  width: 32px;
-  height: 32px;
-  display: grid;
-  place-items: center;
-  border: 0;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--text);
-  cursor: pointer;
+/* =====================================================
+   PRODUCT PURCHASE HISTORY EXPAND BUTTON
+===================================================== */
+
+.godown-table .expand-row-btn,
+.godown-table .expand-row-btn:hover,
+.godown-table .expand-row-btn:focus,
+.godown-table .expand-row-btn:active {
+  width: 30px !important;
+  min-width: 30px !important;
+  max-width: 30px !important;
+
+  height: 30px !important;
+  min-height: 30px !important;
+  max-height: 30px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--muted) !important;
+
+  cursor: pointer !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    color 150ms ease,
+    box-shadow 150ms ease !important;
 }
 
-.expand-row-btn svg {
-  transition: transform 160ms ease;
+.godown-table .expand-row-btn:hover {
+  border-color: color-mix(
+    in srgb,
+    var(--accent) 55%,
+    var(--border)
+  ) !important;
+
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
 }
 
-.expand-row-btn svg.open {
-  transform: rotate(180deg);
+.godown-table .expand-row-btn:focus-visible {
+  outline: none !important;
+
+  border-color: var(--accent) !important;
+
+  box-shadow:
+    0 0 0 3px var(--accent-soft) !important;
+}
+
+/* آیکن داخل دکمه */
+.godown-table .expand-row-btn > svg {
+  position: static !important;
+
+  width: 15px !important;
+  height: 15px !important;
+
+  display: block !important;
+  flex: 0 0 15px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: currentColor !important;
+  stroke: currentColor !important;
+  stroke-width: 2.2 !important;
+
+  transform: rotate(0deg) !important;
+
+  pointer-events: none !important;
+
+  transition:
+    transform 180ms ease !important;
+}
+
+/* حالت باز */
+.godown-table .expand-row-btn > svg.open {
+  transform: rotate(180deg) !important;
+}
+
+/* وقتی تاریخچه محصول باز است */
+.godown-table .expand-row-btn:has(svg.open) {
+  border-color: var(--accent) !important;
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
 }
 
 .history-row td {
@@ -396,16 +671,214 @@
   grid-column: 6 / 8;
 }
 
-.line-delete {
-  width: 36px;
-  min-height: 40px;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--border);
+/* =====================================================
+   PURCHASE ROW DELETE BUTTON
+===================================================== */
+
+.godown-purchase-modal .purchase-row-delete,
+.godown-purchase-modal .purchase-row-delete:hover,
+.godown-purchase-modal .purchase-row-delete:focus,
+.godown-purchase-modal .purchase-row-delete:active {
+  width: 30px !important;
+  min-width: 30px !important;
+  max-width: 30px !important;
+
+  height: 30px !important;
+  min-height: 30px !important;
+  max-height: 30px !important;
+
+  align-self: start !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 1px 0 0 !important;
+  padding: 0 !important;
+
+  border: 1px solid rgba(239, 68, 68, 0.25) !important;
+  border-radius: 50% !important;
+
+  background: rgba(239, 68, 68, 0.08) !important;
+  color: #dc2626 !important;
+
+  cursor: pointer !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease,
+    color 140ms ease,
+    transform 140ms ease !important;
+}
+
+.godown-purchase-modal .purchase-row-delete:hover:not(:disabled) {
+  border-color: #ef4444 !important;
+  background: #ef4444 !important;
+  color: #ffffff !important;
+
+  transform: scale(1.05) !important;
+}
+
+.godown-purchase-modal .purchase-row-delete:active:not(:disabled) {
+  transform: scale(0.94) !important;
+}
+
+.godown-purchase-modal .purchase-row-delete:disabled {
+  border-color: var(--border) !important;
+  background: var(--panel-soft) !important;
+  color: var(--muted) !important;
+
+  cursor: not-allowed !important;
+  opacity: 0.45 !important;
+}
+
+.godown-purchase-modal .purchase-row-delete svg {
+  width: 14px !important;
+  height: 14px !important;
+
+  display: block !important;
+
+  color: currentColor !important;
+  stroke: currentColor !important;
+
+  pointer-events: none !important;
+}
+/* =====================================================
+   PURCHASE MODAL CLOSE BUTTON
+===================================================== */
+
+.godown-purchase-modal .godown-purchase-close,
+.godown-purchase-modal .godown-purchase-close:hover,
+.godown-purchase-modal .godown-purchase-close:focus,
+.godown-purchase-modal .godown-purchase-close:active {
+  position: absolute !important;
+
+  top: 12px !important;
+  inset-inline-end: 12px !important;
+
+  z-index: 20 !important;
+
+  width: 30px !important;
+  min-width: 30px !important;
+  max-width: 30px !important;
+
+  height: 30px !important;
+  min-height: 30px !important;
+  max-height: 30px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 50% !important;
+
+  background: var(--panel-soft) !important;
+  color: var(--muted) !important;
+
+  cursor: pointer !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease,
+    color 140ms ease !important;
+}
+
+.godown-purchase-modal .godown-purchase-close:hover {
+  border-color: rgba(239, 68, 68, 0.35) !important;
+
+  background: rgba(239, 68, 68, 0.09) !important;
+  color: #dc2626 !important;
+}
+
+.godown-purchase-modal .godown-purchase-close svg {
+  width: 15px !important;
+  height: 15px !important;
+
+  display: block !important;
+
+  color: currentColor !important;
+  stroke: currentColor !important;
+  stroke-width: 2.4 !important;
+
+  pointer-events: none !important;
+}
+.godown-purchase-modal .add-line-btn {
+  min-height: 36px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  padding: 0 13px;
+
+  border: 1px dashed var(--accent);
   border-radius: 9px;
-  background: var(--panel-bg);
-  color: #ef4444;
-  cursor: pointer;
+
+  background: var(--accent-soft);
+  color: var(--accent);
+
+  font-size: 12px;
+  font-weight: 750;
+
+  box-shadow: none;
+}
+
+.godown-purchase-modal .add-line-btn svg {
+  width: 14px;
+  height: 14px;
+}
+@media (max-width: 980px) {
+  .godown-purchase-modal
+  .purchase-line:not(.purchase-line-head) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .godown-purchase-modal .purchase-line-head {
+    display: none;
+  }
+
+  .godown-purchase-modal .product-pick,
+  .godown-purchase-modal .line-category,
+  .godown-purchase-modal .line-notes,
+  .godown-purchase-modal .line-alert-caption,
+  .godown-purchase-modal .line-alert-threshold,
+  .godown-purchase-modal .line-alert-date,
+  .godown-purchase-modal .line-alert-days {
+    grid-column: auto;
+  }
+
+  .godown-purchase-modal .product-pick,
+  .godown-purchase-modal .line-notes {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .godown-purchase-modal .purchase-meta-grid,
+  .godown-purchase-modal
+  .purchase-line:not(.purchase-line-head) {
+    grid-template-columns: 1fr;
+  }
+
+  .godown-purchase-modal .purchase-supplier-field,
+  .godown-purchase-modal .purchase-date-field,
+  .godown-purchase-modal .purchase-currency-field,
+  .godown-purchase-modal .product-pick,
+  .godown-purchase-modal .line-category,
+  .godown-purchase-modal .line-notes {
+    grid-column: 1 / -1;
+    max-width: none;
+  }
 }
 
 .add-line-btn {
@@ -1245,16 +1718,20 @@
   min-width: 180px !important;
 }
 
-.segmented-view {
+.godown-filter-bar .godown-view-switch {
   width: fit-content !important;
-  min-width: 150px !important;
+  min-width: 176px !important;
 }
 
-.segmented-view button {
-  min-width: 74px !important;
-  height: 38px !important;
-  padding: 0 12px !important;
-  font-size: 12px !important;
+.godown-filter-bar .godown-view-switch > button {
+  min-width: 84px !important;
+
+  height: 32px !important;
+  min-height: 32px !important;
+
+  padding: 0 10px !important;
+
+  font-size: 11px !important;
 }
 
 .godown-filter-bar {
@@ -1287,16 +1764,24 @@
     grid-template-columns: 1fr !important;
   }
 
-  .godown-date-range,
-  .segmented-view {
+@media (max-width: 760px) {
+  .godown-filter-bar .godown-view-switch {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .godown-filter-bar .godown-view-switch > button {
     width: 100% !important;
     min-width: 0 !important;
   }
 
-  .segmented-view {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr;
+  .godown-filter-bar .godown-date-filter {
+    width: 100% !important;
   }
+}
 
   .supplier-controls,
   .supplier-portal-controls {
@@ -1312,4 +1797,1754 @@
     width: 100% !important;
     min-width: 0 !important;
   }
+}
+
+/* =====================================================
+   HIDE SOLD-OUT FILTER BUTTON
+===================================================== */
+
+.godown-filter-bar .toggle-filter-btn,
+.godown-filter-bar .toggle-filter-btn:hover,
+.godown-filter-bar .toggle-filter-btn:focus,
+.godown-filter-bar .toggle-filter-btn:active {
+  height: 40px !important;
+  min-height: 40px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 0 15px !important;
+
+  border: 1px solid var(--border) !important;
+
+  /* Border radius اضافه شد */
+  border-radius: 10px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+
+  white-space: nowrap !important;
+  cursor: pointer !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    color 150ms ease,
+    box-shadow 150ms ease !important;
+}
+
+/* حالت OFF */
+.godown-filter-bar .toggle-filter-btn:not(.active) {
+  border-color: var(--border) !important;
+  background: var(--panel-bg) !important;
+  color: var(--muted) !important;
+}
+
+.godown-filter-bar .toggle-filter-btn:not(.active):hover {
+  border-color: #94a3b8 !important;
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+}
+
+/* حالت ON */
+.godown-filter-bar .toggle-filter-btn.active,
+.godown-filter-bar .toggle-filter-btn.active:hover {
+  border-color: color-mix(
+    in srgb,
+    var(--accent) 55%,
+    var(--border)
+  ) !important;
+
+  border-radius: 10px !important;
+
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
+
+  box-shadow:
+    inset 0 0 0 1px
+    color-mix(
+      in srgb,
+      var(--accent) 15%,
+      transparent
+    ) !important;
+}
+
+.godown-filter-bar .toggle-filter-btn:focus-visible {
+  outline: none !important;
+
+  border-color: var(--accent) !important;
+
+  box-shadow:
+    0 0 0 3px var(--accent-soft) !important;
+}/* =====================================================
+   MULTI-PRODUCT PURCHASE META FIELDS
+===================================================== */
+
+.godown-purchase-modal .purchase-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  gap: 12px 14px;
+}
+
+.godown-purchase-modal .purchase-meta-grid label {
+  grid-column: auto;
+  min-width: 0;
+
+  display: grid;
+  align-content: start;
+  gap: 6px;
+}
+
+.godown-purchase-modal .purchase-supplier-field {
+  grid-column: 1 / 2;
+}
+
+.godown-purchase-modal .purchase-date-field {
+  grid-column: 2 / 3;
+}
+
+.godown-purchase-modal .purchase-currency-field {
+  grid-column: 1 / 2;
+  max-width: 320px;
+}
+
+/* همه Input و Selectها دقیقاً یک ارتفاع */
+.godown-purchase-modal
+.purchase-meta-grid
+:is(input, .smooth-select-btn) {
+  width: 100% !important;
+  min-width: 0 !important;
+
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+
+  margin: 0 !important;
+
+  border-radius: 9px !important;
+
+  font-family: inherit !important;
+  font-size: 12px !important;
+  line-height: 1 !important;
+
+  box-shadow: none !important;
+}
+
+/* Select Supplier و Currency */
+.godown-purchase-modal
+.purchase-meta-grid
+.smooth-select-btn {
+  padding: 0 12px !important;
+
+  border: 1px solid var(--border) !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+}
+
+/* Date */
+.godown-purchase-modal
+.purchase-meta-grid
+input {
+  padding: 0 12px !important;
+
+  border: 1px solid var(--border) !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+}
+
+.godown-purchase-modal
+.purchase-meta-grid
+:is(input, .smooth-select-btn):focus,
+.godown-purchase-modal
+.purchase-meta-grid
+.smooth-select-btn.active {
+  border-color: var(--accent) !important;
+
+  box-shadow:
+    0 0 0 3px var(--accent-soft) !important;
+}
+/* =====================================================
+   MULTI-PRODUCT PURCHASE ROW
+===================================================== */
+
+.godown-purchase-modal .purchase-lines {
+  display: grid;
+  gap: 12px;
+
+  padding: 12px;
+
+  border: 1px solid var(--border);
+  border-radius: 12px;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--panel-soft) 72%,
+      var(--panel-bg)
+    );
+}
+
+/* عنوان ستون‌ها */
+.godown-purchase-modal .purchase-line-head {
+  min-height: auto;
+
+  padding: 0 10px 2px;
+
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.godown-purchase-modal .purchase-line-head > span {
+  color: var(--muted);
+
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1.2;
+
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* هر Row اصلی */
+.godown-purchase-modal
+.purchase-line:not(.purchase-line-head) {
+  position: relative;
+
+  display: grid;
+  grid-template-columns:
+    minmax(180px, 1.35fr)
+    minmax(90px, 0.72fr)
+    62px
+    72px
+    minmax(94px, 0.75fr)
+    minmax(94px, 0.75fr)
+    minmax(128px, 0.92fr)
+    34px;
+
+  align-items: start;
+  gap: 8px;
+
+  padding: 12px;
+
+  border: 1px solid var(--border);
+  border-radius: 11px;
+
+  background: var(--panel-bg);
+
+  box-shadow:
+    0 5px 16px rgba(15, 23, 42, 0.045);
+
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.godown-purchase-modal
+.purchase-line:not(.purchase-line-head):focus-within {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--accent) 45%,
+      var(--border)
+    );
+
+  box-shadow:
+    0 7px 20px rgba(15, 23, 42, 0.07);
+}
+.godown-purchase-modal
+.purchase-line:not(.purchase-line-head)
+:is(
+  input,
+  textarea,
+  .smooth-select-btn
+) {
+  width: 100% !important;
+  min-width: 0 !important;
+
+  min-height: 38px !important;
+
+  margin: 0 !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+
+  font-family: inherit !important;
+  font-size: 12px !important;
+
+  box-shadow: none !important;
+}
+
+.godown-purchase-modal
+.purchase-line:not(.purchase-line-head)
+input {
+  padding: 0 10px !important;
+}
+
+.godown-purchase-modal
+.purchase-line:not(.purchase-line-head)
+textarea {
+  min-height: 54px !important;
+
+  padding: 10px 11px !important;
+
+  line-height: 1.4 !important;
+}
+
+.godown-purchase-modal
+.purchase-line:not(.purchase-line-head)
+.smooth-select-btn {
+  height: 38px !important;
+  padding: 0 10px !important;
+}
+
+.godown-purchase-modal
+.purchase-line:not(.purchase-line-head)
+:is(input, textarea):focus,
+.godown-purchase-modal
+.purchase-line:not(.purchase-line-head)
+.smooth-select-btn.active {
+  border-color: var(--accent) !important;
+
+  background: var(--panel-bg) !important;
+
+  box-shadow:
+    0 0 0 3px var(--accent-soft) !important;
+}
+.godown-purchase-modal .product-pick {
+  display: grid;
+  gap: 7px;
+}
+
+.godown-purchase-modal .product-pick input {
+  background: var(--panel-bg) !important;
+}
+.godown-purchase-modal .line-category {
+  grid-column: 1 / 4;
+}
+
+.godown-purchase-modal .line-notes {
+  grid-column: 4 / 8;
+}
+
+.godown-purchase-modal .line-alert-caption {
+  grid-column: 1 / 3;
+
+  min-height: 38px;
+
+  display: inline-flex;
+  align-items: center;
+
+  padding-inline-start: 4px;
+
+  color: var(--muted);
+
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1.3;
+
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.godown-purchase-modal .line-alert-threshold {
+  grid-column: 3 / 5;
+}
+
+.godown-purchase-modal .line-alert-date {
+  grid-column: 5 / 7;
+}
+
+.godown-purchase-modal .line-alert-days {
+  grid-column: 7 / 9;
+}/* =====================================================
+   GODOWN DETAIL BACK BUTTON
+===================================================== */
+
+.godown-detail-page .godown-detail-back-btn,
+.godown-detail-page .godown-detail-back-btn:hover,
+.godown-detail-page .godown-detail-back-btn:focus,
+.godown-detail-page .godown-detail-back-btn:active {
+  width: 38px !important;
+  min-width: 38px !important;
+  max-width: 38px !important;
+
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  flex: 0 0 38px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  cursor: pointer !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    color 150ms ease !important;
+}
+
+.godown-detail-page .godown-detail-back-btn:hover {
+  border-color: var(--accent) !important;
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
+}
+
+.godown-detail-page .godown-detail-back-btn:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 3px var(--accent-soft) !important;
+}
+
+.godown-detail-page .godown-detail-back-btn svg {
+  position: static !important;
+
+  width: 18px !important;
+  height: 18px !important;
+
+  display: block !important;
+  flex: 0 0 18px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: currentColor !important;
+  stroke: currentColor !important;
+  stroke-width: 2.3 !important;
+
+  pointer-events: none !important;
+}
+[dir="rtl"]
+.godown-detail-page
+.godown-detail-back-btn
+svg {
+  transform: rotate(180deg) !important;
+}
+/* =====================================================
+   GODOWN DETAIL HEADER ACTION
+===================================================== */
+
+.godown-detail-page .godown-detail-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 8px;
+
+  margin: 0;
+}
+
+.godown-detail-page .godown-detail-print-btn,
+.godown-detail-page .godown-detail-print-btn:hover {
+  height: 40px;
+  min-height: 40px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  margin: 0;
+  padding: 0 15px;
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  background: var(--panel-bg);
+  color: var(--text);
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1;
+
+  cursor: pointer;
+
+  box-shadow: none;
+  transform: none;
+}
+
+.godown-detail-page .godown-detail-print-btn:hover {
+  border-color: #94a3b8;
+  background: var(--panel-soft);
+}
+
+.godown-detail-page .godown-detail-print-btn svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+
+  color: currentColor;
+  stroke: currentColor;
+}
+
+.godown-detail-page .godown-detail-print-btn span {
+  display: inline-flex;
+  align-items: center;
+
+  line-height: 1;
+}
+/* =====================================================
+   GODOWN DETAIL TABS
+===================================================== */
+
+.godown-detail-page .godown-detail-tabs {
+  width: fit-content;
+
+  display: inline-flex;
+  align-items: center;
+
+  gap: 4px;
+
+  padding: 4px;
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  background: var(--panel-soft);
+}
+
+.godown-detail-page .godown-detail-tabs button,
+.godown-detail-page .godown-detail-tabs button:hover {
+  height: 34px;
+  min-height: 34px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  margin: 0;
+  padding: 0 12px;
+
+  border: 1px solid transparent;
+  border-radius: 7px;
+
+  background: transparent;
+  color: var(--muted);
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+
+  cursor: pointer;
+
+  box-shadow: none;
+  transform: none;
+}
+
+.godown-detail-page
+.godown-detail-tabs
+button:hover:not(.active) {
+  background: var(--panel-bg);
+  color: var(--text);
+}
+
+.godown-detail-page .godown-detail-tabs button.active,
+.godown-detail-page .godown-detail-tabs button.active:hover {
+  border-color: var(--border);
+
+  background: var(--panel-bg);
+  color: var(--text);
+
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.godown-detail-page .godown-detail-tabs button svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+
+  color: currentColor;
+  stroke: currentColor;
+}
+
+.godown-detail-page .godown-detail-tabs button span {
+  display: inline-flex;
+  align-items: center;
+
+  color: inherit;
+  font-size: inherit;
+  line-height: 1;
+}
+.godown-detail-page .godown-product-table-title {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 8px;
+
+  margin: 0 0 18px;
+
+  color: var(--text);
+
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.godown-detail-page .godown-product-table-title svg {
+  width: 17px;
+  height: 17px;
+
+  color: var(--accent);
+  stroke: currentColor;
+}
+/* =====================================================
+   SUPPLIER PORTAL BACK BUTTON
+===================================================== */
+
+.supplier-portal-page .supplier-portal-back-btn,
+.supplier-portal-page .supplier-portal-back-btn:hover,
+.supplier-portal-page .supplier-portal-back-btn:focus,
+.supplier-portal-page .supplier-portal-back-btn:active {
+  width: 38px !important;
+  min-width: 38px !important;
+  max-width: 38px !important;
+
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  flex: 0 0 38px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  cursor: pointer !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.supplier-portal-page .supplier-portal-back-btn:hover {
+  border-color: var(--accent) !important;
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
+}
+
+.supplier-portal-page .supplier-portal-back-btn:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 3px var(--accent-soft) !important;
+}
+
+.supplier-portal-page .supplier-portal-back-btn svg {
+  width: 18px !important;
+  height: 18px !important;
+
+  display: block !important;
+  flex: 0 0 18px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: currentColor !important;
+  stroke: currentColor !important;
+  stroke-width: 2.4 !important;
+
+  pointer-events: none !important;
+}
+
+[dir="rtl"] .supplier-portal-page .supplier-portal-back-btn svg {
+  transform: rotate(180deg) !important;
+}
+/* =====================================================
+   SUPPLIER PORTAL HEADER
+===================================================== */
+
+.supplier-portal-page .supplier-portal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 18px;
+
+  margin: 0;
+}
+
+.supplier-portal-page .back-title-row {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.supplier-portal-title {
+  min-width: 0;
+}
+
+.supplier-portal-title h1 {
+  margin: 0;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  font-size: 23px;
+  font-weight: 850;
+}
+
+.supplier-portal-title p {
+  margin: 4px 0 0;
+
+  color: var(--muted);
+
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.supplier-portal-statement-btn,
+.supplier-portal-statement-btn:hover {
+  height: 40px;
+  min-height: 40px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  margin: 0;
+  padding: 0 15px;
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  background: var(--panel-bg);
+  color: var(--text);
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1;
+
+  white-space: nowrap;
+  cursor: pointer;
+
+  box-shadow: none;
+  transform: none;
+}
+
+.supplier-portal-statement-btn:hover {
+  border-color: #94a3b8;
+  background: var(--panel-soft);
+}
+
+.supplier-portal-statement-btn svg {
+  width: 16px;
+  height: 16px;
+
+  flex: 0 0 16px;
+
+  margin: 0;
+
+  color: currentColor;
+  stroke: currentColor;
+}
+
+.supplier-portal-statement-btn span {
+  display: inline-flex;
+  align-items: center;
+
+  line-height: 1;
+}
+/* =====================================================
+   SUPPLIER PORTAL CONTROLS
+===================================================== */
+
+.supplier-portal-controls {
+  width: 100%;
+
+  display: grid;
+  grid-template-columns: 160px 170px;
+  align-items: center;
+  justify-content: start;
+
+  gap: 10px;
+
+  margin: 0;
+}
+
+.supplier-portal-controls.has-custom-range {
+  grid-template-columns: 160px 170px 170px;
+}
+
+/* Add Adjustment */
+.supplier-add-adjustment-btn,
+.supplier-add-adjustment-btn:hover {
+  width: 160px;
+  min-width: 160px;
+
+  height: 40px;
+  min-height: 40px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  margin: 0;
+  padding: 0 13px;
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  background: var(--panel-bg);
+  color: var(--text);
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1;
+
+  white-space: nowrap;
+  cursor: pointer;
+
+  box-shadow: none;
+  transform: none;
+}
+
+.supplier-add-adjustment-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.supplier-add-adjustment-btn svg {
+  width: 15px;
+  height: 15px;
+
+  flex: 0 0 15px;
+
+  color: currentColor;
+  stroke: currentColor;
+}
+
+.supplier-add-adjustment-btn span {
+  display: inline-flex;
+  align-items: center;
+
+  line-height: 1;
+}
+
+/* All Time */
+.supplier-filter-control {
+  position: relative;
+
+  width: 170px;
+  min-width: 170px;
+
+  height: 40px;
+  min-height: 40px;
+
+  display: flex;
+  align-items: center;
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  background: var(--panel-bg);
+
+  overflow: visible;
+}
+
+/* All Time calendar icon */
+.supplier-filter-control .supplier-filter-calendar-icon {
+  position: absolute !important;
+
+  top: 50% !important;
+  inset-inline-start: 12px !important;
+
+  z-index: 4 !important;
+
+  width: 15px !important;
+  height: 15px !important;
+
+  display: block !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: var(--muted) !important;
+  stroke: currentColor !important;
+
+  transform: translateY(-50%) !important;
+
+  pointer-events: none !important;
+}
+.supplier-filter-control
+.supplier-time-select
+.smooth-select-btn {
+  padding-inline-start: 38px !important;
+  padding-inline-end: 11px !important;
+}
+
+.supplier-filter-control .supplier-time-select {
+  width: 100%;
+  min-width: 0;
+}
+
+.supplier-filter-control .smooth-select-btn,
+.supplier-filter-control .smooth-select-btn:hover,
+.supplier-filter-control .smooth-select-btn.active {
+  width: 100%;
+
+  height: 38px !important;
+  min-height: 38px !important;
+
+  padding-inline-start: 36px !important;
+  padding-inline-end: 10px !important;
+
+  border: 0 !important;
+  border-radius: 9px !important;
+
+  background: transparent !important;
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+}
+
+.supplier-portal-date-range {
+  width: 190px !important;
+  min-width: 190px !important;
+  max-width: 190px !important;
+
+  height: 40px !important;
+  min-height: 40px !important;
+}
+
+.supplier-portal-date-range > button,
+.supplier-portal-date-range input,
+.supplier-portal-date-range .date-range-trigge
+r {
+  width: 100% !important;
+
+  height: 40px !important;
+  min-height: 40px !important;
+
+  margin: 0 !important;
+
+  border-radius: 10px !important;
+}
+/* =====================================================
+   SUPPLIER PORTAL TABS
+===================================================== */
+
+.supplier-tabs-container {
+  width: fit-content;
+  max-width: 100%;
+
+  padding: 4px;
+
+  border: 1px solid var(--border);
+  border-radius: 11px;
+
+  background: var(--panel-soft);
+
+  overflow-x: auto;
+}
+
+.supplier-tabs-container .supplier-tabs {
+  display: inline-grid;
+  grid-template-columns: repeat(4, minmax(110px, auto));
+  align-items: center;
+
+  gap: 3px;
+
+  margin: 0;
+  padding: 0;
+
+  border: 0;
+  border-radius: 0;
+
+  background: transparent;
+}
+
+.supplier-tabs-container .supplier-tabs button,
+.supplier-tabs-container .supplier-tabs button:hover {
+  height: 34px;
+  min-height: 34px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0;
+  padding: 0 12px;
+
+  border: 1px solid transparent;
+  border-radius: 8px;
+
+  background: transparent;
+  color: var(--muted);
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+
+  white-space: nowrap;
+  cursor: pointer;
+
+  box-shadow: none;
+  transform: none;
+}
+
+.supplier-tabs-container .supplier-tabs button:hover:not(.active) {
+  background: color-mix(
+    in srgb,
+    var(--panel-bg) 70%,
+    transparent
+  );
+
+  color: var(--text);
+}
+
+.supplier-tabs-container .supplier-tabs button.active,
+.supplier-tabs-container .supplier-tabs button.active:hover {
+  border-color: var(--border);
+
+  background: var(--panel-bg);
+  color: var(--text);
+
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.supplier-tabs-container .supplier-tabs button span {
+  display: inline-flex;
+  align-items: center;
+
+  line-height: 1;
+}
+/* =====================================================
+   SUPPLIER PRINT & PDF BUTTON
+===================================================== */
+
+.supplier-section-card .supplier-print-pdf-btn,
+.supplier-section-card .supplier-print-pdf-btn:hover {
+  height: 38px;
+  min-height: 38px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  margin: 0;
+  padding: 0 14px;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 9px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 750 !important;
+  line-height: 1;
+
+  cursor: pointer;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.supplier-section-card .supplier-print-pdf-btn:hover {
+  border-color: var(--accent) !important;
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
+}
+
+.supplier-section-card .supplier-print-pdf-btn svg {
+  width: 15px;
+  height: 15px;
+
+  flex: 0 0 15px;
+
+  color: currentColor;
+  stroke: currentColor;
+}
+
+.supplier-section-card .supplier-print-pdf-btn span {
+  display: inline-flex;
+  align-items: center;
+
+  line-height: 1;
+}
+/* =====================================================
+   ADD ADJUSTMENT MODAL — REDESIGNED
+===================================================== */
+
+.godown-adjustment-modal {
+  position: relative;
+
+  width: min(470px, calc(100vw - 28px));
+
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  column-gap: 12px;
+  row-gap: 11px;
+
+  padding: 20px;
+
+  border: 1px solid var(--border);
+  border-radius: 14px;
+
+  background: var(--panel-bg);
+  color: var(--text);
+
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.25);
+}
+
+.godown-adjustment-modal .adjustment-modal-header {
+  grid-column: 1 / -1;
+
+  min-width: 0;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+
+  padding-inline-end: 38px;
+  margin-bottom: 2px;
+}
+
+.adjustment-modal-icon {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 10px;
+
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.adjustment-modal-icon svg {
+  width: 18px;
+  height: 18px;
+
+  color: currentColor;
+  stroke: currentColor;
+}
+
+.adjustment-modal-header h2 {
+  margin: 0 !important;
+  padding: 0 !important;
+
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  line-height: 1.3;
+}
+
+.adjustment-modal-header p {
+  margin: 4px 0 0 !important;
+
+  color: var(--muted);
+
+  font-size: 11px !important;
+  line-height: 1.45;
+}
+
+.godown-adjustment-modal label {
+  min-width: 0;
+
+  display: grid;
+  align-content: start;
+  gap: 6px;
+}
+
+.godown-adjustment-modal label span {
+  color: var(--text);
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.godown-adjustment-modal input,
+.godown-adjustment-modal .smooth-select-btn {
+  width: 100%;
+  min-width: 0;
+
+  height: 40px;
+  min-height: 40px;
+
+  border: 1px solid var(--border);
+  border-radius: 9px;
+
+  background: var(--panel-soft);
+  color: var(--text);
+
+  font-family: inherit;
+  font-size: 12px;
+
+  box-shadow: none;
+}
+
+.godown-adjustment-modal input {
+  padding: 0 12px;
+}
+
+.godown-adjustment-modal input:focus,
+.godown-adjustment-modal .smooth-select-btn.active {
+  border-color: var(--accent);
+
+  background: var(--panel-bg);
+
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* Close */
+.godown-adjustment-modal .adjustment-modal-close,
+.godown-adjustment-modal .adjustment-modal-close:hover {
+  position: absolute;
+
+  top: 14px;
+  inset-inline-end: 14px;
+
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  min-height: 30px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0;
+  padding: 0;
+
+  border: 1px solid var(--border);
+  border-radius: 50%;
+
+  background: var(--panel-soft);
+  color: var(--muted);
+
+  cursor: pointer;
+
+  box-shadow: none;
+  transform: none;
+}
+
+.godown-adjustment-modal .adjustment-modal-close:hover {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.08);
+  color: #dc2626;
+}
+
+.godown-adjustment-modal .adjustment-modal-close svg {
+  width: 15px;
+  height: 15px;
+
+  color: currentColor;
+  stroke: currentColor;
+}
+
+/* Wallet toggle */
+.godown-adjustment-modal .wallet-link-toggle {
+  min-height: 58px;
+
+  border-radius: 10px;
+
+  padding: 10px 12px;
+
+  background: var(--panel-soft);
+
+  box-shadow: none;
+}
+
+/* Footer */
+.godown-adjustment-modal .modal-actions {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 8px;
+
+  margin-top: 3px;
+  padding-top: 12px;
+
+  border-top: 1px solid var(--border);
+}
+
+.godown-adjustment-modal .modal-actions button {
+  width: 100%;
+
+  height: 40px;
+  min-height: 40px;
+
+  margin: 0;
+  padding: 0 14px;
+
+  border: 1px solid var(--border);
+  border-radius: 9px;
+
+  background: var(--panel-bg);
+  color: var(--text);
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 750;
+
+  cursor: pointer;
+
+  box-shadow: none;
+}
+
+.godown-adjustment-modal .modal-actions .primary-btn {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.godown-adjustment-modal .modal-actions .primary-btn:disabled {
+  border-color: var(--border);
+  background: var(--panel-soft);
+  color: var(--muted);
+
+  cursor: not-allowed;
+  opacity: 1;
+}
+/* =====================================================
+   SUPPLIER STATEMENT MODAL
+===================================================== */
+
+.supplier-statement-modal {
+  position: relative;
+
+  width: min(900px, calc(100vw - 30px));
+  max-height: calc(100dvh - 32px);
+
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+
+  gap: 14px;
+
+  padding: 16px;
+
+  border: 1px solid var(--border);
+  border-radius: 14px;
+
+  background: var(--panel-bg);
+  color: var(--text);
+
+  overflow: hidden;
+
+  box-shadow: 0 26px 80px rgba(15, 23, 42, 0.28);
+}
+
+.supplier-statement-modal-header {
+  position: relative;
+
+  min-height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 14px;
+
+  padding-inline-end: 38px;
+}
+
+.supplier-statement-modal-header h2 {
+  margin: 0;
+
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.supplier-statement-modal-header p {
+  margin: 3px 0 0;
+
+  color: var(--muted);
+
+  font-size: 10px;
+}
+
+.supplier-statement-modal .statement-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.supplier-statement-modal .statement-print-btn,
+.supplier-statement-modal .statement-print-btn:hover {
+  height: 38px;
+  min-height: 38px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  margin: 0;
+  padding: 0 14px;
+
+  border: 1px solid var(--accent);
+  border-radius: 9px;
+
+  background: var(--accent);
+  color: var(--accent-contrast);
+
+  font-size: 12px;
+  font-weight: 750;
+
+  box-shadow: none;
+  transform: none;
+}
+
+.supplier-statement-modal .statement-print-btn span {
+  display: inline-flex;
+  align-items: center;
+
+  line-height: 1;
+}
+
+/* Close */
+.supplier-statement-modal .statement-modal-close,
+.supplier-statement-modal .statement-modal-close:hover {
+  position: absolute;
+
+  top: 0;
+  inset-inline-end: 0;
+
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  min-height: 30px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0;
+  padding: 0;
+
+  border: 1px solid var(--border);
+  border-radius: 50%;
+
+  background: var(--panel-soft);
+  color: var(--muted);
+
+  cursor: pointer;
+
+  box-shadow: none;
+}
+
+.supplier-statement-modal .statement-modal-close:hover {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.08);
+  color: #dc2626;
+}
+
+.supplier-statement-modal .statement-modal-close svg {
+  width: 15px;
+  height: 15px;
+
+  color: currentColor;
+  stroke: currentColor;
+}
+
+/* Preview paper */
+.supplier-statement-modal .supplier-statement-paper {
+  width: min(776px, 100%);
+  max-height: 100%;
+
+  margin: 0 auto;
+  padding: 24px;
+
+  border: 1px solid #dbe3ef;
+  border-radius: 10px;
+
+  background: #ffffff;
+  color: #0f172a;
+
+  overflow: auto;
+}
+
+.supplier-statement-modal .statement-brand-logo {
+  width: 58px;
+  min-width: 58px;
+  height: 44px;
+
+  display: grid;
+  place-items: center;
+
+  overflow: hidden;
+
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.supplier-statement-modal .statement-brand-logo img {
+  display: block;
+
+  width: auto !important;
+  max-width: 52px !important;
+
+  height: auto !important;
+  max-height: 38px !important;
+
+  margin: 0 !important;
+
+  object-fit: contain !important;
+}
+@media (max-width: 760px) {
+  .supplier-portal-page .supplier-portal-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .supplier-portal-statement-btn {
+    width: 100%;
+  }
+
+  .supplier-portal-controls,
+  .supplier-portal-controls.has-custom-range {
+    width: 100%;
+
+    grid-template-columns: 1fr;
+  }
+
+  .supplier-add-adjustment-btn,
+  .supplier-filter-control,
+  .supplier-portal-date-range {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+
+  .supplier-tabs-container {
+    width: 100%;
+  }
+
+  .supplier-tabs-container .supplier-tabs {
+    width: 100%;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .supplier-tabs-container .supplier-tabs button {
+    width: 100%;
+  }
+
+  .godown-adjustment-modal {
+    grid-template-columns: 1fr;
+
+    width: calc(100vw - 18px);
+
+    padding: 18px 14px;
+  }
+
+  .godown-adjustment-modal label,
+  .godown-adjustment-modal .wide,
+  .godown-adjustment-modal .wallet-link-toggle,
+  .godown-adjustment-modal .modal-actions {
+    grid-column: 1 / -1;
+  }
+
+  .supplier-statement-modal {
+    width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+
+    padding: 12px;
+  }
+
+  .supplier-statement-modal-header {
+    align-items: flex-start;
+    flex-direction: column;
+
+    padding-inline-end: 36px;
+  }
+
+  .supplier-statement-modal .statement-actions,
+  .supplier-statement-modal .statement-print-btn {
+    width: 100%;
+  }
+
+  .supplier-statement-modal .supplier-statement-paper {
+    padding: 14px;
+  }
+}
+/* =====================================================
+   SUPPLIER PORTAL DATE RANGE — COMPACT
+===================================================== */
+
+.supplier-portal-controls.has-custom-range {
+  grid-template-columns: 160px 170px 190px !important;
+  justify-content: start !important;
+  align-items: center !important;
+}
+
+/* ریشه DateRangePicker */
+.supplier-portal-controls
+.supplier-portal-date-range {
+  width: 190px !important;
+  min-width: 190px !important;
+  max-width: 190px !important;
+
+  height: 40px !important;
+  min-height: 40px !important;
+
+  justify-self: start !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* اگر کامپوننت این کلاس اصلی را داشته باشد */
+.supplier-portal-controls
+.supplier-portal-date-range.date-range-picker {
+  width: 190px !important;
+  min-width: 190px !important;
+  max-width: 190px !important;
+}
+
+/* دکمه بازکننده Date Range */
+/* فقط دکمه اصلی Select Date Range */
+.supplier-portal-controls
+.supplier-portal-date-range
+> .date-range-btn {
+  width: 190px !important;
+  min-width: 190px !important;
+  max-width: 190px !important;
+
+  height: 40px !important;
+  min-height: 40px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+
+  margin: 0 !important;
+  padding: 0 12px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+
+  text-align: start !important;
+  white-space: nowrap !important;
+
+  cursor: pointer !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* متن Select date range */
+.supplier-portal-controls
+.supplier-portal-date-range
+> .date-range-btn
+> span {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+
+  display: block !important;
+
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  line-height: 1.2 !important;
+}
+.supplier-portal-page
+.supplier-filter-control
+.smooth-select-btn {
+  padding-inline-start: 38px !important;
+}
+/* =====================================================
+   SUPPLIER PORTAL DATE RANGE CALENDAR
+===================================================== */
+
+.supplier-portal-date-range {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+.supplier-portal-date-range .date-range-calendar {
+  position: absolute !important;
+
+  top: calc(100% + 7px) !important;
+  inset-inline-start: 0 !important;
+  inset-inline-end: auto !important;
+
+  z-index: 50000 !important;
+
+  width: 270px !important;
+  min-width: 270px !important;
+  max-width: 270px !important;
+
+  display: grid !important;
+  gap: 10px !important;
+
+  margin: 0 !important;
+  padding: 12px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  box-shadow:
+    0 18px 45px rgba(15, 23, 42, 0.2) !important;
+
+  overflow: hidden !important;
 }

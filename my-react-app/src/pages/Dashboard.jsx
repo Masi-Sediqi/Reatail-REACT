@@ -5,7 +5,6 @@ import Section from '../components/Section.jsx'
 import TrendChart from '../components/TrendChart.jsx'
 import CustomSelect from '../components/CustomSelect.jsx'
 import DateRangePicker from '../components/DateRangePicker.jsx'
-import { X } from '../components/Icons.jsx'
 import './Dashboard.css'
 import {
   financialCards,
@@ -13,7 +12,8 @@ import {
   stockCards,
   supplierCards,
 } from '../data/dashboardData.js'
-import { calculateBusinessMetrics, dateOptionsFor, filterByDate, formatMoney, parseDate, parseNumber } from '../utils/businessMetrics.js'
+import { calculateBusinessMetrics, dateOptionsFor, filterByDate, parseDate, parseNumber } from '../utils/businessMetrics.js'
+import { convertAndFormatCurrency } from '../utils/currencyExchange.js'
 
 const getSaleBalance = (sale) => {
   const hasBalance = sale.balance !== undefined && sale.balance !== null && sale.balance !== ''
@@ -95,44 +95,70 @@ const buildTrendData = ({ customEndDate, customStartDate, expenses, filter, sale
   return [...totals.values()]
 }
 
-function Dashboard({ cashWallet, customers = [], expenses = [], onNavigate, products = [], sales = [], staffMembers = [], suppliers = [], t }) {
+function Dashboard({
+  baseCurrency = 'AFN',
+  businessCurrencyFilter = 'all',
+  cashWallet,
+  customers = [],
+  exchangeCurrency = 'original',
+  exchangeRates = {},
+  expenses = [],
+  onNavigate,
+  products = [],
+  sales = [],
+  staffMembers = [],
+  suppliers = [],
+  t,
+}) {
   const [dateFilter, setDateFilter] = useState('all')
   const [customStartDate, setCustomStartDate] = useState('')
   const [customEndDate, setCustomEndDate] = useState('')
+  const stockAlertCount = useMemo(() => products.filter((product) => {
+    const quantity = parseNumber(product.quantity)
+    const lowStock = parseNumber(product.lowStock || product.lowStockThreshold)
+    return quantity <= 0 || (lowStock > 0 && quantity <= lowStock)
+  }).length, [products])
   const filteredSales = useMemo(() => filterByDate(sales, dateFilter, customStartDate, customEndDate), [customEndDate, customStartDate, dateFilter, sales])
   const filteredExpenses = useMemo(() => filterByDate(expenses, dateFilter, customStartDate, customEndDate), [customEndDate, customStartDate, dateFilter, expenses])
   const trendData = useMemo(() => buildTrendData({ customEndDate, customStartDate, expenses: filteredExpenses, filter: dateFilter, sales: filteredSales }), [customEndDate, customStartDate, dateFilter, filteredExpenses, filteredSales])
   const dashboardMetrics = useMemo(() => {
+    const targetCurrency = exchangeCurrency !== 'original'
+      ? exchangeCurrency
+      : businessCurrencyFilter !== 'all'
+        ? businessCurrencyFilter
+        : baseCurrency
+    const money = (value) => convertAndFormatCurrency(value, {
+      baseCurrency,
+      exchangeRates,
+      fromCurrency: baseCurrency,
+      targetCurrency,
+    })
     const metrics = calculateBusinessMetrics({ cashWallet, expenses: filteredExpenses, products, sales: filteredSales, staffMembers })
     const totalPayables = suppliers.reduce((sum, supplier) => sum + Math.max(0, parseNumber(supplier.balance)), 0)
     const totalReceivables = customers.reduce((sum, customer) => sum + parseNumber(customer.pending), 0)
     return {
       activeProducts: String(products.length),
-      currentCashWallet: metrics.currentCashWallet,
-      globalStockValue: metrics.formatted.stockValue,
-      netBalance: formatMoney(totalPayables - totalReceivables),
-      netProfit: metrics.formatted.netProfit,
-      pendingPayments: metrics.formatted.pendingPayments,
-      pureProfit: metrics.formatted.pureProfit,
-      staffPaid: metrics.formatted.staffPaid,
-      staffPayable: metrics.formatted.staffPayable,
+      currentCashWallet: money(cashWallet),
+      globalStockValue: money(metrics.stockValue),
+      netBalance: money(totalPayables - totalReceivables),
+      netProfit: money(metrics.netProfit),
+      pendingPayments: money(metrics.pendingPayments),
+      pureProfit: money(metrics.pureProfit),
+      staffPaid: money(metrics.staffPaid),
+      staffPayable: money(metrics.staffPayable),
       stockQuantity: String(metrics.stockQuantity),
       totalCustomers: String(customers.length),
-      totalExpenses: metrics.formatted.expenseTotal,
-      totalPayables: formatMoney(totalPayables),
-      totalReceivables: formatMoney(totalReceivables),
-      totalRefunds: metrics.totalRefunds,
-      totalRevenue: metrics.formatted.revenue,
+      totalExpenses: money(metrics.expenseTotal),
+      totalPayables: money(totalPayables),
+      totalReceivables: money(totalReceivables),
+      totalRefunds: money(metrics.refundTotal),
+      totalRevenue: money(metrics.revenue),
       totalSales: String(filteredSales.length),
       totalStaff: String(staffMembers.length),
     }
-  }, [cashWallet, customers, filteredExpenses, filteredSales, products, staffMembers, suppliers])
+  }, [baseCurrency, businessCurrencyFilter, cashWallet, customers, exchangeCurrency, exchangeRates, filteredExpenses, filteredSales, products, staffMembers, suppliers])
   const dateOptions = useMemo(() => dateOptionsFor(t), [t])
-  const resetDateFilter = () => {
-    setDateFilter('monthly')
-    setCustomStartDate('')
-    setCustomEndDate('')
-  }
+
   const withValues = (cards) => cards.map((card) => ({
     ...card,
     value: dashboardMetrics?.[card.labelKey] ?? card.value,
@@ -140,7 +166,7 @@ function Dashboard({ cashWallet, customers = [], expenses = [], onNavigate, prod
   const openMetric = (metricKey) => onNavigate?.(`dashboardMetric:${metricKey}`)
 
   return (
-    <div className="content">
+    <div className="content dashboard-page">
       <div className="page-heading">
         <div>
           <h1>{t.dashboard}</h1>
@@ -156,25 +182,38 @@ function Dashboard({ cashWallet, customers = [], expenses = [], onNavigate, prod
               onChange={setDateFilter}
             />
           </div>
-          {dateFilter === 'custom' && (
-            <div className="dashboard-range-shell">
-              <DateRangePicker
-                className="dashboard-date-range"
-                end={customEndDate}
-                onChange={({ start, end }) => {
-                  setCustomStartDate(start)
-                  setCustomEndDate(end)
-                }}
-                start={customStartDate}
-                t={t}
-              />
-              <button className="dashboard-filter-reset" type="button" aria-label={t.resetFilter ?? 'Reset filter'} title={t.resetFilter ?? 'Reset filter'} onClick={resetDateFilter}>
-                <X size={15} />
-              </button>
-            </div>
-          )}
+         {dateFilter === 'custom' && (
+  <div className="dashboard-custom-date-group">
+    <div className="dashboard-range-shell">
+      <DateRangePicker
+        className="dashboard-date-range"
+        end={customEndDate}
+        onChange={({ start, end }) => {
+          setCustomStartDate(start)
+          setCustomEndDate(end)
+        }}
+        start={customStartDate}
+        t={t}
+      />
+    </div>
+  </div>
+)}
         </div>
       </div>
+
+      {stockAlertCount > 0 && (
+        <button className="dashboard-stock-alert" type="button" onClick={() => onNavigate?.('products')}>
+          <span className="dashboard-stock-alert-icon">
+            <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 24 24" width="18">
+              <path d="M12 3 2.5 20h19L12 3Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+              <path d="M12 9v5" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
+              <path d="M12 17h.01" stroke="currentColor" strokeLinecap="round" strokeWidth="2.5" />
+            </svg>
+          </span>
+          <span><strong>{stockAlertCount} Products</strong> products are running low on stock</span>
+          <span className="dashboard-stock-alert-link">View Details →</span>
+        </button>
+      )}
 
       <Section title={t.financialOverview} cards={withValues(financialCards)} onCardClick={openMetric} variant="financial" t={t} />
       <Section title={t.suppliersOverview} cards={withValues(supplierCards)} onCardClick={openMetric} variant="three" t={t} />

@@ -1,0 +1,312 @@
+/* Extracted from App.css. Keep component/page styles out of App.css. */
+
+.main-area > .content p,
+.main-area > .entity-content p,
+.main-area > .settings-content p,
+.main-area > .billing-content p,
+.main-area > .sales-content p,
+.data-table,
+.filter-card input,
+.filter-bar input,
+.smooth-select-btn,
+.smooth-select-menu button,
+.entity-modal input,
+.entity-modal textarea {
+  font-size: 13px;
+}
+
+.smooth-select {
+  position: relative;
+  min-width: 0;
+}
+
+.inline-field .smooth-select,
+.entity-modal .smooth-select,
+.filter-card .smooth-select,
+.filter-bar .smooth-select,
+.settings-form .smooth-select,
+.print-config-grid .smooth-select,
+.single-field .smooth-select,
+.recycle-toolbar .smooth-select {
+  width: 100%;
+}
+
+.smooth-select-btn {
+  width: 100%;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-soft);
+  color: var(--text);
+  padding: 0 13px;
+  cursor: pointer;
+  font: inherit;
+  text-align: start;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.smooth-select-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.smooth-select-btn.active,
+.smooth-select-btn:focus-visible {
+  border-color: var(--border);
+  background: var(--panel-bg);
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.16);
+  outline: none;
+}
+
+.smooth-select-btn svg {
+  flex: 0 0 auto;
+  color: var(--muted);
+  transition: transform 160ms ease;
+}
+
+.smooth-select-btn svg.rotate {
+  transform: rotate(180deg);
+}
+
+.smooth-select-menu {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(100% + 8px);
+  z-index: 80;
+  display: grid;
+  gap: 2px;
+  min-width: 100%;
+  max-height: 224px;
+  overflow-y: auto;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel-bg);
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.18);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px) scale(0.98);
+  transform-origin: top;
+  transition: opacity 190ms cubic-bezier(0.16, 1, 0.3, 1), transform 190ms cubic-bezier(0.16, 1, 0.3, 1), visibility 190ms ease;
+}
+
+.floating-select-menu {
+  padding: 4px;
+  border-radius: 10px;
+  min-width: 160px;
+  max-height: 180px;
+}
+
+.floating-select-menu button {
+  min-height: 28px;
+  padding: 0 8px;
+  font-size: 12px;   /* متن کوچکتر */
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+.floating-select-menu button span {
+  font-size: 12px;   /* متن آیتم‌ها */
+}
+
+.smooth-select-btn {
+  min-height: 38px;  /* خود باکس اصلی هم کوچکتر */
+  font-size: 13px;
+}
+
+.smooth-select-label {
+  font-size: 13px;
+}
+
+.smooth-select-menu.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.smooth-select-menu button:hover {
+  background: var(--panel-soft);
+}
+
+.smooth-select-menu button.selected {
+  background: var(--panel-soft);
+  color: var(--text);
+}
+
+.smooth-select {
+  position: relative;
+  width: 100%;
+}
+
+.stock-select {
+  min-width: 180px;
+}
+
+.smooth-select-btn {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-soft);
+  color: var(--text);
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.smooth-select-btn.active,
+.smooth-select-btn:focus {
+  border-color: var(--border);
+  background: var(--panel-bg);
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.16);
+}
+
+.smooth-select-btn svg {
+  transition: transform 180ms ease;
+}
+
+.smooth-select-btn svg.rotate {
+  transform: rotate(180deg);
+}
+
+.floating-select-menu {
+  position: fixed;
+  overflow-y: auto;
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+  z-index: 9999;
+  animation: dropdownSoftIn 190ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.floating-select-menu button {
+  width: 100%;
+  min-height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  padding: 0 11px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.floating-select-menu button:hover {
+  background: var(--panel-soft);
+}
+
+.floating-select-menu button.selected {
+  background: var(--panel-soft);
+  color: var(--text);
+}
+
+.dashboard-date-control .smooth-select,
+.dashboard-date-control .smooth-select-btn {
+  width: 100%;
+}
+
+.dashboard-date-control .smooth-select-btn {
+  min-height: 44px;
+  padding-inline: 42px 28px;
+  border-radius: 12px;
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--navy) 10%, transparent);
+}
+
+.retail-shell .financial-date-control .smooth-select-btn,
+.retail-shell .report-date-control .smooth-select-btn {
+  border: 1px solid var(--border) !important;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+
+.retail-shell .print-controls :is(.smooth-select-btn, input, select) {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #dbe3ef !important;
+}
+
+.retail-shell :is(
+  .smooth-select-menu button,
+  .floating-select-menu button,
+  .category-search-menu button
+) {
+  background: transparent !important;
+  color: var(--text) !important;
+}
+
+.retail-shell :is(
+  .smooth-select-menu button:hover,
+  .smooth-select-menu button.selected,
+  .floating-select-menu button:hover,
+  .floating-select-menu button.selected,
+  .customer-search-menu > button:hover,
+  .customer-search-menu > button.selected,
+  .currency-menu button:hover,
+  .currency-menu button.selected,
+  .category-search-menu button:hover,
+  .category-search-menu .add-category-option
+) {
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+}
+
+.retail-shell .main-area :is(
+  .smooth-select-menu button:hover,
+  .smooth-select-menu button.selected,
+  .floating-select-menu button:hover,
+  .floating-select-menu button.selected,
+  .customer-search-menu button:hover,
+  .customer-search-menu button.selected,
+  .currency-menu button:hover,
+  .currency-menu button.selected,
+  .category-search-menu button:hover,
+  .category-search-menu .add-category-option
+) {
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+  box-shadow: inset 0 0 0 1px var(--border) !important;
+}
+
+.retail-shell .main-area :is(.products-date-filter, .date-filter-shell) .smooth-select-btn {
+  padding-inline-start: 40px !important;
+}
+
+.retail-shell :is(.smooth-select-menu, .floating-select-menu, .customer-search-menu, .currency-menu, .category-search-menu) {
+  display: grid !important;
+  gap: 4px !important;
+  padding: 7px !important;
+}
+
+.retail-shell .smooth-select-menu button span:first-child,
+.retail-shell .floating-select-menu button span:first-child {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.retail-shell .smooth-select-menu button.selected .smooth-select-check,
+.retail-shell .floating-select-menu button.selected .smooth-select-check {
+  background: #2563eb !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14) !important;
+}

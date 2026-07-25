@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import CustomSelect from '../components/CustomSelect.jsx'
-import { Archive, Bell, Download, Mail, Play, Shuffle, Trash2, Upload, Volume2 } from '../components/Icons.jsx'
-import { colorThemes, currencies, printTemplates, profileIcons, settingsTabs } from '../data/dashboardData.js'
+import { Archive, Bell, Box, Download, Factory, Mail, Play, Plus, Printer, Shuffle, Trash2, Truck, Upload, UserPlus, Users, Volume2, WalletCards, X } from '../components/Icons.jsx'
+import { colorThemes, currencies, printTemplates, profileIcons, settingsTabs, sidebarItems } from '../data/dashboardData.js'
 import { playNotificationSound, soundOptions } from '../utils/notificationSounds.js'
+import './Settings.css'
 
 const backupFrequencyOptions = [
   { value: 'hourly', label: 'Hourly' },
@@ -11,6 +13,70 @@ const backupFrequencyOptions = [
   { value: 'monthly', label: 'Monthly' },
   { value: 'custom', label: 'Custom (minutes)' },
 ]
+
+const posPaperWidthOptions = [
+  { value: '55mm', label: '55mm (32 cols)' },
+  { value: '80mm', label: '80mm (42 cols)' },
+  { value: '88mm', label: '88mm (48 cols)' },
+]
+
+const posCodePageOptions = [
+  { value: 'CP437', label: 'CP437 (default)' },
+  { value: 'CP850', label: 'CP850 (Latin-1)' },
+  { value: 'CP1252', label: 'CP1252 (Windows West)' },
+  { value: 'GB18030', label: 'GB18030 (Chinese)' },
+]
+
+const defaultPosBridge = {
+  enabled: false,
+  paperWidth: '80mm',
+  codePage: 'CP437',
+  pairedPrinters: [],
+}
+
+const permissionActions = ['create', 'read', 'update', 'delete']
+const permissionModules = [
+  { key: 'dashboard', label: 'Dashboard' },
+  ...sidebarItems
+    .filter((item) => item.key !== 'agent' && item.key !== 'dashboard')
+    .map((item) => ({ key: item.key, label: item.key === 'bundlesManagement' ? 'Bundles' : item.key === 'salesBills' ? 'Sales/Bills' : item.key === 'suppliers' ? 'Suppliers' : item.key.charAt(0).toUpperCase() + item.key.slice(1) })),
+  { key: 'settings', label: 'Settings' },
+]
+
+const customFieldModules = [
+  { key: 'products', label: 'Products', icon: Box },
+  { key: 'customers', label: 'Customers', icon: Users },
+  { key: 'expenses', label: 'Expenses', icon: WalletCards },
+  { key: 'staff', label: 'Staff', icon: UserPlus },
+  { key: 'suppliers', label: 'Suppliers/Katanama', icon: Truck },
+  { key: 'godown', label: 'Godown', icon: Factory },
+]
+
+const customFieldTypeOptions = [
+  { value: 'text', label: 'Text' },
+  { value: 'number', label: 'Number' },
+  { value: 'date', label: 'Date' },
+  { value: 'dropdown', label: 'Dropdown' },
+]
+
+const emptyCustomFieldDraft = () => ({
+  label: '',
+  placeholder: '',
+  type: 'text',
+  required: false,
+  options: '',
+})
+
+const emptyUserForm = () => ({
+  username: '',
+  displayName: '',
+  password: '',
+  confirmPassword: '',
+  permissions: Object.fromEntries(permissionModules.map((module) => [
+    module.key,
+    { create: false, read: false, update: false, delete: false },
+  ])),
+})
 
 const getBackupDelay = (settings) => {
   if (settings.frequency === 'hourly') return 60 * 60 * 1000
@@ -52,6 +118,12 @@ function SettingsPage({
   t,
 }) {
   const [activeTab, setActiveTab] = useState('general')
+  const [editingUserId, setEditingUserId] = useState(null)
+  const [userForm, setUserForm] = useState(emptyUserForm)
+  const [userModalOpen, setUserModalOpen] = useState(false)
+  const [activeCustomFieldModule, setActiveCustomFieldModule] = useState('products')
+  const [customFieldModalOpen, setCustomFieldModalOpen] = useState(false)
+  const [customFieldDraft, setCustomFieldDraft] = useState(emptyCustomFieldDraft)
   const fileInputRef = useRef(null)
   const importInputRef = useRef(null)
   const SaveIcon = profileIcons.save
@@ -79,6 +151,10 @@ function SettingsPage({
   const taxSettings = companyInfo.taxSettings ?? { taxRate: '0', adjustments: '0', currency: 'Ø‹ Afghan Afghani (AFN)' }
   const inventorySettings = companyInfo.inventorySettings ?? { costingMethod: 'lifo' }
   const notificationSettings = companyInfo.notificationSettings ?? { sound: 'bell' }
+  const posBridgeSettings = { ...defaultPosBridge, ...(companyInfo.posBridge ?? {}) }
+  const systemUsers = companyInfo.systemUsers ?? []
+  const customFormFields = companyInfo.customFormFields ?? {}
+  const activeCustomFields = customFormFields[activeCustomFieldModule] ?? []
   const backupSettings = companyInfo.backupSettings ?? {
     automatic: false,
     frequency: 'daily',
@@ -107,6 +183,256 @@ function SettingsPage({
 
   const updateNestedField = (group, field, value) => {
     onCompanyInfoChange((current) => ({ ...current, [group]: { ...(current[group] ?? {}), [field]: value } }))
+  }
+
+  const openCustomFieldModal = () => {
+    setCustomFieldDraft(emptyCustomFieldDraft())
+    setCustomFieldModalOpen(true)
+  }
+
+  const closeCustomFieldModal = () => {
+    setCustomFieldModalOpen(false)
+    setCustomFieldDraft(emptyCustomFieldDraft())
+  }
+
+  const saveCustomField = () => {
+    const label = customFieldDraft.label.trim()
+    if (!label) {
+      onNotify?.(t.fieldLabelRequired ?? 'Field label is required')
+      return
+    }
+
+    const field = {
+      id: crypto.randomUUID(),
+      label,
+      placeholder: customFieldDraft.placeholder.trim(),
+      type: customFieldDraft.type,
+      required: Boolean(customFieldDraft.required),
+      options: customFieldDraft.options
+        .split('\n')
+        .map((option) => option.trim())
+        .filter(Boolean),
+      createdAt: new Date().toISOString(),
+    }
+
+    onCompanyInfoChange((current) => {
+      const currentFields = current.customFormFields ?? {}
+      return {
+        ...current,
+        customFormFields: {
+          ...currentFields,
+          [activeCustomFieldModule]: [...(currentFields[activeCustomFieldModule] ?? []), field],
+        },
+      }
+    })
+
+    closeCustomFieldModal()
+    onNotify?.(t.savedSuccessfully ?? 'Saved successfully')
+  }
+
+  const deleteCustomField = (fieldId) => {
+    onCompanyInfoChange((current) => {
+      const currentFields = current.customFormFields ?? {}
+      return {
+        ...current,
+        customFormFields: {
+          ...currentFields,
+          [activeCustomFieldModule]: (currentFields[activeCustomFieldModule] ?? []).filter((field) => field.id !== fieldId),
+        },
+      }
+    })
+  }
+
+  const updatePosBridge = (field, value) => {
+    onCompanyInfoChange((current) => ({
+      ...current,
+      posBridge: {
+        ...defaultPosBridge,
+        ...(current.posBridge ?? {}),
+        [field]: value,
+      },
+    }))
+  }
+
+  const addPairedPrinter = (printer) => {
+    onCompanyInfoChange((current) => {
+      const currentBridge = { ...defaultPosBridge, ...(current.posBridge ?? {}) }
+      const existing = currentBridge.pairedPrinters ?? []
+      const withoutDuplicate = existing.filter((item) => item.id !== printer.id)
+      return {
+        ...current,
+        posBridge: {
+          ...currentBridge,
+          pairedPrinters: [printer, ...withoutDuplicate],
+        },
+      }
+    })
+    onNotify?.(`${printer.name} paired`)
+  }
+
+  const removePairedPrinter = (printerId) => {
+    onCompanyInfoChange((current) => {
+      const currentBridge = { ...defaultPosBridge, ...(current.posBridge ?? {}) }
+      return {
+        ...current,
+        posBridge: {
+          ...currentBridge,
+          pairedPrinters: (currentBridge.pairedPrinters ?? []).filter((item) => item.id !== printerId),
+        },
+      }
+    })
+  }
+
+  const openUserModal = (user = null) => {
+    setEditingUserId(user?.id ?? null)
+    setUserForm(user ? {
+      username: user.username ?? '',
+      displayName: user.displayName ?? '',
+      password: user.password ?? '',
+      confirmPassword: user.password ?? '',
+      permissions: {
+        ...emptyUserForm().permissions,
+        ...(user.permissions ?? {}),
+      },
+    } : emptyUserForm())
+    setUserModalOpen(true)
+  }
+
+  const closeUserModal = () => {
+    setUserModalOpen(false)
+    setEditingUserId(null)
+    setUserForm(emptyUserForm())
+  }
+
+  const updateUserField = (field, value) => {
+    setUserForm((current) => ({ ...current, [field]: value }))
+  }
+
+  const setModulePermission = (moduleKey, action, value) => {
+    setUserForm((current) => {
+      const modulePermissions = {
+        create: false,
+        read: false,
+        update: false,
+        delete: false,
+        ...(current.permissions[moduleKey] ?? {}),
+      }
+      const nextModule = action === 'all'
+        ? Object.fromEntries(permissionActions.map((item) => [item, value]))
+        : { ...modulePermissions, [action]: value }
+
+      return {
+        ...current,
+        permissions: {
+          ...current.permissions,
+          [moduleKey]: nextModule,
+        },
+      }
+    })
+  }
+
+  const saveUser = () => {
+    const username = userForm.username.trim()
+    const displayName = userForm.displayName.trim()
+    if (!username || !displayName || !userForm.password || userForm.password !== userForm.confirmPassword) {
+      onNotify?.(t.completeUserFields ?? 'Please complete user fields and confirm password')
+      return
+    }
+
+    const savedUser = {
+      id: editingUserId ?? crypto.randomUUID(),
+      username,
+      displayName,
+      password: userForm.password,
+      permissions: userForm.permissions,
+      updatedAt: new Date().toISOString(),
+      createdAt: systemUsers.find((user) => user.id === editingUserId)?.createdAt ?? new Date().toISOString(),
+    }
+
+    onCompanyInfoChange((current) => {
+      const users = current.systemUsers ?? []
+      return {
+        ...current,
+        systemUsers: editingUserId
+          ? users.map((user) => (user.id === editingUserId ? savedUser : user))
+          : [savedUser, ...users],
+      }
+    })
+
+    closeUserModal()
+    onNotify?.(editingUserId ? (t.userUpdated ?? 'User updated') : (t.userCreated ?? 'User created'))
+  }
+
+  const deleteUser = (userId) => {
+    onCompanyInfoChange((current) => ({
+      ...current,
+      systemUsers: (current.systemUsers ?? []).filter((user) => user.id !== userId),
+    }))
+    onNotify?.(t.userDeleted ?? 'User deleted')
+  }
+
+  const pairUsbPrinter = async () => {
+    if (!navigator.usb?.requestDevice) {
+      onNotify?.('WebUSB is not supported in this browser')
+      return
+    }
+
+    try {
+      const device = await navigator.usb.requestDevice({ filters: [] })
+      addPairedPrinter({
+        id: `usb-${device.vendorId}-${device.productId}`,
+        name: device.productName || device.manufacturerName || 'USB printer',
+        type: 'WebUSB',
+        detail: `Vendor ${device.vendorId} · Product ${device.productId}`,
+        pairedAt: new Date().toISOString(),
+      })
+    } catch (error) {
+      if (error?.name !== 'NotFoundError') onNotify?.(error?.message || 'USB pairing failed')
+    }
+  }
+
+  const pairBluetoothPrinter = async () => {
+    if (!navigator.bluetooth?.requestDevice) {
+      onNotify?.('Web Bluetooth is not supported in this browser')
+      return
+    }
+
+    try {
+      const device = await navigator.bluetooth.requestDevice({
+        acceptAllDevices: true,
+        optionalServices: ['battery_service'],
+      })
+      addPairedPrinter({
+        id: `bluetooth-${device.id}`,
+        name: device.name || 'Bluetooth printer',
+        type: 'Web Bluetooth',
+        detail: device.gatt ? 'GATT capable device' : 'Bluetooth device',
+        pairedAt: new Date().toISOString(),
+      })
+    } catch (error) {
+      if (error?.name !== 'NotFoundError') onNotify?.(error?.message || 'Bluetooth pairing failed')
+    }
+  }
+
+  const pairSerialPrinter = async () => {
+    if (!navigator.serial?.requestPort) {
+      onNotify?.('Web Serial is not supported in this browser')
+      return
+    }
+
+    try {
+      const port = await navigator.serial.requestPort()
+      const info = port.getInfo?.() ?? {}
+      addPairedPrinter({
+        id: `serial-${info.usbVendorId ?? 'vendor'}-${info.usbProductId ?? Date.now()}`,
+        name: 'Serial printer',
+        type: 'Web Serial',
+        detail: `Vendor ${info.usbVendorId ?? '-'} · Product ${info.usbProductId ?? '-'}`,
+        pairedAt: new Date().toISOString(),
+      })
+    } catch (error) {
+      if (error?.name !== 'NotFoundError') onNotify?.(error?.message || 'Serial pairing failed')
+    }
   }
 
   const updatePrintField = (field, value) => {
@@ -194,25 +520,29 @@ function SettingsPage({
       </div>
 
       <div className="settings-tabs" role="tablist" aria-label={t.settings}>
-        {settingsTabs.map((tab) => {
-          const TabIcon = tab.icon
+  {settingsTabs.map((tab) => {
+    const TabIcon = tab.icon
+    const isActive = activeTab === tab.key
 
-          return (
-            <button
-              className={activeTab === tab.key ? 'active' : ''}
-              type="button"
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-            >
-              <TabIcon size={17} />
-              <span>{t[tab.key]}</span>
-            </button>
-          )
-        })}
-      </div>
+    return (
+      <button
+        className={isActive ? 'active' : ''}
+        type="button"
+        role="tab"
+        aria-selected={isActive}
+        tabIndex={isActive ? 0 : -1}
+        key={tab.key}
+        onClick={() => setActiveTab(tab.key)}
+      >
+        <TabIcon size={17} />
+        <span>{t[tab.key]}</span>
+      </button>
+    )
+  })}
+</div>
 
       {activeTab === 'currency' ? (
-        <section className="settings-card">
+        <section className="settings-card exchange-rates-card">
           <div className="settings-card-head">
             <div>
               <h2>{t.exchangeRates ?? 'Exchange Rates'}</h2>
@@ -428,6 +758,205 @@ function SettingsPage({
             </div>
           </div>
         </section>
+      ) : activeTab === 'posPrinting' ? (
+        <section className="pos-bridge-settings">
+          <div className="settings-card pos-bridge-card">
+            <div className="pos-bridge-head">
+              <div>
+                <h2><Printer size={22} /> {t.posPrinterBridge ?? 'POS printer bridge'}</h2>
+                <p>{t.posBridgeHint ?? 'Print directly to USB or Bluetooth thermal printers.'}</p>
+              </div>
+            </div>
+
+            <div className="pos-feature-row" aria-label="Supported browser APIs">
+              <span>WebUSB</span>
+              <span>Web Bluetooth</span>
+              <span>Web Serial</span>
+            </div>
+
+            <div className="pos-direct-toggle">
+              <div>
+                <strong>{t.enableDirectPosPrinting ?? 'Enable direct POS printing'}</strong>
+                <span>{t.enableDirectPosPrintingHint ?? 'When on, thermal receipts stream straight to the paired printer.'}</span>
+              </div>
+              <button
+                className={posBridgeSettings.enabled ? 'toggle on' : 'toggle'}
+                type="button"
+                aria-pressed={posBridgeSettings.enabled}
+                onClick={() => updatePosBridge('enabled', !posBridgeSettings.enabled)}
+              >
+                <span>{posBridgeSettings.enabled ? 'ON' : 'OFF'}</span>
+              </button>
+            </div>
+
+            <div className="pos-bridge-grid">
+              <label>
+                <span>{t.paperWidth ?? 'Paper width'}</span>
+                <CustomSelect
+                  ariaLabel="Paper width"
+                  menuClassName="pos-select-menu"
+                  options={posPaperWidthOptions}
+                  value={posBridgeSettings.paperWidth}
+                  onChange={(value) => updatePosBridge('paperWidth', value)}
+                />
+              </label>
+
+              <label>
+                <span>{t.codePage ?? 'Code page'}</span>
+                <CustomSelect
+                  ariaLabel="Code page"
+                  menuClassName="pos-select-menu"
+                  options={posCodePageOptions}
+                  value={posBridgeSettings.codePage}
+                  onChange={(value) => updatePosBridge('codePage', value)}
+                />
+              </label>
+            </div>
+
+            <div className="pos-pair-actions">
+              <button type="button" onClick={pairUsbPrinter}>{t.pairUsbPrinter ?? 'Pair USB printer'}</button>
+              <button type="button" onClick={pairBluetoothPrinter}>{t.pairBluetoothPrinter ?? 'Pair Bluetooth printer'}</button>
+              <button type="button" onClick={pairSerialPrinter}>{t.pairSerialPrinter ?? 'Pair Serial printer'}</button>
+            </div>
+          </div>
+
+          <div className="settings-card pos-paired-card">
+            <h3>{t.paired ?? 'Paired'} ({posBridgeSettings.pairedPrinters.length})</h3>
+            <p>{t.pairedDevicesHint ?? "Devices you've authorised. The default printer receives every direct print job."}</p>
+
+            {posBridgeSettings.pairedPrinters.length ? (
+              <div className="pos-paired-list">
+                {posBridgeSettings.pairedPrinters.map((printer) => (
+                  <article className="pos-paired-item" key={printer.id}>
+                    <span className="pos-paired-icon"><Printer size={18} /></span>
+                    <div>
+                      <strong>{printer.name}</strong>
+                      <small>{printer.type} · {printer.detail}</small>
+                    </div>
+                    <button type="button" aria-label={t.removePairedPrinter ?? 'Remove paired printer'} onClick={() => removePairedPrinter(printer.id)}>
+                      <Trash2 size={16} />
+                    </button>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <p>{t.noPrintersPaired ?? 'No printers paired yet. Use the buttons above to add one.'}</p>
+            )}
+          </div>
+        </section>
+      ) : activeTab === 'users' ? (
+        <section className="settings-card user-management-card">
+            <div className="settings-card-head">
+            <div>
+              <h2>{t.userManagement ?? 'User Management'}</h2>
+              <p>{t.createUsersWithPermissions ?? 'Create users with specific module access and CRUD permissions'}</p>
+            </div>
+            <button className="save-btn" type="button" onClick={() => openUserModal()}>
+              <Plus size={17} />
+              <span>{t.addUser ?? 'Add User'}</span>
+            </button>
+          </div>
+
+          {systemUsers.length ? (
+            <div className="settings-users-table-wrap">
+              <table className="settings-users-table">
+                <thead>
+                  <tr>
+                    <th>{t.username ?? 'Username'}</th>
+                    <th>{t.displayName ?? 'Display Name'}</th>
+                    <th>{t.modulesAccess ?? 'Modules'}</th>
+                    <th>{t.lastUpdated ?? 'Updated'}</th>
+                    <th>{t.actions ?? 'Actions'}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {systemUsers.map((user) => {
+                    const enabledModules = Object.entries(user.permissions ?? {})
+                      .filter(([, permissions]) => Object.values(permissions ?? {}).some(Boolean))
+                      .length
+                    return (
+                      <tr key={user.id}>
+                        <td><strong>{user.username}</strong></td>
+                        <td>{user.displayName}</td>
+                        <td>{enabledModules}</td>
+                        <td>{user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : '-'}</td>
+                        <td>
+                          <div className="settings-user-actions">
+                            <button type="button" onClick={() => openUserModal(user)}>{t.edit ?? 'Edit'}</button>
+                            <button type="button" className="danger" onClick={() => deleteUser(user.id)}>{t.delete ?? 'Delete'}</button>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="settings-users-empty">
+              <strong>{t.noUsersYet ?? 'No users yet'}</strong>
+              <span>{t.createUsersWithPermissions ?? 'Create your first user and assign module permissions.'}</span>
+            </div>
+          )}
+        </section>
+      ) : activeTab === 'forms' ? (
+        <section className="settings-card custom-fields-card">
+          <div className="settings-card-head custom-fields-head">
+            <div>
+              <h2>{t.customFormFields ?? 'Custom Form Fields'}</h2>
+              <p>{t.customFormFieldsHint ?? 'Add custom fields to module forms'}</p>
+            </div>
+            <button className="custom-fields-add-btn" type="button" onClick={openCustomFieldModal}>
+              <Plus size={16} />
+              <span>{t.addField ?? 'Add Field'}</span>
+            </button>
+          </div>
+
+          <div className="custom-field-module-tabs" role="tablist" aria-label={t.forms ?? 'Forms'}>
+            {customFieldModules.map((module) => {
+              const ModuleIcon = module.icon
+              const isActive = activeCustomFieldModule === module.key
+
+              return (
+                <button
+                  className={isActive ? 'active' : ''}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  key={module.key}
+                  onClick={() => setActiveCustomFieldModule(module.key)}
+                >
+                  <ModuleIcon size={15} />
+                  <span>{t[module.key] ?? module.label}</span>
+                </button>
+              )
+            })}
+          </div>
+
+          <div className="custom-field-list">
+            {activeCustomFields.length ? activeCustomFields.map((field) => (
+              <article className="custom-field-row" key={field.id}>
+                <span className="custom-field-type-icon">T</span>
+                <div className="custom-field-summary">
+                  <strong>{field.label}</strong>
+                  <div>
+                    <span className="custom-field-type-pill">{customFieldTypeOptions.find((item) => item.value === field.type)?.label ?? field.type}</span>
+                    {field.required && <span className="custom-field-required-pill">{t.required ?? 'Required'}</span>}
+                    {field.placeholder && <small>{field.placeholder}</small>}
+                  </div>
+                </div>
+                <button className="custom-field-delete-btn" type="button" aria-label={t.delete ?? 'Delete'} onClick={() => deleteCustomField(field.id)}>
+                  <Trash2 size={15} />
+                </button>
+              </article>
+            )) : (
+              <div className="custom-fields-empty">
+                <strong>{t.noCustomFieldsYet ?? 'No custom fields yet'}</strong>
+                <span>{t.addCustomFieldsHint ?? 'Add a field to show it at the end of this module form.'}</span>
+              </div>
+            )}
+          </div>
+        </section>
       ) : activeTab === 'notifications' ? (
         <section className="settings-card notification-settings-card">
           <div className="settings-card-head">
@@ -515,12 +1044,31 @@ function SettingsPage({
                 <p>{t.automaticBackupHint ?? 'Downloads a full JSON backup on the chosen cadence while the app is open.'}</p>
               </div>
               <button
-                className={backupSettings.automatic ? 'toggle on' : 'toggle'}
-                type="button"
-                onClick={() => updateNestedField('backupSettings', 'automatic', !backupSettings.automatic)}
-              >
-                <span />
-              </button>
+  className={`backup-auto-toggle ${
+    backupSettings.automatic ? 'active' : ''
+  }`}
+  type="button"
+  role="switch"
+  aria-checked={backupSettings.automatic}
+  aria-label={`Automatic backup: ${
+    backupSettings.automatic ? 'ON' : 'OFF'
+  }`}
+  onClick={() =>
+    updateNestedField(
+      'backupSettings',
+      'automatic',
+      !backupSettings.automatic,
+    )
+  }
+>
+  <span className="backup-auto-toggle-track">
+    <i />
+  </span>
+
+  <b>
+    {backupSettings.automatic ? 'ON' : 'OFF'}
+  </b>
+</button>
             </div>
             <div className="settings-form two">
               <label>
@@ -555,9 +1103,9 @@ function SettingsPage({
           </div>
         </section>
       ) : activeTab === 'themes' ? (
-        <section className="settings-card">
-          <h2>{t.themeSelection}</h2>
-          <p>{t.themeSelectionHint}</p>
+        <section className="settings-card theme-selection-card">
+  <h2>{t.themeSelection}</h2>
+  <p>{t.themeSelectionHint}</p>
           <div className="theme-grid">
             {colorThemes.map((item) => (
               <button
@@ -639,21 +1187,65 @@ function SettingsPage({
           <h2>{t.cashWalletKpiRouting ?? 'Cash Wallet — KPI routing'}</h2>
           <p>{t.cashWalletKpiRoutingHint ?? 'Choose which dashboard cards include cash-wallet deposits and withdrawals (supplier adjustments + manual entries).'}</p>
           <div className="kpi-route-list">
-            {[
-              ['totalRevenue', t.totalRevenue],
-              ['pureProfit', t.pureProfit],
-              ['netProfit', t.netProfit],
-              ['currentCashWallet', t.currentCashWallet],
-            ].map(([key, label]) => (
-              <div className="kpi-route-row" key={key}>
-                <div>
-                  <strong>{label}</strong>
-                  <span>{kpiRouting[key] ? (t.walletFlowsAffectKpi ?? 'Wallet deposits/withdrawals affect this KPI.') : (t.walletFlowsIgnoredKpi ?? 'Wallet flows are ignored for this KPI.')}</span>
-                </div>
-                <button className={kpiRouting[key] ? 'toggle on' : 'toggle'} type="button" onClick={() => updateNestedField('kpiRouting', key, !kpiRouting[key])}><span /></button>
-              </div>
-            ))}
-          </div>
+  {[
+    ['totalRevenue', t.totalRevenue],
+    ['pureProfit', t.pureProfit],
+    ['netProfit', t.netProfit],
+    ['currentCashWallet', t.currentCashWallet],
+  ].map(([key, label]) => {
+    const isEnabled = Boolean(kpiRouting[key])
+
+    return (
+      <div
+        className={`kpi-route-row ${
+          isEnabled ? 'active' : ''
+        }`}
+        key={key}
+      >
+        <div className="kpi-route-content">
+          <strong>{label}</strong>
+
+          <span>
+            {isEnabled
+              ? (
+                  t.walletFlowsAffectKpi ??
+                  'Wallet deposits and withdrawals affect this KPI.'
+                )
+              : (
+                  t.walletFlowsIgnoredKpi ??
+                  'Wallet flows are ignored for this KPI.'
+                )}
+          </span>
+        </div>
+
+       <button
+  className={`kpi-route-toggle ${
+    isEnabled ? 'active' : ''
+  }`}
+  type="button"
+  role="switch"
+  aria-checked={isEnabled}
+  aria-label={`${label}: ${
+    isEnabled ? 'ON' : 'OFF'
+  }`}
+  onClick={() =>
+    updateNestedField(
+      'kpiRouting',
+      key,
+      !isEnabled,
+    )
+  }
+>
+  <span className="kpi-route-toggle-track">
+    <i />
+  </span>
+
+  <b>{isEnabled ? 'ON' : 'OFF'}</b>
+</button>
+      </div>
+    )
+  })}
+</div>
         </section>
 
         <section className="settings-card tax-adjustment-card">
@@ -683,9 +1275,325 @@ function SettingsPage({
           <p>{t.settingsComingSoon}</p>
         </section>
       )}
+     {customFieldModalOpen &&
+  createPortal(
+    <div className="modal-backdrop custom-field-modal-backdrop" onClick={closeCustomFieldModal}>
+      <section className="custom-field-modal" onClick={(event) => event.stopPropagation()}>
+        <header className="custom-field-modal-head">
+          <h2>{t.addField ?? 'Add Field'} — {t[activeCustomFieldModule] ?? customFieldModules.find((module) => module.key === activeCustomFieldModule)?.label}</h2>
+          <button className="custom-field-modal-close" type="button" aria-label={t.close ?? 'Close'} onClick={closeCustomFieldModal}>
+            <X size={16} />
+          </button>
+        </header>
+
+        <label>
+          <span>{t.fieldLabel ?? 'Field Label'} *</span>
+          <input
+            autoFocus
+            placeholder="e.g. Warranty Period"
+            value={customFieldDraft.label}
+            onChange={(event) => setCustomFieldDraft((current) => ({ ...current, label: event.target.value }))}
+          />
+        </label>
+
+        <label>
+          <span>{t.placeholder ?? 'Placeholder'}</span>
+          <input
+            placeholder="e.g. Enter warranty period"
+            value={customFieldDraft.placeholder}
+            onChange={(event) => setCustomFieldDraft((current) => ({ ...current, placeholder: event.target.value }))}
+          />
+        </label>
+
+        <label>
+          <span>{t.fieldType ?? 'Field Type'}</span>
+          <CustomSelect
+            ariaLabel={t.fieldType ?? 'Field Type'}
+            className="custom-field-type-select"
+            menuClassName="custom-field-type-menu"
+            options={customFieldTypeOptions}
+            value={customFieldDraft.type}
+            onChange={(value) => setCustomFieldDraft((current) => ({ ...current, type: value }))}
+          />
+        </label>
+
+        {customFieldDraft.type === 'dropdown' && (
+          <label>
+            <span>{t.dropdownOptions ?? 'Dropdown Options'}</span>
+            <textarea
+              placeholder="One option per line"
+              value={customFieldDraft.options}
+              onChange={(event) => setCustomFieldDraft((current) => ({ ...current, options: event.target.value }))}
+            />
+          </label>
+        )}
+
+        <label className="custom-field-required-row">
+          <span>{t.required ?? 'Required'}</span>
+          <button
+            className={`custom-field-switch ${customFieldDraft.required ? 'active' : ''}`}
+            type="button"
+            role="switch"
+            aria-checked={customFieldDraft.required}
+            onClick={() => setCustomFieldDraft((current) => ({ ...current, required: !current.required }))}
+          >
+            <i />
+          </button>
+        </label>
+
+        <footer className="custom-field-modal-actions">
+          <button type="button" onClick={closeCustomFieldModal}>{t.cancel ?? 'Cancel'}</button>
+          <button type="button" className="primary" onClick={saveCustomField}>{t.addField ?? 'Add Field'}</button>
+        </footer>
+      </section>
+    </div>,
+    document.querySelector('.retail-shell') ?? document.body,
+  )}
+     {userModalOpen &&
+  createPortal(
+    <div
+      className="modal-backdrop settings-user-modal-backdrop"
+      onClick={closeUserModal}
+    >
+      <section
+        className="settings-user-modal"
+        onClick={(event) => event.stopPropagation()}
+      >
+        {/* Modal header */}
+        <header className="settings-user-modal-header">
+          <div className="settings-user-modal-heading">
+            <span className="settings-user-modal-icon">
+              {editingUserId ? 'E' : '+'}
+            </span>
+
+            <div>
+              <h2>
+                {editingUserId
+                  ? (t.editUser ?? 'Edit User')
+                  : (t.createNewUser ?? 'Create New User')}
+              </h2>
+
+              <p>
+                {editingUserId
+                  ? 'Update account details and module permissions.'
+                  : 'Create a new account and assign module permissions.'}
+              </p>
+            </div>
+          </div>
+
+          <button
+            className="settings-user-modal-close"
+            type="button"
+            aria-label={t.close ?? 'Close'}
+            title={t.close ?? 'Close'}
+            onClick={closeUserModal}
+          >
+            <X size={15} />
+          </button>
+        </header>
+
+        {/* Account information */}
+        <div className="settings-user-section">
+          <div className="settings-user-section-head">
+            <div>
+              <h3>Account Information</h3>
+              <p>Enter the login and display information for this user.</p>
+            </div>
+
+            <span>Required fields *</span>
+          </div>
+
+          <div className="settings-user-form-grid">
+            <label>
+              <span className="settings-user-field-label">
+                {t.username ?? 'Username'}
+                <b>*</b>
+              </span>
+
+              <input
+                autoFocus
+                autoComplete="username"
+                placeholder="Enter username"
+                value={userForm.username}
+                onChange={(event) =>
+                  updateUserField('username', event.target.value)
+                }
+              />
+            </label>
+
+            <label>
+              <span className="settings-user-field-label">
+                {t.displayName ?? 'Display Name'}
+                <b>*</b>
+              </span>
+
+              <input
+                autoComplete="name"
+                placeholder="Enter display name"
+                value={userForm.displayName}
+                onChange={(event) =>
+                  updateUserField('displayName', event.target.value)
+                }
+              />
+            </label>
+
+            <label>
+              <span className="settings-user-field-label">
+                {t.password ?? 'Password'}
+                {!editingUserId && <b>*</b>}
+              </span>
+
+              <input
+                type="password"
+                autoComplete="new-password"
+                placeholder={
+                  editingUserId
+                    ? 'Leave empty to keep current password'
+                    : 'Enter password'
+                }
+                value={userForm.password}
+                onChange={(event) =>
+                  updateUserField('password', event.target.value)
+                }
+              />
+            </label>
+
+            <label>
+              <span className="settings-user-field-label">
+                {t.confirmPassword ?? 'Confirm Password'}
+                {!editingUserId && <b>*</b>}
+              </span>
+
+              <input
+                type="password"
+                autoComplete="new-password"
+                placeholder="Repeat password"
+                value={userForm.confirmPassword}
+                onChange={(event) =>
+                  updateUserField(
+                    'confirmPassword',
+                    event.target.value,
+                  )
+                }
+              />
+            </label>
+          </div>
+        </div>
+
+        {/* Permissions */}
+        <div className="settings-user-section permissions-section">
+          <div className="settings-user-section-head">
+            <div>
+              <h3>{t.modulePermissions ?? 'Module Permissions'}</h3>
+              <p>
+                Select which actions this user can perform in each module.
+              </p>
+            </div>
+          </div>
+
+          <div className="settings-permissions-table-wrap">
+            <table className="settings-permissions-table">
+              <thead>
+                <tr>
+                  <th>{t.modulesAccess ?? 'Module'}</th>
+                  <th>{t.createPermission ?? 'Create'}</th>
+                  <th>{t.readPermission ?? 'Read'}</th>
+                  <th>{t.updatePermission ?? 'Update'}</th>
+                  <th>{t.delete ?? 'Delete'}</th>
+                  <th>{t.allPermissions ?? 'All'}</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {permissionModules.map((module) => {
+                  const modulePermissions =
+                    userForm.permissions[module.key] ?? {}
+
+                  const allChecked = permissionActions.every(
+                    (action) => modulePermissions[action],
+                  )
+
+                  return (
+                    <tr key={module.key}>
+                      <td>
+                        <strong>
+                          {t[module.key] ?? module.label}
+                        </strong>
+                      </td>
+
+                      {permissionActions.map((action) => (
+                        <td key={action}>
+                          <label className="settings-permission-check">
+                            <input
+                              type="checkbox"
+                              checked={Boolean(
+                                modulePermissions[action],
+                              )}
+                              onChange={(event) =>
+                                setModulePermission(
+                                  module.key,
+                                  action,
+                                  event.target.checked,
+                                )
+                              }
+                            />
+
+                            <span />
+                          </label>
+                        </td>
+                      ))}
+
+                      <td>
+                        <label className="settings-permission-check all">
+                          <input
+                            type="checkbox"
+                            checked={allChecked}
+                            onChange={(event) =>
+                              setModulePermission(
+                                module.key,
+                                'all',
+                                event.target.checked,
+                              )
+                            }
+                          />
+
+                          <span />
+                        </label>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <footer className="settings-user-modal-actions">
+          <button
+            className="settings-user-cancel-btn"
+            type="button"
+            onClick={closeUserModal}
+          >
+            {t.cancel ?? 'Cancel'}
+          </button>
+
+          <button
+            className="settings-user-save-btn"
+            type="button"
+            onClick={saveUser}
+          >
+            {editingUserId
+              ? (t.saveUserChanges ?? 'Save Changes')
+              : (t.createUser ?? 'Create User')}
+          </button>
+        </footer>
+      </section>
+    </div>,
+    document.querySelector('.retail-shell') ?? document.body,
+  )}
     </div>
   )
 }
 
 export default SettingsPage
-

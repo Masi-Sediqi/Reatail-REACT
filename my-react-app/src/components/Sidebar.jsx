@@ -4,7 +4,7 @@ import { Archive, ChevronLeft, Eye, Shield } from './Icons.jsx'
 import { sidebarItems } from '../data/dashboardData.js'
 import './Sidebar.css'
 
-function Sidebar({ activePage, companyInfo, onNavigate, t }) {
+function Sidebar({ activePage, companyInfo, onNavigate, onToggle, t }) {
   const [helpOpen, setHelpOpen] = useState(false)
   const [menuPos, setMenuPos] = useState({ left: 0, bottom: 0 })
 
@@ -25,9 +25,11 @@ function Sidebar({ activePage, companyInfo, onNavigate, t }) {
     if (!helpBtnRef.current) return
 
     const rect = helpBtnRef.current.getBoundingClientRect()
+    const isRtl = document.querySelector('.retail-shell')?.getAttribute('dir') === 'rtl'
+    const menuWidth = 190
 
     setMenuPos({
-      left: rect.right + 16,
+      left: isRtl ? Math.max(12, rect.left - menuWidth - 16) : rect.right + 16,
       bottom: window.innerHeight - rect.bottom - 10,
     })
 
@@ -62,7 +64,7 @@ function Sidebar({ activePage, companyInfo, onNavigate, t }) {
           <small>{companyInfo.tagline || t.retailManagement}</small>
         </div>
 
-        <button className="collapse-btn" aria-label="Collapse sidebar">
+        <button className="collapse-btn" type="button" aria-label="Collapse sidebar" onClick={onToggle}>
           <ChevronLeft size={18} />
         </button>
       </div>

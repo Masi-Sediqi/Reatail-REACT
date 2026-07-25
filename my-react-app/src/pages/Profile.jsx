@@ -1,4 +1,5 @@
 import { profileIcons } from '../data/dashboardData.js'
+import './Profile.css'
 
 function Profile({ onNotify, t }) {
   const CameraIcon = profileIcons.camera

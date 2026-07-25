@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import CustomSelect from '../components/CustomSelect.jsx'
 import FloatingActionMenu from '../components/FloatingActionMenu.jsx'
 import PrintPreviewModal from '../components/PrintPreviewModal.jsx'
+import { formatBusinessCurrencyAmount } from '../utils/currencyExchange.js'
 import {
   CalendarDays,
   CreditCard,
@@ -40,7 +41,7 @@ const currencyOptions = [
 
 const formatMoney = (value, currencyCode) => {
   const currency = currencyOptions.find((item) => item.code === currencyCode) ?? currencyOptions[0]
-  return `${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency.symbol}`
+  return formatBusinessCurrencyAmount(value, currency.code)
 }
 
 const parseNumber = (value) => Number.parseFloat(value || 0) || 0
@@ -103,8 +104,9 @@ const printInvoice = (sale, companyInfo, t) => {
         <title>${escapeHtml(sale.invoiceNumber)}</title>
         <style>
           * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          @page { size: A4; margin: 10mm; }
           body { margin: 0; background: #e5e7eb; font-family: Arial, sans-serif; }
-          .invoice-paper { width: 794px; min-height: 1123px; margin: 0 auto; background: #fff; color: #111827; position: relative; overflow: hidden; }
+          .invoice-paper { width: 190mm; min-height: 270mm; margin: 0 auto; background: #fff; color: #111827; position: relative; overflow: hidden; }
           .invoice-ribbon { height: 62px; background: linear-gradient(100deg, #1e5265, #20c765); border-bottom-left-radius: 58% 22px; border-bottom-right-radius: 8px; }
           .invoice-head { display: flex; justify-content: space-between; gap: 24px; padding: 22px 38px 12px; }
           .invoice-brand { display: flex; align-items: center; gap: 16px; }
@@ -120,11 +122,12 @@ const printInvoice = (sale, companyInfo, t) => {
           .invoice-table th { background: #f1f5f9; color: #1e3a5f; letter-spacing: 1px; }
           .invoice-summary { width: 300px; margin: 18px 38px 0 auto; display: grid; gap: 7px; font-size: 12px; }
           .invoice-summary div { display: flex; justify-content: space-between; gap: 20px; }
+          .invoice-summary .remaining-total strong { color: #f59e0b; }
           .invoice-summary .grand { border-top: 1px solid #cbd5e1; padding-top: 8px; font-weight: 800; }
           .invoice-watermark { position: absolute; left: 50%; top: 68%; transform: translate(-50%, -50%); width: 180px; height: 180px; border-radius: 30px; background: #f1f5f9; display: grid; place-items: center; color: #fff; font-size: 96px; opacity: .72; }
           .success-text { color: #16a34a; }
           .warning-text { color: #d97706; }
-          @media print { body { background: #fff; } .invoice-paper { width: 100%; margin: 0; } }
+          @media print { body { background: #fff; } .invoice-paper { width: 190mm; min-height: auto; margin: 0 auto; } }
         </style>
       </head>
       <body>
@@ -156,6 +159,7 @@ const printInvoice = (sale, companyInfo, t) => {
           <div class="invoice-summary">
             <div><span>${escapeHtml(t.subtotal)}</span><strong>${formatMoney(sale.subtotal, sale.currency)}</strong></div>
             <div><span>${escapeHtml(t.discount)}</span><strong>${formatMoney(sale.discountTotal, sale.currency)}</strong></div>
+            ${parseNumber(sale.balance) > 0 ? `<div class="remaining-total"><span>${escapeHtml(t.remaining)}</span><strong>${formatMoney(sale.balance, sale.currency)}</strong></div>` : ''}
             <div class="grand"><span>${escapeHtml(t.total)}</span><strong>${formatMoney(sale.total, sale.currency)}</strong></div>
           </div>
           <div class="invoice-watermark">$</div>
@@ -365,9 +369,31 @@ function AddPaymentModal({ onClose, onRecord, sale, t }) {
   )
 }
 
-function PaymentHistoryModal({ onAddPayment, onClose, sale, t }) {
+function PaymentHistoryModal({ onAddPayment, onClose, onDeletePayment, onUpdatePayment, sale, t }) {
   const payments = sale.paymentHistory || []
   const remaining = Math.max(0, Number(sale.balance || 0))
+  const [editingPaymentId, setEditingPaymentId] = useState('')
+  const [editAmount, setEditAmount] = useState('')
+  const [editNotes, setEditNotes] = useState('')
+
+  const startEditPayment = (payment) => {
+    setEditingPaymentId(payment.id)
+    setEditAmount(String(payment.amount ?? ''))
+    setEditNotes(payment.notes || '')
+  }
+
+  const cancelEditPayment = () => {
+    setEditingPaymentId('')
+    setEditAmount('')
+    setEditNotes('')
+  }
+
+  const saveEditPayment = (payment) => {
+    const amount = parseNumber(editAmount)
+    if (amount <= 0) return
+    onUpdatePayment(sale, payment.id, { amount, notes: editNotes.trim() })
+    cancelEditPayment()
+  }
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
@@ -394,11 +420,31 @@ function PaymentHistoryModal({ onAddPayment, onClose, sale, t }) {
           <div className="payment-list">
             {payments.map((payment) => (
               <div className="payment-row" key={payment.id}>
-                <div>
-                  <strong>{formatMoney(payment.amount, sale.currency)}</strong>
-                  <span>{payment.notes || t.paymentReference}</span>
-                </div>
+                {editingPaymentId === payment.id ? (
+                  <div className="payment-edit-fields">
+                    <input type="number" min="0" step="0.01" value={editAmount} onChange={(event) => setEditAmount(event.target.value)} />
+                    <input value={editNotes} onChange={(event) => setEditNotes(event.target.value)} placeholder={t.paymentReference} />
+                  </div>
+                ) : (
+                  <div>
+                    <strong>{formatMoney(payment.amount, sale.currency)}</strong>
+                    <span>{payment.notes || t.paymentReference}</span>
+                  </div>
+                )}
                 <small>{new Date(payment.createdAt).toLocaleString()}</small>
+                <div className="payment-row-actions">
+                  {editingPaymentId === payment.id ? (
+                    <>
+                      <button type="button" onClick={() => saveEditPayment(payment)}>{t.save ?? 'Save'}</button>
+                      <button type="button" onClick={cancelEditPayment}>{t.cancel}</button>
+                    </>
+                  ) : (
+                    <>
+                      <button type="button" onClick={() => startEditPayment(payment)}>{t.edit}</button>
+                      <button className="danger-action" type="button" onClick={() => onDeletePayment(sale, payment.id)}><Trash2 size={14} /></button>
+                    </>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -457,6 +503,7 @@ function InvoicePrintPreviewModal({ companyInfo, onClose, onPrint, sale, t }) {
             <div className="invoice-summary">
               <div><span>{t.subtotal}</span><strong>{formatMoney(sale.subtotal, sale.currency)}</strong></div>
               <div><span>{t.discount}</span><strong>{formatMoney(sale.discountTotal, sale.currency)}</strong></div>
+              {parseNumber(sale.balance) > 0 && <div className="remaining-total"><span>{t.remaining}</span><strong>{formatMoney(sale.balance, sale.currency)}</strong></div>}
               <div className="grand"><span>{t.total}</span><strong>{formatMoney(sale.total, sale.currency)}</strong></div>
             </div>
             <div className="invoice-watermark">$</div>
@@ -753,6 +800,52 @@ function SalesBillsPage({ companyInfo, onEditBill, onNotify, onProductsChange, o
     onNotify?.(t.paymentRecorded)
   }
 
+  const applyPaymentHistory = (sale, nextHistory) => {
+    const currentHistoryTotal = (sale.paymentHistory || []).reduce((sum, payment) => sum + parseNumber(payment.amount), 0)
+    const basePaid = Math.max(0, parseNumber(sale.paidAmount) - currentHistoryTotal)
+    const nextHistoryTotal = nextHistory.reduce((sum, payment) => sum + parseNumber(payment.amount), 0)
+    const nextPaid = roundMoney(Math.min(parseNumber(sale.total), basePaid + nextHistoryTotal))
+    const nextBalance = roundMoney(Math.max(0, parseNumber(sale.total) - nextPaid))
+    return {
+      ...sale,
+      paidAmount: nextPaid,
+      balance: nextBalance,
+      paymentStatus: nextBalance <= 0 ? 'paid' : 'loan',
+      paymentHistory: nextHistory,
+      updatedAt: new Date().toISOString(),
+    }
+  }
+
+  const updatePayment = (sale, paymentId, patch) => {
+    let nextSale = null
+    onSalesChange((current) => current.map((item) => {
+      if (item.id !== sale.id) return item
+      const nextHistory = (item.paymentHistory || []).map((payment) => payment.id === paymentId
+        ? { ...payment, amount: parseNumber(patch.amount), notes: patch.notes, updatedAt: new Date().toISOString() }
+        : payment)
+      nextSale = applyPaymentHistory(item, nextHistory)
+      return nextSale
+    }))
+    setHistorySale((current) => current && current.id === sale.id ? applyPaymentHistory(current, (current.paymentHistory || []).map((payment) => payment.id === paymentId
+      ? { ...payment, amount: parseNumber(patch.amount), notes: patch.notes, updatedAt: new Date().toISOString() }
+      : payment)) : current)
+    if (previewSale?.id === sale.id && nextSale) setPreviewSale(nextSale)
+    onNotify?.(t.savedSuccessfully)
+  }
+
+  const deletePayment = (sale, paymentId) => {
+    let nextSale = null
+    onSalesChange((current) => current.map((item) => {
+      if (item.id !== sale.id) return item
+      const nextHistory = (item.paymentHistory || []).filter((payment) => payment.id !== paymentId)
+      nextSale = applyPaymentHistory(item, nextHistory)
+      return nextSale
+    }))
+    setHistorySale((current) => current && current.id === sale.id ? applyPaymentHistory(current, (current.paymentHistory || []).filter((payment) => payment.id !== paymentId)) : current)
+    if (previewSale?.id === sale.id && nextSale) setPreviewSale(nextSale)
+    onNotify?.(t.deletedSuccessfully ?? t.deleted)
+  }
+
   const markSalePaid = (sale) => {
     const remaining = Math.max(0, Number(sale.balance || 0))
     if (remaining <= 0) return
@@ -858,11 +951,11 @@ function SalesBillsPage({ companyInfo, onEditBill, onNotify, onProductsChange, o
         <h2><ShoppingCart size={19} /> {t.sales} ({filteredSales.length})</h2>
         <table className="data-table sales-table">
           <thead>
-            <tr><th>{t.invoice}</th><th>{t.customer}</th><th>{t.items}</th><th>{t.total}</th><th>{t.paid}</th><th>{t.status}</th><th>{t.date}</th><th>{t.actions}</th></tr>
+            <tr><th>{t.invoice}</th><th>{t.customer}</th><th>{t.items}</th><th>{t.total}</th><th>{t.paid}</th><th>{t.remaining}</th><th>{t.status}</th><th>{t.date}</th><th>{t.actions}</th></tr>
           </thead>
           <tbody>
             {filteredSales.length === 0 ? (
-              <tr><td colSpan="8" className="empty-cell">{t.noSalesFound}</td></tr>
+              <tr><td colSpan="9" className="empty-cell">{t.noSalesFound}</td></tr>
             ) : filteredSales.map((sale) => (
               <tr key={sale.id}>
                 <td className="mono-cell">{sale.invoiceNumber}</td>
@@ -870,6 +963,7 @@ function SalesBillsPage({ companyInfo, onEditBill, onNotify, onProductsChange, o
                 <td>{sale.items.length}</td>
                 <td><strong>{formatMoney(sale.total, sale.currency)}</strong></td>
                 <td>{formatMoney(sale.paidAmount, sale.currency)}</td>
+                <td className={parseNumber(sale.balance) > 0 ? 'danger-text' : 'success-text'}>{formatMoney(sale.balance, sale.currency)}</td>
                 <td><span className={sale.paymentStatus === 'paid' ? 'status-pill active' : 'status-pill warning'}>{sale.paymentStatus === 'paid' ? t.paidStatus : t.loanStatus}</span></td>
                 <td><span className="stacked-cell">{getGregorianLabel(sale.date)}<small>{getShamsiShortLabel(sale.date)}</small></span></td>
                 <td>
@@ -892,7 +986,7 @@ function SalesBillsPage({ companyInfo, onEditBill, onNotify, onProductsChange, o
         </table>
       </div>
       {detailsSale && <InvoiceDetailsModal onClose={() => setDetailsSale(null)} onPrint={setPreviewSale} sale={detailsSale} t={t} />}
-      {historySale && <PaymentHistoryModal onAddPayment={setAddPaymentSale} onClose={() => setHistorySale(null)} sale={historySale} t={t} />}
+      {historySale && <PaymentHistoryModal onAddPayment={setAddPaymentSale} onClose={() => setHistorySale(null)} onDeletePayment={deletePayment} onUpdatePayment={updatePayment} sale={historySale} t={t} />}
       {previewSale && <InvoicePrintPreviewModal companyInfo={companyInfo} onClose={() => setPreviewSale(null)} onPrint={handlePrintInvoice} sale={previewSale} t={t} />}
       {reportPreviewOpen && (
         <PrintPreviewModal

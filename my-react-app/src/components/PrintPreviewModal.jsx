@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import CustomSelect from './CustomSelect.jsx'
 import { Download, Mail, MessageCircle, Printer, Share2, X } from './Icons.jsx'
 import { printTemplates } from '../data/dashboardData.js'
+import './PrintPreviewModal.css'
 
 function PrintPreviewModal({ companyInfo, onClose, printSettings, rows, title, columns, t }) {
   const [selectedTemplateId, setSelectedTemplateId] = useState(printSettings.template)

@@ -1,0 +1,2064 @@
+/* Global responsive layer. Keep this imported last. */
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.app-header {
+  position: fixed !important;
+  top: 8px !important;
+  inset-inline-start: 272px !important;
+  inset-inline-end: 12px !important;
+  width: auto !important;
+  margin: 0 !important;
+  z-index: 2200 !important;
+}
+
+[dir="rtl"] .app-header {
+  inset-inline-start: 12px !important;
+  inset-inline-end: 272px !important;
+}
+
+.main-area > :not(.app-header) {
+  padding-top: 84px !important;
+}
+
+.mobile-sidebar-toggle,
+.mobile-sidebar-scrim {
+  display: none;
+}
+
+.retail-shell,
+.workspace,
+.main-area {
+  min-width: 0;
+}
+
+@media (min-width: 901px) {
+  .workspace {
+    display: block !important;
+    min-height: 100vh !important;
+  }
+
+  .sidebar {
+    position: fixed !important;
+    inset-block: 0 !important;
+    inset-inline-start: 0 !important;
+    z-index: 2300 !important;
+    width: 260px !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+  }
+
+  [dir="rtl"] .sidebar {
+    inset-inline-start: auto !important;
+    inset-inline-end: 0 !important;
+  }
+
+  .main-area {
+    margin-inline-start: 260px !important;
+    width: calc(100% - 260px) !important;
+    min-height: 100vh !important;
+  }
+
+  [dir="rtl"] .main-area {
+    margin-inline-start: 0 !important;
+    margin-inline-end: 260px !important;
+  }
+}
+
+.entity-content,
+.dashboard-content,
+.metric-detail-content,
+.settings-page,
+.profile-page,
+.products-page,
+.suppliers-page,
+.customers-page,
+.expenses-page,
+.billing-page,
+.sales-bills-page,
+.godown-page,
+.loans-page,
+.financials-page,
+.reports-page,
+.agent-page,
+.cash-wallet-page {
+  max-width: 100%;
+}
+
+.summary-grid,
+.metric-grid,
+.dashboard-grid,
+.products-grid,
+.settings-grid,
+.report-grid,
+.financial-grid {
+  min-width: 0;
+}
+
+.filter-card,
+.entity-heading,
+.page-heading,
+.metric-detail-heading,
+.cash-wallet-heading,
+.dashboard-hero,
+.data-panel {
+  min-width: 0;
+}
+
+.data-table,
+.metric-detail-table,
+.cash-wallet-table,
+.net-source-table {
+  width: 100%;
+}
+
+/* DashboardMetricDetail final non-Revenue alignment */
+#root#root#root .retail-shell .metric-detail-content:not(.revenue-view-page) .metric-detail-filter.has-custom-range {
+  grid-template-columns: minmax(280px, 1fr) 190px 190px 34px !important;
+}
+
+#root#root#root .retail-shell .metric-detail-content:not(.revenue-view-page) .metric-detail-filter .metric-detail-date-range,
+#root#root#root .retail-shell .metric-detail-content:not(.revenue-view-page) .metric-detail-filter .metric-detail-date-range .date-range-btn,
+#root#root#root .retail-shell .metric-detail-content:not(.revenue-view-page) .metric-detail-filter .smooth-select,
+#root#root#root .retail-shell .metric-detail-content:not(.revenue-view-page) .metric-detail-filter .smooth-select-btn {
+  width: 190px !important;
+  max-width: 190px !important;
+}
+
+#root#root#root .retail-shell .metric-detail-content:not(.revenue-view-page) .metric-filter-reset,
+#root#root#root .retail-shell .metric-detail-content:not(.revenue-view-page) .metric-filter-reset:hover {
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 42px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 7px !important;
+  background: transparent !important;
+  background-image: none !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root .retail-shell .metric-detail-content:not(.revenue-view-page) .metric-filter-reset:hover {
+  background: var(--panel-soft) !important;
+}
+
+#root#root#root .retail-shell .metric-detail-content:not(.revenue-view-page) .expenses-view-filter {
+  grid-template-columns: minmax(260px, 1fr) 180px 180px 180px !important;
+}
+
+#root#root#root .retail-shell .metric-detail-content:not(.revenue-view-page) .expenses-view-filter:has(.metric-filter-reset) {
+  grid-template-columns: minmax(260px, 1fr) 180px 180px 34px 180px 180px !important;
+}
+
+#root#root#root .retail-shell .metric-detail-content:not(.revenue-view-page) .expenses-view-filter .smooth-select,
+#root#root#root .retail-shell .metric-detail-content:not(.revenue-view-page) .expenses-view-filter .smooth-select-btn,
+#root#root#root .retail-shell .metric-detail-content:not(.revenue-view-page) .expenses-view-filter .metric-detail-date-range,
+#root#root#root .retail-shell .metric-detail-content:not(.revenue-view-page) .expenses-view-filter .metric-detail-date-range .date-range-btn {
+  width: 180px !important;
+  max-width: 180px !important;
+}
+
+@media (max-width: 1180px) {
+  .workspace {
+    grid-template-columns: 232px minmax(0, 1fr);
+  }
+
+  .sidebar {
+    width: 232px !important;
+  }
+
+  .main-area {
+    margin-inline-start: 232px !important;
+    width: calc(100% - 232px) !important;
+  }
+
+  [dir="rtl"] .main-area {
+    margin-inline-start: 0 !important;
+    margin-inline-end: 232px !important;
+  }
+
+  .brand-block {
+    padding-inline: 12px;
+  }
+
+  .side-nav button {
+    gap: 10px;
+    padding-inline: 12px;
+    font-size: 13px;
+  }
+
+  .app-header {
+    inset-inline-start: 244px !important;
+    inset-inline-end: 10px !important;
+    margin-inline: 0;
+    padding-inline: 18px;
+  }
+
+  [dir="rtl"] .app-header {
+    inset-inline-start: 10px !important;
+    inset-inline-end: 244px !important;
+  }
+
+  .summary-grid.four,
+  .cash-wallet-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .dashboard-grid,
+  .metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .entity-heading,
+  .metric-detail-heading,
+  .cash-wallet-heading {
+    grid-template-columns: 1fr !important;
+    align-items: stretch !important;
+  }
+
+  .entity-actions,
+  .heading-actions,
+  .cash-wallet-top-actions {
+    justify-content: start !important;
+  }
+}
+
+@media (max-width: 900px) {
+
+  .retail-shell:not(.sidebar-open) .mobile-sidebar-toggle {
+    display: grid;
+  }
+
+  .entity-content,
+  .dashboard-content,
+  .metric-detail-content,
+  .settings-page,
+  .profile-page,
+  .products-page,
+  .suppliers-page,
+  .customers-page,
+  .expenses-page,
+  .billing-page,
+  .sales-bills-page,
+  .godown-page,
+  .loans-page,
+  .financials-page,
+  .reports-page,
+  .agent-page,
+  .cash-wallet-page {
+    padding: 18px 14px 28px !important;
+  }
+
+  .summary-grid,
+  .summary-grid.three,
+  .summary-grid.four,
+  .metric-detail-summary,
+  .cash-wallet-summary,
+  .dashboard-grid,
+  .metric-grid,
+  .settings-grid,
+  .report-grid,
+  .financial-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .filter-card,
+  .metric-detail-filter,
+  .metric-detail-filter.has-custom-range,
+  .customer-view-filter,
+  .expenses-view-filter,
+  .expenses-view-filter:has(.metric-filter-reset),
+  .cash-wallet-filters,
+  .cash-wallet-top-actions,
+  .cash-wallet-top-actions.has-custom-range,
+  .revenue-view-filter,
+  .revenue-view-filter.has-custom-range {
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+  }
+
+  .filter-card > *,
+  .metric-detail-filter > *,
+  .cash-wallet-top-actions > *,
+  .cash-wallet-top-actions .smooth-select,
+  .cash-wallet-top-actions .smooth-select-btn,
+  .cash-wallet-top-actions .date-range-picker,
+  .cash-wallet-top-actions .date-range-btn,
+  .cash-wallet-print-btn,
+  .entity-actions > button,
+  .heading-actions > button,
+  .date-range-picker,
+  .date-range-btn,
+  .smooth-select,
+  .smooth-select-btn,
+  .search-field {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .cash-wallet-add-btn,
+  .mobile-full-width-action {
+    width: 100% !important;
+    border-radius: 8px !important;
+  }
+
+  .data-panel,
+  .filter-card,
+  .metric-detail-panel,
+  .cash-wallet-table-panel,
+  .net-profit-breakdown,
+  .net-profit-source {
+    padding: 16px !important;
+    border-radius: 8px !important;
+  }
+
+  .metric-detail-table-wrap,
+  .table-wrap,
+  .cash-print-stage {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .data-table {
+    min-width: 680px;
+  }
+
+  .quick-panel {
+    padding: 20px 16px !important;
+  }
+
+  .quick-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .retail-shell .quick-panel .quick-action,
+  .retail-shell .quick-panel .quick-action.featured,
+  .retail-shell .quick-panel .quick-action:hover,
+  .retail-shell .quick-panel .quick-action.featured:hover {
+    min-height: 58px !important;
+    padding: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 10px !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 9px !important;
+    background: var(--panel-bg) !important;
+    background-image: none !important;
+    color: var(--text) !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  .retail-shell .quick-panel .quick-action svg,
+  .retail-shell .quick-panel .quick-action.featured svg {
+    width: 18px !important;
+    height: 18px !important;
+    color: #506483 !important;
+  }
+
+  .retail-shell .quick-panel .quick-action span,
+  .retail-shell .quick-panel .quick-action.featured span {
+    display: inline !important;
+    min-width: 0 !important;
+    color: var(--text) !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 1.25 !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .metric-detail-title h1,
+  .entity-heading h1,
+  .page-heading h1,
+  .dashboard-hero h1 {
+    font-size: clamp(20px, 7vw, 26px) !important;
+    line-height: 1.15 !important;
+  }
+
+  .metric-detail-title p,
+  .entity-heading p,
+  .page-heading p,
+  .dashboard-hero p {
+    font-size: 13px !important;
+  }
+
+  .modal-backdrop,
+  .header-modal-backdrop,
+  .cash-wallet-backdrop,
+  .cash-print-backdrop {
+    padding: 12px !important;
+    align-items: center !important;
+  }
+
+  .entity-modal,
+  .header-shared-modal,
+  .cash-wallet-modal,
+  .cash-print-modal,
+  .print-preview-modal,
+  .app-confirm-modal {
+    width: min(100%, calc(100vw - 24px)) !important;
+    max-height: calc(100dvh - 24px) !important;
+  }
+}
+
+@media (max-width: 520px) {
+
+  .brand-block {
+    min-height: 62px;
+  }
+
+  .side-nav {
+    padding: 14px 10px;
+  }
+
+  .side-nav button {
+    min-height: 38px;
+  }
+
+  .detail-summary-card,
+  .cash-wallet-card,
+  .metric-card {
+    min-height: 88px !important;
+    padding: 16px 58px 16px 16px !important;
+  }
+
+  [dir="rtl"] .detail-summary-card,
+  [dir="rtl"] .cash-wallet-card,
+  [dir="rtl"] .metric-card {
+    padding: 16px 16px 16px 58px !important;
+  }
+
+  .detail-summary-card > svg,
+  .cash-wallet-card i {
+    width: 36px !important;
+    height: 36px !important;
+    top: 16px !important;
+    inset-inline-end: 16px !important;
+  }
+
+  .modal-actions,
+  .wallet-modal-actions,
+  .cash-print-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .modal-actions button,
+  .wallet-modal-actions button,
+  .cash-print-actions button,
+  .cash-print-actions label,
+  .cash-print-actions .smooth-select {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .entity-content,
+  .dashboard-content,
+  .metric-detail-content,
+  .cash-wallet-page {
+    padding-inline: 10px !important;
+  }
+
+
+  .data-table {
+    min-width: 620px;
+  }
+}
+
+
+#root#root#root .retail-shell .products-content .product-date-range-picker {
+  position: relative !important;
+}
+
+#root#root#root .retail-shell .products-content .product-date-range-btn {
+  padding-inline-end: 12px !important;
+}
+
+#root#root#root .retail-shell .products-content .products-custom-date-controls {
+  display: grid !important;
+  grid-template-columns: minmax(170px, 180px) 32px !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+
+#root#root#root .retail-shell .products-content .products-filter-reset,
+#root#root#root .retail-shell .products-content .products-filter-reset:hover,
+#root#root#root .retail-shell .products-content .products-filter-reset:focus-visible {
+  position: static !important;
+  width: 32px !important;
+  min-width: 32px !important;
+  height: 40px !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 0 !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 7px !important;
+  background: var(--panel-bg) !important;
+  background-image: none !important;
+  color: hsl(222 47% 20%) !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+#root#root#root .retail-shell.theme-dark .products-content .products-filter-reset,
+#root#root#root .retail-shell.theme-dark .products-content .products-filter-reset:hover,
+#root#root#root .retail-shell.theme-dark .products-content .products-filter-reset:focus-visible {
+  color: #e5e7eb !important;
+}
+
+#root#root#root .retail-shell .product-image-preview .product-image-remove,
+#root#root#root .retail-shell .product-image-preview .product-image-remove:hover,
+#root#root#root .retail-shell .product-image-preview .product-image-remove:focus-visible {
+  position: absolute !important;
+  top: 4px !important;
+  inset-inline-end: 4px !important;
+  z-index: 6 !important;
+  width: 16px !important;
+  min-width: 16px !important;
+  height: 16px !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 0 !important;
+  border: 1px solid rgba(239, 68, 68, 0.38) !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  background-image: none !important;
+  color: #ef4444 !important;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12) !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Project-wide button lock: keep every non-sidebar action simple and theme-neutral. */
+#root#root#root .retail-shell .main-area :where(
+  button,
+  a.print-top-link,
+  .print-preview-top a,
+  .invoice-preview-top a
+),
+#root#root#root .retail-shell :where(
+  .modal-backdrop,
+  .header-modal-backdrop,
+  .print-backdrop,
+  .search-backdrop,
+  .cash-wallet-backdrop,
+  .cash-print-backdrop,
+  .app-confirm-backdrop
+) :where(button, a.print-top-link, .print-preview-top a, .invoice-preview-top a) {
+  border: 1px solid var(--border) !important;
+  background: var(--panel-bg) !important;
+  background-color: var(--panel-bg) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+  filter: none !important;
+  text-shadow: none !important;
+  transform: none !important;
+  outline-color: var(--border) !important;
+}
+
+#root#root#root .retail-shell .main-area :where(
+  button:hover,
+  button:focus-visible,
+  a.print-top-link:hover,
+  a.print-top-link:focus-visible,
+  .print-preview-top a:hover,
+  .print-preview-top a:focus-visible,
+  .invoice-preview-top a:hover,
+  .invoice-preview-top a:focus-visible
+),
+#root#root#root .retail-shell :where(
+  .modal-backdrop,
+  .header-modal-backdrop,
+  .print-backdrop,
+  .search-backdrop,
+  .cash-wallet-backdrop,
+  .cash-print-backdrop,
+  .app-confirm-backdrop
+) :where(
+  button:hover,
+  button:focus-visible,
+  a.print-top-link:hover,
+  a.print-top-link:focus-visible,
+  .print-preview-top a:hover,
+  .print-preview-top a:focus-visible,
+  .invoice-preview-top a:hover,
+  .invoice-preview-top a:focus-visible
+) {
+  border-color: var(--border) !important;
+  background: var(--panel-soft) !important;
+  background-color: var(--panel-soft) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+  filter: none !important;
+  text-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root .retail-shell .main-area :where(
+  button.active,
+  button.selected,
+  button[aria-pressed="true"],
+  .smooth-select-menu button.selected,
+  .dropdown-menu button.selected,
+  .settings-tabs button.active,
+  .terms-tabs button.active,
+  .brand-language-tabs button.active,
+  .print-template.active,
+  .theme-choice.active,
+  .notification-sound-option.active
+),
+#root#root#root .retail-shell :where(
+  .modal-backdrop,
+  .header-modal-backdrop,
+  .print-backdrop,
+  .search-backdrop,
+  .cash-wallet-backdrop,
+  .cash-print-backdrop,
+  .app-confirm-backdrop
+) :where(
+  button.active,
+  button.selected,
+  button[aria-pressed="true"],
+  .smooth-select-menu button.selected,
+  .dropdown-menu button.selected,
+  .print-template.active,
+  .theme-choice.active,
+  .notification-sound-option.active
+) {
+  border-color: var(--border) !important;
+  background: var(--panel-soft) !important;
+  background-color: var(--panel-soft) !important;
+  color: var(--text) !important;
+  box-shadow: inset 0 0 0 1px var(--border) !important;
+}
+
+#root#root#root .retail-shell .main-area :where(
+  button.danger,
+  button.danger-btn,
+  button.delete-btn,
+  button.delete-line-btn,
+  button[class*="delete"],
+  button[class*="danger"]
+),
+#root#root#root .retail-shell :where(
+  .modal-backdrop,
+  .header-modal-backdrop,
+  .print-backdrop,
+  .search-backdrop,
+  .cash-wallet-backdrop,
+  .cash-print-backdrop,
+  .app-confirm-backdrop
+) :where(
+  button.danger,
+  button.danger-btn,
+  button.delete-btn,
+  button.delete-line-btn,
+  button[class*="delete"],
+  button[class*="danger"]
+) {
+  border-color: var(--border) !important;
+  background: var(--panel-bg) !important;
+  background-color: var(--panel-bg) !important;
+  color: #dc2626 !important;
+}
+
+#root#root#root .retail-shell.theme-dark .main-area :where(button, a.print-top-link, .print-preview-top a, .invoice-preview-top a),
+#root#root#root .retail-shell.theme-dark :where(
+  .modal-backdrop,
+  .header-modal-backdrop,
+  .print-backdrop,
+  .search-backdrop,
+  .cash-wallet-backdrop,
+  .cash-print-backdrop,
+  .app-confirm-backdrop
+) :where(button, a.print-top-link, .print-preview-top a, .invoice-preview-top a) {
+  border-color: var(--border) !important;
+  background: var(--panel-bg) !important;
+  background-color: var(--panel-bg) !important;
+  color: var(--text) !important;
+}
+
+#root#root#root .retail-shell .main-area :where(button, a.print-top-link, .print-preview-top a, .invoice-preview-top a) :where(svg, span, i),
+#root#root#root .retail-shell :where(
+  .modal-backdrop,
+  .header-modal-backdrop,
+  .print-backdrop,
+  .search-backdrop,
+  .cash-wallet-backdrop,
+  .cash-print-backdrop,
+  .app-confirm-backdrop
+) :where(button, a.print-top-link, .print-preview-top a, .invoice-preview-top a) :where(svg, span, i) {
+  color: inherit !important;
+  stroke: currentColor !important;
+}
+
+#root#root#root .retail-shell .main-area :where(button:disabled, button[disabled]),
+#root#root#root .retail-shell :where(
+  .modal-backdrop,
+  .header-modal-backdrop,
+  .print-backdrop,
+  .search-backdrop,
+  .cash-wallet-backdrop,
+  .cash-print-backdrop,
+  .app-confirm-backdrop
+) :where(button:disabled, button[disabled]) {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+  background: var(--panel-soft) !important;
+  color: var(--muted) !important;
+}
+
+/* Modal lock: when a form modal is open, the rest of the app is visible but unusable. */
+body:has(.modal-backdrop),
+body:has(.header-modal-backdrop),
+body:has(.print-backdrop),
+body:has(.search-backdrop),
+body:has(.cash-wallet-backdrop),
+body:has(.cash-print-backdrop),
+body:has(.app-confirm-backdrop) {
+  overflow: hidden !important;
+}
+
+#root#root#root .retail-shell:has(.modal-backdrop),
+#root#root#root .retail-shell:has(.header-modal-backdrop),
+#root#root#root .retail-shell:has(.print-backdrop),
+#root#root#root .retail-shell:has(.search-backdrop),
+#root#root#root .retail-shell:has(.cash-wallet-backdrop),
+#root#root#root .retail-shell:has(.cash-print-backdrop),
+#root#root#root .retail-shell:has(.app-confirm-backdrop) {
+  position: relative !important;
+}
+
+#root#root#root .retail-shell:has(.modal-backdrop)::before,
+#root#root#root .retail-shell:has(.header-modal-backdrop)::before,
+#root#root#root .retail-shell:has(.print-backdrop)::before,
+#root#root#root .retail-shell:has(.search-backdrop)::before,
+#root#root#root .retail-shell:has(.cash-wallet-backdrop)::before,
+#root#root#root .retail-shell:has(.cash-print-backdrop)::before,
+#root#root#root .retail-shell:has(.app-confirm-backdrop)::before {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147482990 !important;
+  pointer-events: auto !important;
+  background: rgba(226, 232, 240, 0.62) !important;
+  backdrop-filter: blur(18px) saturate(0.9) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(0.9) !important;
+}
+
+#root#root#root .retail-shell.theme-dark:has(.modal-backdrop)::before,
+#root#root#root .retail-shell.theme-dark:has(.header-modal-backdrop)::before,
+#root#root#root .retail-shell.theme-dark:has(.print-backdrop)::before,
+#root#root#root .retail-shell.theme-dark:has(.search-backdrop)::before,
+#root#root#root .retail-shell.theme-dark:has(.cash-wallet-backdrop)::before,
+#root#root#root .retail-shell.theme-dark:has(.cash-print-backdrop)::before,
+#root#root#root .retail-shell.theme-dark:has(.app-confirm-backdrop)::before {
+  background: rgba(15, 23, 42, 0.62) !important;
+}
+
+#root#root#root .retail-shell:has(.modal-backdrop)::before,
+#root#root#root .retail-shell:has(.header-modal-backdrop)::before,
+#root#root#root .retail-shell:has(.print-backdrop)::before,
+#root#root#root .retail-shell:has(.search-backdrop)::before,
+#root#root#root .retail-shell:has(.cash-wallet-backdrop)::before,
+#root#root#root .retail-shell:has(.cash-print-backdrop)::before,
+#root#root#root .retail-shell:has(.app-confirm-backdrop)::before {
+  content: none !important;
+  display: none !important;
+}
+
+#root#root#root :where(
+  .modal-backdrop,
+  .header-modal-backdrop,
+  .print-backdrop,
+  .search-backdrop,
+  .cash-wallet-backdrop,
+  .cash-print-backdrop,
+  .app-confirm-backdrop
+) {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483000 !important;
+  pointer-events: auto !important;
+  isolation: isolate !important;
+  background: rgba(226, 232, 240, 0.72) !important;
+  background-color: rgba(226, 232, 240, 0.72) !important;
+  background-image: none !important;
+  backdrop-filter: blur(16px) saturate(0.92) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(0.92) !important;
+}
+
+#root#root#root .retail-shell.theme-dark :where(
+  .modal-backdrop,
+  .header-modal-backdrop,
+  .print-backdrop,
+  .search-backdrop,
+  .cash-wallet-backdrop,
+  .cash-print-backdrop,
+  .app-confirm-backdrop
+) {
+  background: rgba(15, 23, 42, 0.62) !important;
+  background-color: rgba(15, 23, 42, 0.62) !important;
+}
+
+body:has(.modal-backdrop) .retail-shell :where(.sidebar, .app-header, .mobile-sidebar-toggle, .mobile-sidebar-scrim),
+body:has(.header-modal-backdrop) .retail-shell :where(.sidebar, .app-header, .mobile-sidebar-toggle, .mobile-sidebar-scrim),
+body:has(.print-backdrop) .retail-shell :where(.sidebar, .app-header, .mobile-sidebar-toggle, .mobile-sidebar-scrim),
+body:has(.search-backdrop) .retail-shell :where(.sidebar, .app-header, .mobile-sidebar-toggle, .mobile-sidebar-scrim),
+body:has(.cash-wallet-backdrop) .retail-shell :where(.sidebar, .app-header, .mobile-sidebar-toggle, .mobile-sidebar-scrim),
+body:has(.cash-print-backdrop) .retail-shell :where(.sidebar, .app-header, .mobile-sidebar-toggle, .mobile-sidebar-scrim),
+body:has(.app-confirm-backdrop) .retail-shell :where(.sidebar, .app-header, .mobile-sidebar-toggle, .mobile-sidebar-scrim) {
+  pointer-events: none !important;
+  user-select: none !important;
+  filter: blur(4px) !important;
+  opacity: 0.42 !important;
+}
+
+#root#root#root :where(
+  .modal-backdrop,
+  .header-modal-backdrop,
+  .print-backdrop,
+  .search-backdrop,
+  .cash-wallet-backdrop,
+  .cash-print-backdrop,
+  .app-confirm-backdrop
+) > * {
+  position: relative !important;
+  z-index: 2147483001 !important;
+  pointer-events: auto !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+#root#root#root .retail-shell .main-area .dashboard-stock-alert,
+#root#root#root .retail-shell .main-area .dashboard-stock-alert:hover,
+#root#root#root .retail-shell .main-area .dashboard-stock-alert:focus-visible {
+  border: 1px solid #f59e0b !important;
+  background: #fffaf0 !important;
+  background-color: #fffaf0 !important;
+  color: #020617 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root .retail-shell.theme-dark .main-area .dashboard-stock-alert,
+#root#root#root .retail-shell.theme-dark .main-area .dashboard-stock-alert:hover,
+#root#root#root .retail-shell.theme-dark .main-area .dashboard-stock-alert:focus-visible {
+  background: rgba(245, 158, 11, 0.1) !important;
+  background-color: rgba(245, 158, 11, 0.1) !important;
+  color: var(--text) !important;
+}
+
+#root#root#root .retail-shell .main-area .dashboard-stock-alert strong,
+#root#root#root .retail-shell .main-area .dashboard-stock-alert-icon {
+  color: #f59e0b !important;
+}
+
+#root#root#root .retail-shell .main-area .bundle-row-delete,
+#root#root#root .retail-shell .main-area .bundle-row-delete:hover,
+#root#root#root .retail-shell .main-area .bundle-row-delete:focus-visible {
+  width: 30px !important;
+  min-width: 30px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 !important;
+  border: 1px solid #fecaca !important;
+  border-radius: 8px !important;
+  background: #fff5f5 !important;
+  background-color: #fff5f5 !important;
+  color: #ef4444 !important;
+  box-shadow: none !important;
+}
+
+#root#root#root .retail-shell.theme-dark .main-area .bundle-row-delete,
+#root#root#root .retail-shell.theme-dark .main-area .bundle-row-delete:hover,
+#root#root#root .retail-shell.theme-dark .main-area .bundle-row-delete:focus-visible {
+  border-color: rgba(248, 113, 113, 0.35) !important;
+  background: rgba(127, 29, 29, 0.22) !important;
+  color: #fca5a5 !important;
+}
+
+#root#root#root .retail-shell .bundle-unit-menu {
+  min-width: 112px !important;
+  max-height: 360px !important;
+  padding: 6px !important;
+  border-radius: 8px !important;
+}
+
+#root#root#root .retail-shell .bundle-unit-menu button {
+  min-height: 30px !important;
+  display: grid !important;
+  grid-template-columns: 18px minmax(0, 1fr) !important;
+  gap: 8px !important;
+  padding: 0 10px !important;
+  border-radius: 6px !important;
+  font-size: 13px !important;
+}
+
+#root#root#root .retail-shell .bundle-unit-menu button::before {
+  content: "" !important;
+  color: currentColor !important;
+  font-size: 14px !important;
+}
+
+#root#root#root .retail-shell .bundle-unit-menu button.selected,
+#root#root#root .retail-shell .bundle-unit-menu button.selected:hover {
+  background: #f59e0b !important;
+  color: #020617 !important;
+  box-shadow: none !important;
+}
+
+#root#root#root .retail-shell .bundle-unit-menu button.selected::before {
+  content: "✓" !important;
+}
+
+/* Final RTL shell placement. Keep this at the end because responsive.css is loaded last. */
+#root#root#root .retail-shell[dir="rtl"] {
+  direction: rtl !important;
+}
+
+@media (min-width: 901px) {
+  #root#root#root .retail-shell[dir="rtl"] .sidebar {
+    left: auto !important;
+    right: 0 !important;
+    inset-inline-start: 0 !important;
+    inset-inline-end: auto !important;
+  }
+
+  #root#root#root .retail-shell[dir="rtl"] .main-area {
+    margin-left: 0 !important;
+    margin-right: 260px !important;
+    margin-inline-start: 260px !important;
+    margin-inline-end: 0 !important;
+    width: calc(100% - 260px) !important;
+  }
+
+  #root#root#root .retail-shell[dir="rtl"] .app-header {
+    left: 12px !important;
+    right: 272px !important;
+    inset-inline-start: 272px !important;
+    inset-inline-end: 12px !important;
+  }
+}
+
+
+/* =====================================================
+   FINAL MOBILE SHELL AND HEADER
+   Keep this block at the very end of responsive.css
+===================================================== */
+
+@media (max-width: 900px) {
+  .workspace {
+    display: block !important;
+    width: 100% !important;
+    min-height: 100dvh !important;
+    padding: 0 !important;
+  }
+
+  .main-area {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 100dvh !important;
+    margin: 0 !important;
+  }
+
+  /* Hamburger button */
+/* =====================================================
+   MOBILE HORIZONTAL SIDEBAR
+===================================================== */
+
+@media (max-width: 900px) {
+  /* دکمه سه‌خط و Overlay دیگر لازم نیست */
+  .mobile-sidebar-toggle,
+  .mobile-sidebar-scrim {
+    display: none !important;
+  }
+
+  /*
+    Sidebar becomes a horizontal navigation bar
+  */
+  #root#root#root .retail-shell .sidebar {
+    position: fixed !important;
+
+    top: 58px !important;
+    left: 8px !important;
+    right: 8px !important;
+
+    width: auto !important;
+    max-width: none !important;
+
+    height: 48px !important;
+    min-height: 48px !important;
+
+    z-index: 4600 !important;
+
+    display: block !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+
+    border: 1px solid var(--border) !important;
+    border-radius: 10px !important;
+
+    background: var(--panel-bg) !important;
+
+    box-shadow:
+      0 6px 18px rgba(15, 23, 42, 0.08) !important;
+
+    transform: none !important;
+  }
+
+  /*
+    Hide desktop logo and footer in mobile horizontal mode
+  */
+  #root#root#root .retail-shell .sidebar .brand-block,
+  #root#root#root .retail-shell .sidebar .sidebar-footer {
+    display: none !important;
+  }
+
+  /*
+    Horizontal scroll navigation
+  */
+  #root#root#root .retail-shell .sidebar .side-nav {
+    width: 100% !important;
+    height: 100% !important;
+
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+
+    gap: 6px !important;
+
+    margin: 0 !important;
+    padding: 5px 6px !important;
+
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+
+    white-space: nowrap !important;
+
+    scrollbar-width: thin !important;
+    scrollbar-color:
+      var(--border)
+      transparent !important;
+
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: inline proximity;
+  }
+
+  #root#root#root
+  .retail-shell
+  .sidebar
+  .side-nav::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  #root#root#root
+  .retail-shell
+  .sidebar
+  .side-nav::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  #root#root#root
+  .retail-shell
+  .sidebar
+  .side-nav::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: var(--border);
+  }
+
+  /*
+    Each menu item
+  */
+  #root#root#root
+  .retail-shell
+  .sidebar
+  .side-nav
+  button {
+    width: auto !important;
+    min-width: max-content !important;
+
+    height: 36px !important;
+    min-height: 36px !important;
+
+    flex: 0 0 auto !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 7px !important;
+
+    margin: 0 !important;
+    padding: 0 11px !important;
+
+    border: 1px solid transparent !important;
+    border-radius: 8px !important;
+
+    background: transparent !important;
+    color: var(--text) !important;
+
+    font-size: 11px !important;
+    font-weight: 650 !important;
+
+    white-space: nowrap !important;
+
+    box-shadow: none !important;
+    transform: none !important;
+
+    scroll-snap-align: start;
+  }
+
+  #root#root#root
+  .retail-shell
+  .sidebar
+  .side-nav
+  button
+  svg {
+    width: 15px !important;
+    height: 15px !important;
+
+    flex: 0 0 15px !important;
+
+    color: currentColor !important;
+  }
+
+  #root#root#root
+  .retail-shell
+  .sidebar
+  .side-nav
+  button
+  span {
+    display: inline !important;
+
+    color: currentColor !important;
+
+    font-size: 11px !important;
+    white-space: nowrap !important;
+  }
+
+  /*
+    Active menu
+  */
+  #root#root#root
+  .retail-shell
+  .sidebar
+  .side-nav
+  button.active {
+    border-color: var(--accent) !important;
+
+    background: var(--accent) !important;
+    color: var(--accent-contrast) !important;
+  }
+
+  #root#root#root
+  .retail-shell
+  .sidebar
+  .side-nav
+  button:not(.active):hover {
+    border-color: var(--border) !important;
+
+    background: var(--panel-soft) !important;
+    color: var(--text) !important;
+  }
+}
+@media (max-width: 900px) {
+  .app-header {
+    position: fixed !important;
+
+    top: 8px !important;
+    left: 8px !important;
+    right: 8px !important;
+
+    width: auto !important;
+    height: 42px !important;
+    min-height: 42px !important;
+
+    z-index: 4700 !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 4px !important;
+
+    margin: 0 !important;
+    padding: 0 5px 0 8px !important;
+
+    border: 1px solid var(--border) !important;
+    border-radius: 10px !important;
+
+    background: var(--panel-bg) !important;
+
+    box-shadow:
+      0 6px 18px rgba(15, 23, 42, 0.08) !important;
+  }
+
+  [dir="rtl"] .app-header {
+    left: 8px !important;
+    right: 8px !important;
+
+    inset-inline-start: 8px !important;
+    inset-inline-end: 8px !important;
+
+    padding: 0 8px 0 5px !important;
+  }
+}
+
+  #root#root#root .retail-shell .mobile-sidebar-toggle span {
+    width: 17px !important;
+    height: 2px !important;
+
+    display: block !important;
+
+    margin: 0 !important;
+
+    border-radius: 999px !important;
+
+    background: var(--text) !important;
+  }
+
+  [dir="rtl"] .mobile-sidebar-toggle {
+    inset-inline-start: auto !important;
+    inset-inline-end: 10px !important;
+  }
+
+  /* Header */
+
+  .app-header {
+    position: fixed !important;
+
+    top: 10px !important;
+    inset-inline-start: 60px !important;
+    inset-inline-end: 10px !important;
+
+    z-index: 4700 !important;
+
+    width: auto !important;
+    height: 42px !important;
+    min-height: 42px !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 5px !important;
+
+    margin: 0 !important;
+    padding: 0 5px 0 8px !important;
+
+    border: 1px solid var(--border) !important;
+    border-radius: 11px !important;
+
+    background: var(--panel-bg) !important;
+
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08) !important;
+
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  [dir="rtl"] .app-header {
+    inset-inline-start: 10px !important;
+    inset-inline-end: 60px !important;
+    padding: 0 8px 0 5px !important;
+  }
+
+  /* Search */
+
+  .app-header .search-shell {
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+
+    height: 32px !important;
+    min-height: 32px !important;
+
+    flex: 0 0 32px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border: 0 !important;
+    border-radius: 8px !important;
+
+    background: transparent !important;
+    color: var(--text) !important;
+
+    box-shadow: none !important;
+  }
+
+  .app-header .search-shell svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  /* Header tools */
+
+
+  /* Hide desktop-only controls */
+@media (max-width: 900px) {
+  /*
+    Show all header tools
+  */
+  .app-header .tool-wrap,
+  .app-header .header-tool-filter,
+  .app-header .header-tool-sync,
+  .app-header .header-tool-wallet,
+  .app-header .header-tool-language,
+  .app-header .header-tool-theme,
+  .app-header .header-tool-notifications,
+  .app-header .business-currency-wrap,
+  .app-header .exchange-currency-wrap,
+  .app-header .language-tool-wrap,
+  .app-header .account-wrap {
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+  }
+}
+@media (max-width: 900px) {
+  .app-header .header-tools {
+    min-width: 0 !important;
+
+    flex: 1 1 auto !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+
+    gap: 3px !important;
+
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+
+    padding: 0 1px 2px !important;
+
+    scrollbar-width: none !important;
+
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-inline: contain;
+  }
+
+  .app-header .header-tools::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .app-header .search-shell {
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+
+    height: 30px !important;
+    min-height: 30px !important;
+
+    flex: 0 0 30px !important;
+  }
+
+  .app-header .icon-btn,
+  .app-header .avatar-btn {
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+
+    height: 30px !important;
+    min-height: 30px !important;
+    max-height: 30px !important;
+
+    flex: 0 0 30px !important;
+
+    padding: 0 !important;
+  }
+
+  .app-header .icon-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  /*
+    متن Currency در موبایل پنهان باشد،
+    ولی خود آیکن دیده شود
+  */
+  .app-header .pill-mini,
+  .app-header .theme-state {
+    display: none !important;
+  }
+}
+/* =====================================================
+   MOBILE / TABLET HEADER — FIT CONTENT
+   Keep this at the very end of responsive.css
+===================================================== */
+
+@media (max-width: 900px) {
+  /*
+    Header فقط به اندازه محتویات باشد
+  */
+  #root#root#root .retail-shell .app-header {
+    position: fixed !important;
+
+    top: 8px !important;
+    left: 8px !important;
+    right: auto !important;
+
+    inset-inline-start: 8px !important;
+    inset-inline-end: auto !important;
+
+    width: fit-content !important;
+    min-width: 0 !important;
+    max-width: calc(100vw - 16px) !important;
+
+    height: 42px !important;
+    min-height: 42px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+
+    gap: 3px !important;
+
+    margin: 0 !important;
+    padding: 4px 5px !important;
+
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+
+    border: 1px solid var(--border) !important;
+    border-radius: 10px !important;
+
+    background: var(--panel-bg) !important;
+
+    box-shadow:
+      0 6px 18px rgba(15, 23, 42, 0.08) !important;
+
+    scrollbar-width: none !important;
+  }
+
+  #root#root#root
+  .retail-shell
+  .app-header::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /*
+    RTL
+  */
+  #root#root#root
+  .retail-shell[dir="rtl"]
+  .app-header {
+    left: auto !important;
+    right: 8px !important;
+
+    inset-inline-start: 8px !important;
+    inset-inline-end: auto !important;
+  }
+
+  /*
+    Search icon
+  */
+  #root#root#root
+  .retail-shell
+  .app-header
+  .search-shell {
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+
+    height: 30px !important;
+    min-height: 30px !important;
+    max-height: 30px !important;
+
+    flex: 0 0 30px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border: 0 !important;
+    border-radius: 7px !important;
+
+    background: transparent !important;
+    color: var(--text) !important;
+
+    box-shadow: none !important;
+  }
+
+  /*
+    ابزارها فقط به اندازه آیکن‌ها باشند
+  */
+  #root#root#root
+  .retail-shell
+  .app-header
+  .header-tools {
+    width: fit-content !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    flex: 0 0 auto !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+
+    gap: 3px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  /*
+    هر Wrapper فقط به اندازه دکمه باشد
+  */
+  #root#root#root
+  .retail-shell
+  .app-header
+  .tool-wrap,
+  #root#root#root
+  .retail-shell
+  .app-header
+  .account-wrap {
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+
+    height: 30px !important;
+    min-height: 30px !important;
+    max-height: 30px !important;
+
+    flex: 0 0 30px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /*
+    تمام ابزارها دیده شوند
+  */
+  #root#root#root
+  .retail-shell
+  .app-header
+  :is(
+    .header-tool-filter,
+    .header-tool-sync,
+    .header-tool-wallet,
+    .header-tool-theme,
+    .header-tool-language,
+    .header-tool-notifications,
+    .business-currency-wrap,
+    .exchange-currency-wrap,
+    .language-tool-wrap,
+    .account-wrap
+  ) {
+    display: inline-flex !important;
+  }
+
+  /*
+    دکمه‌های آیکن
+  */
+  #root#root#root
+  .retail-shell
+  .app-header
+  :is(.icon-btn, .avatar-btn) {
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+
+    height: 30px !important;
+    min-height: 30px !important;
+    max-height: 30px !important;
+
+    flex: 0 0 30px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border: 0 !important;
+    border-radius: 7px !important;
+
+    background: transparent !important;
+    color: var(--text) !important;
+
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  #root#root#root
+  .retail-shell
+  .app-header
+  :is(.icon-btn, .avatar-btn):hover {
+    background: var(--panel-soft) !important;
+  }
+
+  #root#root#root
+  .retail-shell
+  .app-header
+  .icon-btn
+  svg {
+    width: 16px !important;
+    height: 16px !important;
+
+    flex: 0 0 16px !important;
+
+    margin: 0 !important;
+  }
+
+  /*
+    متن‌های کوچک داخل دکمه‌ها مخفی باشند
+    تا Header فقط از آیکن‌ها تشکیل شود
+  */
+  #root#root#root
+  .retail-shell
+  .app-header
+  :is(.pill-mini, .theme-state) {
+    display: none !important;
+  }
+}
+  /* Header buttons */
+
+  .app-header .icon-btn,
+  .app-header .avatar-btn {
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+
+    height: 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border: 0 !important;
+    border-radius: 8px !important;
+
+    background: transparent !important;
+    color: var(--text) !important;
+
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  .app-header .icon-btn:hover,
+  .app-header .icon-btn.active,
+  .app-header .avatar-btn:hover {
+    background: var(--panel-soft) !important;
+  }
+
+  .app-header .icon-btn svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .app-header .avatar-btn {
+    border: 1px solid var(--border) !important;
+    border-radius: 50% !important;
+
+    background: var(--panel-bg) !important;
+    color: var(--text) !important;
+
+    font-size: 12px !important;
+    font-weight: 750 !important;
+  }
+
+  .app-header .pill-mini,
+  .app-header .theme-state {
+    display: none !important;
+  }
+
+  /* Notification badge */
+
+  .app-header .notification-trigger {
+    position: relative !important;
+    overflow: visible !important;
+  }
+
+  .app-header .notification-trigger .notification-badge {
+    top: -3px !important;
+    inset-inline-end: -3px !important;
+
+    min-width: 14px !important;
+    height: 14px !important;
+
+    padding: 0 3px !important;
+
+    border: 2px solid var(--panel-bg) !important;
+
+    font-size: 8px !important;
+
+    transform: none !important;
+  }
+
+  /* Page position below header */
+
+ @media (max-width: 900px) {
+  .main-area > :not(.app-header) {
+    padding-top: 120px !important;
+  }
+}
+}
+
+@media (max-width: 420px) {
+  .mobile-sidebar-toggle {
+    top: 8px !important;
+    inset-inline-start: 8px !important;
+
+    width: 40px !important;
+    min-width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+
+    border-radius: 10px !important;
+  }
+
+  [dir="rtl"] .mobile-sidebar-toggle {
+    inset-inline-start: auto !important;
+    inset-inline-end: 8px !important;
+  }
+
+  .app-header {
+    top: 8px !important;
+    inset-inline-start: 56px !important;
+    inset-inline-end: 8px !important;
+
+    height: 40px !important;
+    min-height: 40px !important;
+
+    padding-inline: 4px !important;
+
+    border-radius: 10px !important;
+  }
+
+  [dir="rtl"] .app-header {
+    inset-inline-start: 8px !important;
+    inset-inline-end: 56px !important;
+  }
+
+  .app-header .search-shell,
+  .app-header .icon-btn,
+  .app-header .avatar-btn {
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+
+    height: 30px !important;
+    min-height: 30px !important;
+    max-height: 30px !important;
+  }
+
+  .app-header .header-tools {
+    gap: 2px !important;
+  }
+
+  .main-area > :not(.app-header) {
+    padding-top: 62px !important;
+  }
+}
+
+/* =====================================================
+   RESPONSIVE VIEWPORT STABILIZER
+   Final layer for mobile, tablet, iPad and narrow laptops.
+===================================================== */
+
+#root#root#root .retail-shell {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+#root#root#root .retail-shell :where(.main-area, .workspace, .content, .entity-content, .dashboard-content, .metric-detail-content) {
+  min-width: 0 !important;
+}
+
+#root#root#root .retail-shell .main-area :where(.metric-card, .summary-grid article, .detail-summary-card, .cash-wallet-card, .data-panel, .filter-card, .trend-panel, .quick-panel, .activity-panel, .settings-card, .profile-card) {
+  max-width: 100%;
+}
+
+#root#root#root .retail-shell .main-area :where(.metric-card, .summary-grid article, .detail-summary-card, .cash-wallet-card) :where(p, span, small, strong) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 901px) and (max-width: 1180px) {
+  #root#root#root .retail-shell .sidebar {
+    width: 232px !important;
+  }
+
+  #root#root#root .retail-shell .main-area {
+    margin-inline-start: 232px !important;
+    width: calc(100% - 232px) !important;
+  }
+
+  #root#root#root .retail-shell[dir="rtl"] .main-area {
+    margin-inline-start: 0 !important;
+    margin-inline-end: 232px !important;
+  }
+
+  #root#root#root .retail-shell .app-header {
+    inset-inline-start: 244px !important;
+    inset-inline-end: 10px !important;
+  }
+
+  #root#root#root .retail-shell[dir="rtl"] .app-header {
+    inset-inline-start: 10px !important;
+    inset-inline-end: 244px !important;
+  }
+}
+
+@media (max-width: 900px) {
+  #root#root#root .retail-shell .workspace,
+  #root#root#root .retail-shell .main-area {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  #root#root#root .retail-shell .app-header {
+    position: fixed !important;
+    top: max(8px, env(safe-area-inset-top)) !important;
+    left: 8px !important;
+    right: 8px !important;
+    inset-inline-start: 8px !important;
+    inset-inline-end: 8px !important;
+    width: auto !important;
+    max-width: calc(100vw - 16px) !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    padding: 5px 6px !important;
+    overflow: hidden !important;
+    border-radius: 10px !important;
+    z-index: 4700 !important;
+  }
+
+  #root#root#root .retail-shell[dir="rtl"] .app-header {
+    left: 8px !important;
+    right: 8px !important;
+    inset-inline-start: 8px !important;
+    inset-inline-end: 8px !important;
+  }
+
+  #root#root#root .retail-shell .app-header .search-shell,
+  #root#root#root .retail-shell .app-header :is(.icon-btn, .avatar-btn),
+  #root#root#root .retail-shell .app-header :is(.tool-wrap, .account-wrap) {
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
+    flex: 0 0 32px !important;
+  }
+
+  #root#root#root .retail-shell .app-header .header-tools {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    display: flex !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    gap: 3px !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #root#root#root .retail-shell .app-header .header-tools::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  #root#root#root .retail-shell .app-header :is(.pill-mini, .theme-state) {
+    display: none !important;
+  }
+
+  #root#root#root .retail-shell .sidebar {
+    position: fixed !important;
+    top: calc(max(8px, env(safe-area-inset-top)) + 52px) !important;
+    left: 8px !important;
+    right: 8px !important;
+    width: auto !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    display: block !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 10px !important;
+    background: var(--panel-bg) !important;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08) !important;
+    z-index: 4600 !important;
+  }
+
+  #root#root#root .retail-shell .sidebar .brand-block,
+  #root#root#root .retail-shell .sidebar .sidebar-footer {
+    display: none !important;
+  }
+
+  #root#root#root .retail-shell .sidebar .side-nav {
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 5px 6px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    white-space: nowrap !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: var(--border) transparent !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #root#root#root .retail-shell .sidebar .side-nav button {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: max-content !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+    padding: 0 11px !important;
+    border-radius: 8px !important;
+    color: var(--text) !important;
+    white-space: nowrap !important;
+  }
+
+  #root#root#root .retail-shell .sidebar .side-nav button.active {
+    background: var(--accent) !important;
+    color: var(--accent-contrast) !important;
+  }
+
+  #root#root#root .retail-shell .main-area > :not(.app-header) {
+    padding-top: calc(118px + env(safe-area-inset-top)) !important;
+  }
+
+  #root#root#root .retail-shell .main-area :where(.content, .entity-content, .dashboard-content, .metric-detail-content, .settings-page, .profile-page, .products-page, .suppliers-page, .customers-page, .expenses-page, .billing-page, .sales-bills-page, .godown-page, .loans-page, .financials-page, .reports-page, .agent-page, .cash-wallet-page) {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-inline: 14px !important;
+    padding-bottom: 28px !important;
+  }
+
+  #root#root#root .retail-shell .main-area :where(.metric-grid, .metric-grid.financial, .metric-grid.three, .summary-grid, .summary-grid.four, .summary-grid.three, .dashboard-grid, .bottom-grid, .settings-grid, .report-grid, .financial-grid, .bundle-summary-grid, .cash-wallet-summary, .metric-detail-summary, .quick-grid) {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  #root#root#root .retail-shell .main-area :where(.filter-card, .filter-bar, .products-filter-card, .sales-filter-card, .metric-detail-filter, .cash-wallet-filters, .entity-heading, .page-heading, .metric-detail-heading, .cash-wallet-heading) {
+    width: 100% !important;
+    max-width: 100% !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  #root#root#root .retail-shell .main-area :where(.entity-actions, .heading-actions, .dashboard-date-actions, .cash-wallet-top-actions, .products-header-actions) {
+    width: 100% !important;
+    justify-content: stretch !important;
+  }
+
+  #root#root#root .retail-shell .main-area :where(.entity-actions, .heading-actions, .dashboard-date-actions, .cash-wallet-top-actions, .products-header-actions) > * {
+    min-width: 0 !important;
+  }
+
+  #root#root#root .retail-shell .main-area :where(.data-panel, .table-wrap, .metric-detail-table-wrap, .cash-wallet-table-panel, .bundle-items-table-wrap, .invoice-table-wrap, .print-preview-scroll) {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 900px) {
+  #root#root#root .retail-shell .main-area :where(.metric-grid.financial, .metric-grid.three, .summary-grid.four, .summary-grid.three, .dashboard-grid, .bottom-grid, .settings-grid, .report-grid, .financial-grid, .bundle-summary-grid, .cash-wallet-summary, .metric-detail-summary) {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 520px) {
+  #root#root#root .retail-shell .app-header {
+    height: 42px !important;
+    min-height: 42px !important;
+  }
+
+  #root#root#root .retail-shell .sidebar {
+    top: calc(max(8px, env(safe-area-inset-top)) + 50px) !important;
+    height: 46px !important;
+    min-height: 46px !important;
+  }
+
+  #root#root#root .retail-shell .main-area > :not(.app-header) {
+    padding-top: calc(112px + env(safe-area-inset-top)) !important;
+  }
+
+  #root#root#root .retail-shell .main-area :where(.content, .entity-content, .dashboard-content, .metric-detail-content, .settings-page, .profile-page, .products-page, .suppliers-page, .customers-page, .expenses-page, .billing-page, .sales-bills-page, .godown-page, .loans-page, .financials-page, .reports-page, .agent-page, .cash-wallet-page) {
+    padding-inline: 10px !important;
+  }
+
+  #root#root#root .retail-shell .main-area :where(.metric-card, .summary-grid article, .detail-summary-card, .cash-wallet-card) {
+    min-height: 88px !important;
+    padding: 16px !important;
+    gap: 12px !important;
+  }
+
+  #root#root#root .retail-shell .main-area :where(.metric-card, .detail-summary-card, .cash-wallet-card) :where(.metric-icon, svg, i) {
+    flex: 0 0 auto;
+  }
+
+  #root#root#root .retail-shell .main-area :where(.metric-card strong, .summary-grid strong, .detail-summary-card strong, .cash-wallet-card strong) {
+    font-size: clamp(20px, 6vw, 24px) !important;
+    white-space: normal !important;
+  }
+
+  #root#root#root .retail-shell .dashboard-stock-alert {
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    align-items: start !important;
+    padding: 10px 12px !important;
+  }
+
+  #root#root#root .retail-shell .dashboard-stock-alert-link {
+    grid-column: 2 !important;
+    white-space: normal !important;
+  }
+}
