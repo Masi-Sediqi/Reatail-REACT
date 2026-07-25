@@ -88,7 +88,7 @@ const bundleTotal = (bundle) => {
 function BundleForm({ bundle, onBack, onSave, onSupplierSave, suppliers, t }) {
   const [form, setForm] = useState(() => normalizeBundle(bundle))
   const [supplierModalOpen, setSupplierModalOpen] = useState(false)
-  const supplierOptions = [{ value: '', label: 'Supplier' }, ...suppliers.map((supplier) => ({ value: supplier.id, label: supplier.name }))]
+  const supplierOptions = [{ value: '', label: t.suppliers ?? 'Supplier' }, ...suppliers.map((supplier) => ({ value: supplier.id, label: supplier.name }))]
   const currencyOptions = currencies.map((currency) => ({ value: currency.code, label: `${currency.code} — ${currency.symbol}` }))
   const unitOptions = ['pcs', 'kg', 'g', 'L', 'ml', 'm', 'cm', 'box', 'pack', 'carton', 'dozen'].map((unit) => ({ value: unit, label: unit }))
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }))
@@ -112,11 +112,11 @@ function BundleForm({ bundle, onBack, onSave, onSupplierSave, suppliers, t }) {
 
     <div>
       <h1>
-        {bundle ? 'Edit bundle' : 'Create new bundle'}
+        {bundle ? (t.editBundle ?? 'Edit bundle') : (t.createNewBundle ?? 'Create new bundle')}
       </h1>
 
       <p>
-        Register imported bundles and track each bag inside.
+        {t.bundleFormHint ?? 'Register imported bundles and track each bag inside.'}
       </p>
     </div>
   </div>
@@ -128,7 +128,7 @@ function BundleForm({ bundle, onBack, onSave, onSupplierSave, suppliers, t }) {
       onClick={onBack}
     >
       <X size={15} />
-      <span>Cancel</span>
+      <span>{t.cancel ?? 'Cancel'}</span>
     </button>
 
     <button
@@ -147,21 +147,21 @@ function BundleForm({ bundle, onBack, onSave, onSupplierSave, suppliers, t }) {
       }}
     >
       <span>
-        {bundle ? 'Save Changes' : 'Create bundle'}
+        {bundle ? (t.saveChanges ?? 'Save Changes') : (t.createBundle ?? 'Create bundle')}
       </span>
     </button>
   </div>
 </div>
 
       <div className="bundle-edit-card">
-        <label><span>Bundle code</span><input value={form.code} onChange={(event) => update('code', event.target.value)} /></label>
-        <label><span>Bundle name *</span><input placeholder="e.g. Khan's textile bag" value={form.name} onChange={(event) => update('name', event.target.value)} /></label>
+        <label><span>{t.bundleCode ?? 'Bundle code'}</span><input value={form.code} onChange={(event) => update('code', event.target.value)} /></label>
+        <label><span>{t.bundleName ?? 'Bundle name'} *</span><input placeholder="e.g. Khan's textile bag" value={form.name} onChange={(event) => update('name', event.target.value)} /></label>
         <label className="bundle-supplier-field">
-          <span>Supplier</span>
+          <span>{t.suppliers ?? 'Supplier'}</span>
 
           <div className="inline-field bundle-supplier-control">
             <CustomSelect
-              ariaLabel="Supplier"
+              ariaLabel={t.suppliers ?? 'Supplier'}
               className="bundle-supplier-select"
               options={supplierOptions}
               value={form.supplierId}
@@ -181,20 +181,20 @@ function BundleForm({ bundle, onBack, onSave, onSupplierSave, suppliers, t }) {
             </button>
           </div>
         </label>
-        <label><span>Currency</span><CustomSelect ariaLabel="Currency" options={currencyOptions} value={form.currency} onChange={(value) => update('currency', value)} /></label>
-        <label><span>Arrival date</span><input type="date" value={form.arrivalDate} onChange={(event) => update('arrivalDate', event.target.value)} /></label>
-        <label><span>Color</span><input placeholder="#000 / red" value={form.color} onChange={(event) => update('color', event.target.value)} /></label>
-        <label><span>Parent tax (%)</span><input type="number" value={form.parentTax} onChange={(event) => update('parentTax', event.target.value)} /></label>
-        <label><span>Expense</span><input type="number" placeholder="0.00" value={form.expense} onChange={(event) => update('expense', event.target.value)} /></label>
-        <label className="wide"><span>Parent group (optional)</span><input placeholder="e.g. Container-2026-01 (groups multiple bundles)" value={form.parentGroup} onChange={(event) => update('parentGroup', event.target.value)} /></label>
+        <label><span>{t.currency ?? 'Currency'}</span><CustomSelect ariaLabel={t.currency ?? 'Currency'} options={currencyOptions} value={form.currency} onChange={(value) => update('currency', value)} /></label>
+        <label><span>{t.arrivalDate ?? 'Arrival date'}</span><input type="date" value={form.arrivalDate} onChange={(event) => update('arrivalDate', event.target.value)} /></label>
+        <label><span>{t.color ?? 'Color'}</span><input placeholder="#000 / red" value={form.color} onChange={(event) => update('color', event.target.value)} /></label>
+        <label><span>{t.parentTax ?? 'Parent tax (%)'}</span><input type="number" value={form.parentTax} onChange={(event) => update('parentTax', event.target.value)} /></label>
+        <label><span>{t.expenses ?? 'Expense'}</span><input type="number" placeholder="0.00" value={form.expense} onChange={(event) => update('expense', event.target.value)} /></label>
+        <label className="wide"><span>{t.parentGroup ?? 'Parent group (optional)'}</span><input placeholder={t.parentGroupPlaceholder ?? 'e.g. Container-2026-01'} value={form.parentGroup} onChange={(event) => update('parentGroup', event.target.value)} /></label>
       </div>
 
       <div className="bundle-items-head">
         <h2 className="bundle-items-title">
-          Bag items
+          {t.bagItems ?? 'Bag items'}
           <span>{form.rows.length}</span>
         </h2>
-        <button type="button" onClick={addRow}><Plus size={15} /> Add row</button>
+        <button type="button" onClick={addRow}><Plus size={15} /> {t.addRow ?? 'Add row'}</button>
       </div>
       <div className="bundle-items-table-wrap">
         <table className="data-table bundle-items-table">
@@ -219,7 +219,7 @@ function BundleForm({ bundle, onBack, onSave, onSupplierSave, suppliers, t }) {
               </tr>
             ))}
           </tbody>
-          <tfoot><tr><td colSpan="12" /><td><strong>Grand Total:</strong></td><td><strong>{money(bundleTotal(form), form.currency)}</strong></td></tr></tfoot>
+          <tfoot><tr><td colSpan="12" /><td><strong>{t.grandTotal ?? 'Grand Total'}:</strong></td><td><strong>{money(bundleTotal(form), form.currency)}</strong></td></tr></tfoot>
         </table>
       </div>
       {supplierModalOpen && <SupplierModal onClose={() => setSupplierModalOpen(false)} onSave={(supplier) => { onSupplierSave(supplier); update('supplierId', supplier.id); setSupplierModalOpen(false) }} t={t} />}
@@ -227,7 +227,7 @@ function BundleForm({ bundle, onBack, onSave, onSupplierSave, suppliers, t }) {
   )
 }
 
-function BundleDetails({ bundle, onBack, onEdit, onPrint, onToggleStatus, suppliers }) {
+function BundleDetails({ bundle, onBack, onEdit, onPrint, onToggleStatus, suppliers, t }) {
   const supplier = suppliers.find((item) => item.id === bundle.supplierId)
   const totalStock = (bundle.rows || []).reduce((sum, row) => sum + parseNumber(row.stockQty), 0)
   const totalQty = (bundle.rows || []).reduce((sum, row) => sum + parseNumber(row.qty), 0)
@@ -292,10 +292,10 @@ function BundleDetails({ bundle, onBack, onEdit, onPrint, onToggleStatus, suppli
   </div>
 </div>
       <div className="summary-grid four bundle-detail-summary">
-        <article><span>Supplier</span><strong>{supplier?.name || '-'}</strong></article>
-        <article><span>Arrival date</span><strong>{dateLabel(bundle.arrivalDate || todayInput())}</strong><small>{shamsiLabel(bundle.arrivalDate || todayInput())}</small></article>
-        <article><span>Bags</span><strong>{bundle.rows?.length || 0}</strong></article>
-        <article><span>Grand Total</span><strong>{money(grandTotal, bundle.currency)}</strong></article>
+        <article><span>{t.suppliers ?? 'Supplier'}</span><strong>{supplier?.name || '-'}</strong></article>
+        <article><span>{t.arrivalDate ?? 'Arrival date'}</span><strong>{dateLabel(bundle.arrivalDate || todayInput())}</strong><small>{shamsiLabel(bundle.arrivalDate || todayInput())}</small></article>
+        <article><span>{t.bags ?? 'Bags'}</span><strong>{bundle.rows?.length || 0}</strong></article>
+        <article><span>{t.grandTotal ?? 'Grand Total'}</span><strong>{money(grandTotal, bundle.currency)}</strong></article>
       </div>
       <div className="data-panel bundle-detail-card">
         <div className="bundle-detail-items-head">
@@ -304,11 +304,11 @@ function BundleDetails({ bundle, onBack, onEdit, onPrint, onToggleStatus, suppli
   </div>
 
   <div>
-    <h2>Bag items</h2>
+    <h2>{t.bagItems ?? 'Bag items'}</h2>
 
     <p>
       {bundle.rows?.length || 0} item
-      {(bundle.rows?.length || 0) === 1 ? '' : 's'} in this bundle
+      {(bundle.rows?.length || 0) === 1 ? '' : 's'} {t.inThisBundle ?? 'in this bundle'}
     </p>
   </div>
 
@@ -350,12 +350,12 @@ function BundleTableRow({
 
   const statusLabel =
     displayStatus === 'checked-in'
-      ? 'Checked-in'
+      ? (t.checkedIn ?? 'Checked-in')
       : displayStatus === 'upcoming'
-        ? 'Upcoming'
+        ? (t.upcoming ?? 'Upcoming')
         : displayStatus === 'overdue'
-          ? 'Overdue'
-          : 'Pending'
+          ? (t.overdue ?? 'Overdue')
+          : (t.pending ?? 'Pending')
 
   const supplierName =
     suppliers.find(
@@ -419,7 +419,7 @@ function BundleTableRow({
           actions={[
             {
               icon: <Eye size={15} />,
-              label: 'View',
+              label: t.view ?? 'View',
               onClick: onView,
             },
             {
@@ -1139,7 +1139,7 @@ function BundleDeleteModal({
   )
 }
 
-function BundlesPage({ bundles = [], companyInfo, onBundlesChange, onSuppliersChange, printSettings, suppliers = [], t }) {
+function BundlesPage({ bundles = [], companyInfo, onBundlesChange, onMoveToRecycle, onSuppliersChange, printSettings, suppliers = [], t }) {
   const [mode, setMode] = useState('list')
   const [deleteBundleTarget, setDeleteBundleTarget] =
   useState(null)
@@ -1263,6 +1263,14 @@ const totalCost = bundles.reduce(
     setEditingBundle(null)
   }
   const requestDeleteBundle = (bundle) => {
+  if (onMoveToRecycle) {
+    onMoveToRecycle('bundles', bundle)
+    if (detailBundle?.id === bundle.id) {
+      setDetailBundle(null)
+    }
+    return
+  }
+
   setDeleteBundleTarget(bundle)
 }
 
@@ -1327,6 +1335,7 @@ if (detailBundle) {
         onPrint={setPrintBundle}
         onToggleStatus={toggleStatus}
         suppliers={suppliers}
+        t={t}
       />
 
       {printBundle && (
@@ -1352,40 +1361,40 @@ if (detailBundle) {
   return (
     <section className="entity-content bundles-page">
       <div className="entity-heading">
-        <div><h1><Box size={24} /> Bundles Management</h1><p>Register imported bundles and track each bag inside.</p></div>
-        <div className="entity-actions"><button className="primary-btn" type="button" onClick={() => { setEditingBundle(null); setMode('form') }}><Plus size={16} /> Create new bundle</button></div>
+        <div><h1><Box size={24} /> {t.bundlesManagement ?? 'Bundles Management'}</h1><p>{t.registerBundlesHint ?? 'Register imported bundles and track each bag inside.'}</p></div>
+        <div className="entity-actions"><button className="primary-btn" type="button" onClick={() => { setEditingBundle(null); setMode('form') }}><Plus size={16} /> {t.createNewBundle ?? 'Create new bundle'}</button></div>
       </div>
       <div className="summary-grid seven bundle-summary-grid">
-        <article className="tone-navy"><span>Total bundles</span><strong>{bundles.length}</strong><Box size={22} /></article>
-        <article className="tone-green"><span>Total arrived</span><strong>{arrived}</strong><Package size={22} /></article>
-        <article className="tone-orange"><span>Total pending</span><strong>{pending}</strong><CalendarDays size={22} /></article>
-        <article className="tone-navy"><span>Upcoming arrivals</span><strong>{upcoming}</strong><CalendarDays size={22} /></article>
-        <article className="tone-red"><span>Overdue arrivals</span><strong>{overdue}</strong><CalendarDays size={22} /></article>
-        <article className="tone-navy"><span>Total bags</span><strong>{totalBags}</strong><Package size={22} /></article>
-        <article className="tone-navy"><span>Total cost</span><strong>{money(totalCost, companyInfo.currency || 'AFN')}</strong></article>
+        <article className="tone-navy"><span>{t.totalBundles ?? 'Total bundles'}</span><strong>{bundles.length}</strong><Box size={22} /></article>
+        <article className="tone-green"><span>{t.totalArrived ?? 'Total arrived'}</span><strong>{arrived}</strong><Package size={22} /></article>
+        <article className="tone-orange"><span>{t.totalPending ?? 'Total pending'}</span><strong>{pending}</strong><CalendarDays size={22} /></article>
+        <article className="tone-navy"><span>{t.upcomingArrivals ?? 'Upcoming arrivals'}</span><strong>{upcoming}</strong><CalendarDays size={22} /></article>
+        <article className="tone-red"><span>{t.overdueArrivals ?? 'Overdue arrivals'}</span><strong>{overdue}</strong><CalendarDays size={22} /></article>
+        <article className="tone-navy"><span>{t.totalBags ?? 'Total bags'}</span><strong>{totalBags}</strong><Package size={22} /></article>
+        <article className="tone-navy"><span>{t.totalCost ?? 'Total cost'}</span><strong>{money(totalCost, companyInfo.currency || 'AFN')}</strong></article>
       </div>
       <div className="filter-card bundle-filter-card">
-        <div className="search-field"><Search size={17} /><input placeholder="Search by code, name, supplier, date, bags..." value={query} onChange={(event) => setQuery(event.target.value)} /></div>
+        <div className="search-field"><Search size={17} /><input placeholder={t.bundleSearchPlaceholder ?? 'Search by code, name, supplier, date, bags...'} value={query} onChange={(event) => setQuery(event.target.value)} /></div>
         <CustomSelect
-          ariaLabel="Bundle status"
+          ariaLabel={t.bundleStatus ?? 'Bundle status'}
           className="bundle-status-filter"
           options={[
-            { value: 'all', label: 'All' },
+            { value: 'all', label: t.all ?? 'All' },
             {
               value: 'checked-in',
-              label: 'Checked-in',
+              label: t.checkedIn ?? 'Checked-in',
             },
             {
               value: 'pending',
-              label: 'Pending',
+              label: t.pending ?? 'Pending',
             },
             {
               value: 'upcoming',
-              label: 'Upcoming',
+              label: t.upcoming ?? 'Upcoming',
             },
             {
               value: 'overdue',
-              label: 'Overdue',
+              label: t.overdue ?? 'Overdue',
             },
           ]}
           value={status}
@@ -1404,15 +1413,15 @@ if (detailBundle) {
 
           <span>
             {groupByParent
-              ? 'Grouped by parent'
-              : 'Group by parent'}
+              ? (t.groupedByParent ?? 'Grouped by parent')
+              : (t.groupByParent ?? 'Group by parent')}
           </span>
         </button>
       </div>
       <div className="data-panel bundle-list-card">
-        {filtered.length === 0 ? <div className="empty-detail-state"><p>No bundles yet. Create your first bundle.</p></div> : (
+        {filtered.length === 0 ? <div className="empty-detail-state"><p>{t.noBundlesFound ?? 'No bundles yet. Create your first bundle.'}</p></div> : (
           <table className="data-table">
-            <thead><tr><th /><th>Bundle code</th><th>Name</th><th>Supplier</th><th>Arrival date</th><th>Bags</th><th>Grand Total</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead><tr><th /><th>{t.bundleCode ?? 'Bundle code'}</th><th>{t.name ?? 'Name'}</th><th>{t.suppliers ?? 'Supplier'}</th><th>{t.arrivalDate ?? 'Arrival date'}</th><th>{t.bags ?? 'Bags'}</th><th>{t.grandTotal ?? 'Grand Total'}</th><th>{t.status ?? 'Status'}</th><th>{t.actions ?? 'Actions'}</th></tr></thead>
             <tbody>
   {groupByParent
     ? Object.entries(groupedBundles).map(

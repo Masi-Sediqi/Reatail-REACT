@@ -14,10 +14,10 @@ function Sidebar({ activePage, companyInfo, onNavigate, onToggle, t }) {
 
   const helpLinks = [
     { key: 'helpCenter', icon: Eye, label: t.helpCenter ?? 'Help Center', page: 'helpCenter' },
-    { key: 'developer', icon: Archive, label: t.developer ?? 'Developer' },
-    { key: 'faq', icon: Eye, label: t.faq ?? 'FAQ' },
+    { key: 'developer', icon: Archive, label: t.developer ?? 'Developer', page: 'about' },
+    { key: 'faq', icon: Eye, label: t.faq ?? 'FAQ', page: 'faq' },
     { key: 'userGuide', icon: Archive, label: t.userGuide ?? 'User Guide', page: 'userGuide' },
-    { key: 'workflows', icon: Archive, label: t.workflows ?? 'Workflows' },
+    { key: 'workflows', icon: Archive, label: t.workflows ?? 'Workflows', page: 'workflows' },
     { key: 'termsPrivacy', icon: Shield, label: t.termsPrivacy ?? 'Terms & Privacy', page: 'terms' },
   ]
 

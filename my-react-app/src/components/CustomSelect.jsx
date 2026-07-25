@@ -62,7 +62,7 @@ function CustomSelect({ ariaLabel, buttonClassName = '', className = '', menuCla
       className={`smooth-select-menu floating-select-menu ${menuClassName} ${open ? 'open' : ''}`.trim()}
       ref={menuRef}
       role="listbox"
-      style={{ ...(position ?? { left: -9999, top: -9999 }), zIndex: 2147483002 }}
+      style={{ insetInline: 'auto', right: 'auto', ...(position ?? { left: -9999, top: -9999 }), zIndex: 2147483002 }}
     >
       {options.map((option) => (
         <button

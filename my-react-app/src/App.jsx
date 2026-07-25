@@ -24,6 +24,9 @@ import Sidebar from './components/Sidebar.jsx'
 import UserGuide from './pages/UserGuide.jsx'
 import HelpCenter from './pages/HelpCenter.jsx'
 import { Eye, Lock, Shield } from './components/Icons.jsx'
+import About from './pages/About.jsx'
+import FAQ from './pages/FAQ.jsx'
+import Workflows from './pages/Workflows.jsx'
 import { colorThemes, productCategories } from './data/dashboardData.js'
 import { translations } from './data/translations.js'
 import { getCurrencyMeta } from './utils/currencyExchange.js'
@@ -39,6 +42,9 @@ const getPageFromPath = () => {
   if (window.location.pathname.startsWith('/customers/')) return `customerProfile:${window.location.pathname.split('/').pop() || ''}`
   if (window.location.pathname === '/user-guide') return 'userGuide'
   if (window.location.pathname === '/help-center') return 'helpCenter'
+  if (window.location.pathname === '/about') return 'about'
+  if (window.location.pathname === '/faq') return 'faq'
+  if (window.location.pathname === '/workflows') return 'workflows'
   if (window.location.pathname === '/profile') return 'profile'
   if (window.location.pathname === '/settings') return 'settings'
   if (window.location.pathname === '/terms') return 'terms'
@@ -307,6 +313,12 @@ function App() {
             ? '/terms'
             : nextPage === 'helpCenter'
               ? '/help-center'
+              : nextPage === 'about'
+                ? '/about'
+              : nextPage === 'faq'
+                ? '/faq'
+              : nextPage === 'workflows'
+                ? '/workflows'
               : nextPage === 'userGuide'
                 ? '/user-guide'
             : nextPage === 'products'
@@ -724,6 +736,7 @@ function App() {
     if (module === 'customers') setCustomers((current) => current.filter((customer) => customer.id !== item.id))
     if (module === 'expenses') setExpenses((current) => current.filter((expense) => expense.id !== item.id))
     if (module === 'staffMembers') setStaffMembers((current) => current.filter((staff) => staff.id !== item.id))
+    if (module === 'bundles') setBundles((current) => current.filter((bundle) => bundle.id !== item.id))
     showToast(t.movedToRecycle)
   }
 
@@ -742,6 +755,7 @@ function App() {
     if (item.module === 'customers') setCustomers((current) => current.some((customer) => customer.id === item.id) ? current : [...current, item.data])
     if (item.module === 'expenses') setExpenses((current) => current.some((expense) => expense.id === item.id) ? current : [...current, item.data])
     if (item.module === 'staffMembers') setStaffMembers((current) => current.some((staff) => staff.id === item.id) ? current : [...current, item.data])
+    if (item.module === 'bundles') setBundles((current) => current.some((bundle) => bundle.id === item.id) ? current : [...current, item.data])
     setDeletedItems((current) => current.filter((deleted) => deleted.recycleId !== item.recycleId))
     showToast(t.restoredSuccessfully)
   }
@@ -824,8 +838,14 @@ function App() {
   <TermsPrivacy companyInfo={companyInfo} t={t} />
 ) : page === 'userGuide' ? (
   <UserGuide t={t} />
-  ) : page === 'helpCenter' ? (
+) : page === 'helpCenter' ? (
   <HelpCenter t={t} onNavigate={navigate} />
+) : page === 'about' ? (
+  <About companyInfo={companyInfo} t={t} />
+) : page === 'faq' ? (
+  <FAQ t={t} />
+) : page === 'workflows' ? (
+  <Workflows t={t} />
 ) : page === 'settings' ? (
   
             <SettingsPage
@@ -881,6 +901,7 @@ function App() {
               bundles={bundles}
               companyInfo={companyInfo}
               onBundlesChange={setBundles}
+              onMoveToRecycle={moveToRecycle}
               onSuppliersChange={setSuppliers}
               printSettings={printSettings}
               suppliers={suppliers}

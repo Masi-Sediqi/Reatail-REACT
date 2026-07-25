@@ -422,3 +422,49 @@
 #root#root#root .retail-shell[dir="rtl"] .collapse-btn svg {
   transform: rotate(180deg);
 }
+
+/* RTL sidebar alignment: keep icons, labels, and lower menu items stable. */
+#root#root#root .retail-shell[dir="rtl"] .sidebar {
+  direction: rtl;
+}
+
+#root#root#root .retail-shell[dir="rtl"] .brand-block {
+  grid-template-columns: 28px minmax(0, 1fr) 34px;
+}
+
+#root#root#root .retail-shell[dir="rtl"] .brand-mark {
+  grid-column: 3;
+}
+
+#root#root#root .retail-shell[dir="rtl"] .brand-name {
+  grid-column: 2;
+  min-width: 0;
+  text-align: right;
+}
+
+#root#root#root .retail-shell[dir="rtl"] .collapse-btn {
+  grid-column: 1;
+}
+
+#root#root#root .retail-shell[dir="rtl"] .side-nav button,
+#root#root#root .retail-shell[dir="rtl"] .sidebar-help-item,
+#root#root#root .retail-shell[dir="rtl"] .sidebar-help-menu button {
+  direction: rtl;
+  flex-direction: row;
+  justify-content: flex-start;
+  text-align: right !important;
+}
+
+#root#root#root .retail-shell[dir="rtl"] .side-nav button svg,
+#root#root#root .retail-shell[dir="rtl"] .sidebar-help-item svg,
+#root#root#root .retail-shell[dir="rtl"] .sidebar-help-menu button svg {
+  flex: 0 0 auto;
+  margin: 0 !important;
+}
+
+#root#root#root .retail-shell[dir="rtl"] .side-nav button span,
+#root#root#root .retail-shell[dir="rtl"] .sidebar-help-item span,
+#root#root#root .retail-shell[dir="rtl"] .sidebar-help-menu button span {
+  min-width: 0;
+  text-align: right;
+}
