@@ -210,7 +210,7 @@ function Dashboard({
               <path d="M12 17h.01" stroke="currentColor" strokeLinecap="round" strokeWidth="2.5" />
             </svg>
           </span>
-          <span><strong>{stockAlertCount} Products</strong> products are running low on stock</span>
+          <span>{(t.stockAlertSummary ?? '{count} products are running low on stock').replace('{count}', stockAlertCount)}</span>
           <span className="dashboard-stock-alert-link">View Details →</span>
         </button>
       )}
