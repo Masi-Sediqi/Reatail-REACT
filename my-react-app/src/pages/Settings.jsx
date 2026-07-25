@@ -8,7 +8,6 @@ import {
   Download,
   Eye,
   Factory,
-  Key,
   Lock,
   Mail,
   Play,
