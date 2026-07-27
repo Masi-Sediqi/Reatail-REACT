@@ -4,6 +4,42 @@ html {
   overflow-x: hidden;
 }
 
+/* Keep Dashboard card icons visible when dark mode makes clickable cards inherit text color. */
+#root#root#root .retail-shell .main-area .dashboard-page .metric-card .metric-icon,
+#root#root#root .retail-shell .main-area .dashboard-page .metric-card .metric-icon svg {
+  color: var(--metric-icon-color) !important;
+  stroke: currentColor !important;
+}
+
+#root#root#root .retail-shell .main-area .dashboard-page .metric-card .metric-icon {
+  background: var(--metric-icon-bg) !important;
+}
+
+#root#root#root .retail-shell .main-area .dashboard-page .metric-card.tone-green {
+  --metric-icon-bg: #dcfce7;
+  --metric-icon-color: #16a34a;
+}
+
+#root#root#root .retail-shell .main-area .dashboard-page .metric-card.tone-blue {
+  --metric-icon-bg: #e0f2fe;
+  --metric-icon-color: #0284c7;
+}
+
+#root#root#root .retail-shell .main-area .dashboard-page .metric-card.tone-orange {
+  --metric-icon-bg: #fef3c7;
+  --metric-icon-color: #d97706;
+}
+
+#root#root#root .retail-shell .main-area .dashboard-page .metric-card.tone-red {
+  --metric-icon-bg: #fee2e2;
+  --metric-icon-color: #dc2626;
+}
+
+#root#root#root .retail-shell .main-area .dashboard-page .metric-card.tone-navy {
+  --metric-icon-bg: #e2e8f0;
+  --metric-icon-color: #1e3a8a;
+}
+
 body {
   min-width: 0;
   overflow-x: hidden;
@@ -12,7 +48,7 @@ body {
 .app-header {
   position: fixed !important;
   top: 8px !important;
-  inset-inline-start: 272px !important;
+  inset-inline-start: 220px !important;
   inset-inline-end: 12px !important;
   width: auto !important;
   margin: 0 !important;
@@ -21,7 +57,7 @@ body {
 
 [dir="rtl"] .app-header {
   inset-inline-start: 12px !important;
-  inset-inline-end: 272px !important;
+  inset-inline-end: 220px !important;
 }
 
 .main-area > :not(.app-header) {
@@ -50,7 +86,7 @@ body {
     inset-block: 0 !important;
     inset-inline-start: 0 !important;
     z-index: 2300 !important;
-    width: 260px !important;
+    width: 208px !important;
     height: 100vh !important;
     height: 100dvh !important;
     min-height: 100vh !important;
@@ -63,14 +99,14 @@ body {
   }
 
   .main-area {
-    margin-inline-start: 260px !important;
-    width: calc(100% - 260px) !important;
+    margin-inline-start: 208px !important;
+    width: calc(100% - 208px) !important;
     min-height: 100vh !important;
   }
 
   [dir="rtl"] .main-area {
     margin-inline-start: 0 !important;
-    margin-inline-end: 260px !important;
+    margin-inline-end: 208px !important;
   }
 }
 
@@ -171,21 +207,21 @@ body {
 
 @media (max-width: 1180px) {
   .workspace {
-    grid-template-columns: 232px minmax(0, 1fr);
+    grid-template-columns: 208px minmax(0, 1fr);
   }
 
   .sidebar {
-    width: 232px !important;
+    width: 208px !important;
   }
 
   .main-area {
-    margin-inline-start: 232px !important;
-    width: calc(100% - 232px) !important;
+    margin-inline-start: 208px !important;
+    width: calc(100% - 208px) !important;
   }
 
   [dir="rtl"] .main-area {
     margin-inline-start: 0 !important;
-    margin-inline-end: 232px !important;
+    margin-inline-end: 208px !important;
   }
 
   .brand-block {
@@ -199,7 +235,7 @@ body {
   }
 
   .app-header {
-    inset-inline-start: 244px !important;
+    inset-inline-start: 220px !important;
     inset-inline-end: 10px !important;
     margin-inline: 0;
     padding-inline: 18px;
@@ -207,7 +243,7 @@ body {
 
   [dir="rtl"] .app-header {
     inset-inline-start: 10px !important;
-    inset-inline-end: 244px !important;
+    inset-inline-end: 220px !important;
   }
 
   .summary-grid.four,
@@ -760,8 +796,8 @@ body:has(.app-confirm-backdrop) {
   z-index: 2147482990 !important;
   pointer-events: auto !important;
   background: rgba(226, 232, 240, 0.62) !important;
-  backdrop-filter: blur(18px) saturate(0.9) !important;
-  -webkit-backdrop-filter: blur(18px) saturate(0.9) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 #root#root#root .retail-shell.theme-dark:has(.modal-backdrop)::before,
@@ -802,8 +838,8 @@ body:has(.app-confirm-backdrop) {
   background: rgba(226, 232, 240, 0.72) !important;
   background-color: rgba(226, 232, 240, 0.72) !important;
   background-image: none !important;
-  backdrop-filter: blur(16px) saturate(0.92) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(0.92) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 #root#root#root .retail-shell.theme-dark :where(
@@ -828,8 +864,8 @@ body:has(.cash-print-backdrop) .retail-shell :where(.sidebar, .app-header, .mobi
 body:has(.app-confirm-backdrop) .retail-shell :where(.sidebar, .app-header, .mobile-sidebar-toggle, .mobile-sidebar-scrim) {
   pointer-events: none !important;
   user-select: none !important;
-  filter: blur(4px) !important;
-  opacity: 0.42 !important;
+  filter: none !important;
+  opacity: 0.58 !important;
 }
 
 #root#root#root :where(
@@ -846,6 +882,20 @@ body:has(.app-confirm-backdrop) .retail-shell :where(.sidebar, .app-header, .mob
   pointer-events: auto !important;
   filter: none !important;
   opacity: 1 !important;
+}
+
+/* Lightweight modal overlays: avoid backdrop blur because it is expensive on large forms. */
+#root#root#root .retail-shell :where(
+  .modal-backdrop,
+  .header-modal-backdrop,
+  .print-backdrop,
+  .search-backdrop,
+  .cash-wallet-backdrop,
+  .cash-print-backdrop,
+  .app-confirm-backdrop
+) {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 #root#root#root .retail-shell .main-area .dashboard-stock-alert,
@@ -945,16 +995,16 @@ body:has(.app-confirm-backdrop) .retail-shell :where(.sidebar, .app-header, .mob
 
   #root#root#root .retail-shell[dir="rtl"] .main-area {
     margin-left: 0 !important;
-    margin-right: 260px !important;
-    margin-inline-start: 260px !important;
+    margin-right: 208px !important;
+    margin-inline-start: 208px !important;
     margin-inline-end: 0 !important;
-    width: calc(100% - 260px) !important;
+    width: calc(100% - 208px) !important;
   }
 
   #root#root#root .retail-shell[dir="rtl"] .app-header {
     left: 12px !important;
-    right: 272px !important;
-    inset-inline-start: 272px !important;
+    right: 220px !important;
+    inset-inline-start: 220px !important;
     inset-inline-end: 12px !important;
   }
 }
@@ -1824,27 +1874,27 @@ body:has(.app-confirm-backdrop) .retail-shell :where(.sidebar, .app-header, .mob
 
 @media (min-width: 901px) and (max-width: 1180px) {
   #root#root#root .retail-shell .sidebar {
-    width: 232px !important;
+    width: 208px !important;
   }
 
   #root#root#root .retail-shell .main-area {
-    margin-inline-start: 232px !important;
-    width: calc(100% - 232px) !important;
+    margin-inline-start: 208px !important;
+    width: calc(100% - 208px) !important;
   }
 
   #root#root#root .retail-shell[dir="rtl"] .main-area {
     margin-inline-start: 0 !important;
-    margin-inline-end: 232px !important;
+    margin-inline-end: 208px !important;
   }
 
   #root#root#root .retail-shell .app-header {
-    inset-inline-start: 244px !important;
+    inset-inline-start: 220px !important;
     inset-inline-end: 10px !important;
   }
 
   #root#root#root .retail-shell[dir="rtl"] .app-header {
     inset-inline-start: 10px !important;
-    inset-inline-end: 244px !important;
+    inset-inline-end: 220px !important;
   }
 }
 

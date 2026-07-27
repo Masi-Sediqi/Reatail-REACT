@@ -82,10 +82,10 @@ function TrendChart({ data = defaultSeries, t }) {
   }
 
   return (
-    <section className="panel trend-panel">
-      <h2>{t.trends}</h2>
+    <section className="panel trend-panel mt-8 rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:shadow-none sm:p-6">
+      <h2 className="mb-3 text-base font-black text-slate-950 dark:text-white sm:text-lg">{t.trends}</h2>
       <div
-        className="chart-wrap trend-chart-wrap"
+        className="chart-wrap trend-chart-wrap relative"
         aria-label={t.trends}
         onMouseLeave={() => setHoverIndex(null)}
         onMouseMove={updateHover}

@@ -32,7 +32,7 @@ export const convertCurrencyAmount = (
   const targetRate = getExchangeRate(targetCurrency, baseCurrency, exchangeRates)
 
   if (!fromRate || !targetRate) return null
-  return (Number(value || 0) / fromRate) * targetRate
+  return (Number(value || 0) * fromRate) / targetRate
 }
 
 export const formatCurrencyAmount = (value, currency = 'AFN') => {
@@ -72,7 +72,7 @@ export const formatBusinessCurrencyAmount = (value, currency = 'AFN') => {
   const view = getBusinessCurrencyView()
   const targetCurrency = view?.businessCurrencyFilter
 
-  if (!targetCurrency || targetCurrency === 'all') {
+  if (!view) {
     return formatCurrencyAmount(value, currency)
   }
 
@@ -80,6 +80,6 @@ export const formatBusinessCurrencyAmount = (value, currency = 'AFN') => {
     baseCurrency: view.baseCurrency,
     exchangeRates: view.exchangeRates,
     fromCurrency: currency,
-    targetCurrency,
+    targetCurrency: !targetCurrency || targetCurrency === 'all' ? view.baseCurrency : targetCurrency,
   })
 }

@@ -29,6 +29,16 @@ export function Archive(props) {
   )
 }
 
+export function AlertTriangle(props) {
+  return (
+    <Icon {...props}>
+      <path d="m12 3 10 18H2L12 3Z" />
+      <path d="M12 9v5" />
+      <path d="M12 17h.01" />
+    </Icon>
+  )
+}
+
 export function BarChart3(props) {
   return (
     <Icon {...props}>
@@ -305,6 +315,22 @@ export function Printer(props) {
       <path d="M6 9V3h12v6" />
       <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
       <path d="M6 14h12v7H6z" />
+    </Icon>
+  )
+}
+
+export function BarcodeScanner(props) {
+  return (
+    <Icon {...props}>
+      <path d="M4 7V4h3" />
+      <path d="M17 4h3v3" />
+      <path d="M20 17v3h-3" />
+      <path d="M7 20H4v-3" />
+
+      <path d="M7 8v8" />
+      <path d="M10 8v8" />
+      <path d="M13 8v8" />
+      <path d="M17 8v8" />
     </Icon>
   )
 }

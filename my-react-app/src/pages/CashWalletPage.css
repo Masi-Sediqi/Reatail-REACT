@@ -178,6 +178,12 @@
   color: #ef4444;
 }
 
+.cash-type-pill.sales {
+  border: 1px solid #d8e0eb;
+  background: #f8fafc;
+  color: #172137;
+}
+
 .cash-wallet-backdrop,
 .cash-print-backdrop {
   z-index: 90;
@@ -480,6 +486,12 @@
 
 .theme-dark .cash-type-pill.withdraw {
   background: rgba(239, 68, 68, 0.14);
+}
+
+.theme-dark .cash-type-pill.sales {
+  border-color: #334155;
+  background: rgba(148, 163, 184, 0.14);
+  color: #e5e7eb;
 }
 
 @media (max-width: 1180px) {
@@ -967,6 +979,22 @@
   font-size: 23px;
   font-weight: 950;
   line-height: 1;
+}
+
+.cash-wallet-card .cash-wallet-card-values {
+  display: grid;
+  gap: 6px;
+  max-width: calc(100% - 54px);
+  white-space: normal;
+}
+
+.cash-wallet-card .cash-wallet-card-values b {
+  display: block;
+  color: var(--text);
+  font-size: 21px;
+  line-height: 1.05;
+  font-weight: 950;
+  white-space: nowrap;
 }
 
 .cash-wallet-card i {

@@ -12,9 +12,8 @@ import {
   DollarSign,
   Eye,
   History,
-  Mail,
-  Phone,
   Plus,
+  Printer,
   ReceiptText,
   Search,
   ShoppingCart,
@@ -22,6 +21,7 @@ import {
   Trash2,
   Users,
   WalletCards,
+  X,
 } from '../components/Icons.jsx'
 import { formatBusinessCurrencyAmount } from '../utils/currencyExchange.js'
 import './Customers.css'
@@ -87,6 +87,7 @@ function CustomerModal({ customFields = [], initialCustomer, onClose, onSave, t 
   const [form, setForm] = useState(() => ({ ...emptyCustomer, ...(initialCustomer ?? {}), customFields: { ...(initialCustomer?.customFields ?? {}) } }))
   const [closing, setClosing] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const requiredMessage = t.requiredFieldMessage ?? 'This field is required.'
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }))
   const updateCustomField = (fieldId, value) => setForm((current) => ({
     ...current,
@@ -111,13 +112,127 @@ function CustomerModal({ customFields = [], initialCustomer, onClose, onSave, t 
           onSave({ ...form, id: form.id ?? crypto.randomUUID(), status: form.status || 'Active' })
         }}
       >
-        <button className="modal-close" type="button" onClick={requestClose}>×</button>
-        <h2>{initialCustomer ? t.editCustomer : t.addNewCustomer}</h2>
-        <label className="wide"><span>{t.name} *</span><input autoFocus className={submitted && !form.name.trim() ? 'field-invalid' : ''} placeholder={t.customerNamePlaceholder} value={form.name} onChange={(e) => update('name', e.target.value)} /></label>
-        <label><span><Phone size={13} /> {t.phoneNumber}</span><input placeholder={t.phonePlaceholder} value={form.phone} onChange={(e) => update('phone', e.target.value)} /></label>
-        <label><span><Mail size={13} /> {t.email}</span><input placeholder={t.emailAddress} value={form.email} onChange={(e) => update('email', e.target.value)} /></label>
-        <label className="wide"><span>{t.address}</span><input placeholder={t.address} value={form.address} onChange={(e) => update('address', e.target.value)} /></label>
-        <label className="wide"><span>{t.notes}</span><textarea placeholder={t.additionalNotes} value={form.notes} onChange={(e) => update('notes', e.target.value)} /></label>
+        <div className="customer-modal-header">
+          <div className="customer-modal-title">
+            <h2>
+              {initialCustomer
+                ? t.editCustomer
+                : t.addNewCustomer}
+            </h2>
+
+            <p>
+              {initialCustomer
+                ? (
+                  t.editCustomerHint ??
+                  'Update the customer information and account settings.'
+                )
+                : (
+                  t.addCustomerHint ??
+                  'Enter the customer information and account settings.'
+                )}
+            </p>
+          </div>
+
+          <button
+            className="customer-modal-close"
+            type="button"
+            onClick={requestClose}
+            aria-label={t.close ?? 'Close'}
+            title={t.close ?? 'Close'}
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+   <label className="wide customer-main-field">
+  <span className="customer-field-label customer-required-label">
+    <span className="customer-label-text">
+      {t.name}
+      <em className="customer-required-star">*</em>
+    </span>
+  </span>
+
+  <input
+    autoFocus
+    className={
+      submitted && !form.name.trim()
+        ? 'field-invalid'
+        : ''
+    }
+    placeholder={t.customerNamePlaceholder}
+    value={form.name}
+    onChange={(event) =>
+      update('name', event.target.value)
+    }
+  />
+
+  {submitted && !form.name.trim() && (
+    <small className="validation-error">
+      {requiredMessage}
+    </small>
+  )}
+</label>
+<div className="customer-contact-row wide">
+  <label>
+    <span className="customer-field-label">
+      <span>{t.phoneNumber}</span>
+    </span>
+
+    <input
+      inputMode="tel"
+      placeholder={t.phonePlaceholder}
+      value={form.phone}
+      onChange={(event) =>
+        update('phone', event.target.value)
+      }
+    />
+  </label>
+
+  <label>
+    <span className="customer-field-label">
+      <span>{t.email}</span>
+    </span>
+
+    <input
+      type="email"
+      placeholder={t.emailAddress}
+      value={form.email}
+      onChange={(event) =>
+        update('email', event.target.value)
+      }
+    />
+  </label>
+</div>
+      <label className="wide">
+  <span className="customer-field-label">
+    <span>{t.address}</span>
+    <small>{t.optional ?? 'Optional'}</small>
+  </span>
+
+  <input
+    placeholder={t.address}
+    value={form.address}
+    onChange={(event) =>
+      update('address', event.target.value)
+    }
+  />
+</label>
+
+<label className="wide">
+  <span className="customer-field-label">
+    <span>{t.notes}</span>
+    <small>{t.optional ?? 'Optional'}</small>
+  </span>
+
+  <textarea
+    rows="3"
+    placeholder={t.additionalNotes}
+    value={form.notes}
+    onChange={(event) =>
+      update('notes', event.target.value)
+    }
+  />
+</label>
         <div className={`customer-vip-field wide ${form.vip ? 'is-active' : ''}`}>
           <div className="customer-vip-info">
             <strong>{t.vipCustomer}</strong>
@@ -149,8 +264,25 @@ function CustomerModal({ customFields = [], initialCustomer, onClose, onSave, t 
           <label><input checked={(form.status || 'Active') === 'Active'} name="customer-status" type="radio" onChange={() => update('status', 'Active')} /> {t.active}</label>
           <label><input checked={(form.status || 'Active') === 'Inactive'} name="customer-status" type="radio" onChange={() => update('status', 'Inactive')} /> {t.inactive ?? 'Inactive'}</label>
         </div>
-        <CustomFieldInputs fields={customFields} onChange={updateCustomField} submitted={submitted} values={form.customFields} />
-        <button className="primary-btn wide" type="submit">{initialCustomer ? t.saveChanges : t.addCustomer}</button>
+        <CustomFieldInputs fields={customFields} onChange={updateCustomField} requiredMessage={requiredMessage} submitted={submitted} values={form.customFields} />
+        <div className="customer-modal-footer wide">
+  <button
+    className="customer-cancel-btn"
+    type="button"
+    onClick={requestClose}
+  >
+    {t.cancel ?? 'Cancel'}
+  </button>
+
+  <button
+    className="customer-save-btn"
+    type="submit"
+  >
+    {initialCustomer
+      ? t.saveChanges
+      : t.addCustomer}
+  </button>
+</div>
       </form>
     </div>
   )
@@ -292,7 +424,7 @@ function CustomerProfile({ companyInfo, customer, onBack, onEdit, printSettings,
             type="button"
             onClick={() => setPrintRows(printConfig)}
           >
-            <ReceiptText size={16} />
+            <Printer size={16} />
             <span>{t.printStatement}</span>
           </button>
         </div>
@@ -505,7 +637,7 @@ function CustomersPage({ companyInfo, customers, initialProfileCustomerId = '', 
             type="button"
             onClick={() => setPrintOpen(true)}
           >
-            <ReceiptText size={16} />
+            <Printer size={16} />
             <span>{t.printReport}</span>
           </button>
 

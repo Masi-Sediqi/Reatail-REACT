@@ -22,7 +22,7 @@ const metricTitles = {
   totalRefunds: { title: 'refunds', subtitle: 'refunds', panel: 'refunds' },
   totalCustomers: { title: 'customers', subtitle: 'customers', panel: 'customers' },
   totalPayables: { title: 'totalPayables', subtitle: 'suppliers', panel: 'suppliers' },
-  totalReceivables: { title: 'totalReceivables', subtitle: 'suppliers', panel: 'suppliers' },
+  totalReceivables: { title: 'totalReceivables', subtitle: 'customers', panel: 'receivables' },
   netBalance: { title: 'netBalance', subtitle: 'suppliers', panel: 'suppliers' },
   activeProducts: { title: 'activeProducts', subtitle: 'products', panel: 'products' },
   stockQuantity: { title: 'stockQuantity', subtitle: 'stock', panel: 'products' },
@@ -46,6 +46,11 @@ const getSaleCost = (sale, products = []) => (sale.items || []).reduce((sum, ite
   const cost = parseNumber(item.purchase ?? item.cost ?? product?.purchase ?? 0)
   return sum + cost * parseNumber(item.quantity || 1)
 }, 0)
+
+const getSaleBalance = (sale) => {
+  const hasBalance = sale.balance !== undefined && sale.balance !== null && sale.balance !== ''
+  return Math.max(0, hasBalance ? parseNumber(sale.balance) : parseNumber(sale.total) - parseNumber(sale.paidAmount))
+}
 
 function SummaryCard({ icon: Icon, label, tone = 'blue', value }) {
   return (
@@ -103,6 +108,21 @@ function DashboardMetricDetail({ cashWallet, companyInfo, customers = [], expens
     date: refund.date || sale.date,
     dateLabel: dateLabel(refund.date || sale.date),
   })))
+  const receivableRows = filteredSales
+    .map((sale) => {
+      const remaining = getSaleBalance(sale)
+      return {
+        id: sale.id,
+        invoice: sale.invoiceNumber,
+        customer: sale.customerName || t.walkInCustomer || 'Walk-in Customer',
+        paidLabel: formatMoney(sale.paidAmount, sale.currency),
+        total: remaining,
+        totalLabel: formatMoney(remaining, sale.currency),
+        date: sale.date,
+        dateLabel: dateLabel(sale.date || sale.createdAt),
+      }
+    })
+    .filter((sale) => sale.total > 0)
   const usedExpenseCategories = useMemo(() => [...new Set(expenses.map((expense) => expense.category).filter(Boolean))], [expenses])
   const expenseRows = filteredExpenses.map((expense) => ({
     category: expense.category || '-',
@@ -185,6 +205,8 @@ function DashboardMetricDetail({ cashWallet, companyInfo, customers = [], expens
       ? productRows
       : config.panel === 'suppliers'
         ? supplierRows
+        : config.panel === 'receivables'
+          ? receivableRows
         : config.panel === 'customers'
           ? customerRows
           : config.panel === 'staff'
@@ -200,7 +222,7 @@ function DashboardMetricDetail({ cashWallet, companyInfo, customers = [], expens
     { key: 'number', label: '#' },
     { key: 'invoice', label: t.invoice ?? 'Invoice' },
     { key: 'customer', label: t.customer ?? 'Customer' },
-    { key: 'totalLabel', label: t.total ?? 'Total' },
+    { key: 'totalLabel', label: config.panel === 'receivables' ? (t.remaining ?? 'Remaining') : (t.total ?? 'Total') },
     { key: 'dateLabel', label: t.date ?? 'Date' },
   ]
   const isRevenueView = config.panel === 'revenue'
@@ -489,7 +511,112 @@ function DashboardMetricDetail({ cashWallet, companyInfo, customers = [], expens
     )
   }
 
-  if (metricKey === 'netProfit' || metricKey === 'pureProfit') {
+  if (metricKey === 'pureProfit') {
+    const revenue = filteredSales.reduce((sum, sale) => sum + parseNumber(sale.paidAmount || sale.total), 0)
+    const cogs = filteredSales.reduce((sum, sale) => sum + getSaleCost(sale, products), 0)
+    const pureProfit = Math.max(0, revenue - cogs)
+    const marginPercent = revenue > 0 ? (pureProfit / revenue) * 100 : 0
+    const saleRows = filteredSales.map((sale) => {
+      const cost = getSaleCost(sale, products)
+      const refunded = (sale.refundHistory || []).reduce((sum, refund) => sum + parseNumber(refund.amount), 0)
+      const paid = parseNumber(sale.paidAmount || sale.total)
+      return {
+        cogs: formatMoney(cost, sale.currency),
+        customer: sale.customerName || t.walkInCustomer || 'Walk-in Customer',
+        date: dateLabel(sale.date),
+        gross: formatMoney(paid, sale.currency),
+        grossProfit: formatMoney(Math.max(0, paid - cost), sale.currency),
+        id: sale.id,
+        invoice: sale.invoiceNumber,
+        net: formatMoney(Math.max(0, paid - refunded), sale.currency),
+        refunded: refunded ? formatMoney(refunded, sale.currency) : '-',
+      }
+    })
+    const cogsRows = filteredSales.flatMap((sale) => (sale.items || []).map((item, index) => {
+      const product = products.find((entry) => entry.id === item.productId)
+      const cost = parseNumber(item.purchase ?? item.cost ?? product?.purchase ?? 0)
+      return {
+        amount: formatMoney(cost * parseNumber(item.quantity || 1), sale.currency),
+        date: dateLabel(sale.date),
+        id: `${sale.id}-pure-cogs-${item.productId || index}`,
+        invoice: sale.invoiceNumber,
+        name: item.name || product?.name || '-',
+        quantity: item.quantity || 1,
+      }
+    }))
+    const sourceTabs = [
+      { key: 'sales', label: `${t.sales ?? 'Sales'} (${saleRows.length})`, rows: saleRows },
+      { key: 'cogs', label: `${t.cogsBreakdown ?? 'COGS breakdown'} (${cogsRows.length})`, rows: cogsRows },
+      { key: 'deposits', label: `${t.deposits ?? 'Deposits'} (0)`, rows: [] },
+      { key: 'withdrawals', label: `${t.withdrawals ?? 'Withdrawals'} (0)`, rows: [] },
+    ]
+    const activeSource = sourceTabs.find((tab) => tab.key === activeTab) ?? sourceTabs[0]
+    const pureQuery = search.trim().toLowerCase()
+    const sourceRows = activeSource.rows.filter((row) => !pureQuery || Object.values(row).join(' ').toLowerCase().includes(pureQuery))
+    const breakdownRows = [
+      { id: 'revenue', name: t.totalRevenuePaidSales ?? 'Total Revenue (Paid Sales)', amount: `+${formatMoney(revenue)}`, tone: 'green' },
+      { id: 'cogs', name: t.costOfGoodsSoldShort ?? 'Cost of Goods Sold (COGS)', amount: `-${formatMoney(cogs)}`, tone: 'red' },
+      { id: 'pure', name: `= ${t.pureProfit ?? 'Pure Profit'}`, amount: formatMoney(pureProfit), success: true },
+      { id: 'margin', name: t.marginPercent ?? 'Margin %', amount: `${marginPercent.toFixed(1)}%`, muted: true },
+    ]
+    const printRows = breakdownRows.map((row, index) => ({ ...row, number: index + 1 }))
+
+    return (
+      <section className="entity-content metric-detail-content net-profit-detail pure-profit-detail">
+        <div className="entity-heading metric-detail-heading">
+          <div className="metric-detail-title">
+            <button className="back-icon-btn" type="button" onClick={onBack}><ChevronLeft size={18} /></button>
+            <div><h1>{t.pureProfitBreakdown ?? 'Pure Profit Breakdown'}</h1><p>{t.pureProfitBreakdownSubtitle ?? 'Raw goods margin without expenses or refunds deducted'}</p></div>
+          </div>
+          <div className="entity-actions"><button type="button" onClick={() => setPrintOpen(true)}><Printer size={16} /> {t.print ?? 'Print'}</button></div>
+        </div>
+
+        <div className="summary-grid four metric-detail-summary pure-profit-summary">
+          <SummaryCard icon={DollarSign} label={t.revenue ?? 'Revenue'} tone="green" value={formatMoney(revenue)} />
+          <SummaryCard icon={DollarSign} label={t.costOfGoodsSoldShort ?? 'Cost of Goods Sold (COGS)'} tone="red" value={formatMoney(cogs)} />
+          <SummaryCard icon={DollarSign} label={t.pureProfit ?? 'Pure Profit'} tone="green" value={formatMoney(pureProfit)} />
+          <SummaryCard icon={WalletCards} label={t.marginPercent ?? 'Margin %'} tone="blue" value={`${marginPercent.toFixed(1)}%`} />
+        </div>
+
+        <div className="data-panel net-profit-breakdown pure-profit-formula">
+          <h2>{t.howPureProfitCalculated ?? 'How Pure Profit is Calculated'}</h2>
+          <div className="net-profit-rows">
+            {breakdownRows.map((row) => (
+              <div className={`${row.success ? 'success' : ''} ${row.muted ? 'muted' : ''} ${row.tone === 'red' ? 'danger-row' : ''}`} key={row.id}>
+                <span>{row.name}</span>
+                <strong>{row.amount}</strong>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="data-panel net-profit-source">
+          <h2>{t.sourceRecords ?? 'Source records'}</h2>
+          <div className="metric-detail-tabs net-source-tabs pure-source-tabs">
+            {sourceTabs.map((tab) => <button className={activeSource.key === tab.key ? 'active' : ''} key={tab.key} type="button" onClick={() => setActiveTab(tab.key)}>{tab.label}</button>)}
+          </div>
+          <div className="net-profit-search"><input placeholder={t.search ?? 'Search'} value={search} onChange={(event) => setSearch(event.target.value)} /></div>
+          <div className="metric-detail-table-wrap">
+            {activeSource.key === 'sales' ? (
+              <table className="data-table metric-detail-table net-source-table">
+                <thead><tr><th>{t.invoice ?? 'Invoice'}</th><th>{t.customer ?? 'Customer'}</th><th>{t.gross ?? 'Gross'}</th><th>{t.refunded ?? 'Refunded'}</th><th>{t.net ?? 'Net'}</th><th>COGS</th><th>{t.grossProfit ?? 'Gross Profit'}</th><th>{t.date ?? 'Date'}</th></tr></thead>
+                <tbody>{sourceRows.length === 0 ? <tr><td className="empty-cell" colSpan="8">{t.noRecordsFound}</td></tr> : sourceRows.map((row) => <tr key={row.id}><td><strong>{row.invoice}</strong></td><td>{row.customer}</td><td>{row.gross}</td><td className="danger-text">{row.refunded}</td><td><strong>{row.net}</strong></td><td>{row.cogs}</td><td className="success-text">{row.grossProfit}</td><td>{row.date}</td></tr>)}</tbody>
+              </table>
+            ) : (
+              <table className="data-table metric-detail-table net-source-table">
+                <thead><tr><th>{t.item ?? 'Item'}</th><th>{t.invoice ?? 'Invoice'}</th><th>{t.quantity ?? 'Quantity'}</th><th>{t.amount ?? 'Amount'}</th><th>{t.date ?? 'Date'}</th></tr></thead>
+                <tbody>{sourceRows.length === 0 ? <tr><td className="empty-cell" colSpan="5">{t.noRecordsFound}</td></tr> : sourceRows.map((row) => <tr key={row.id}><td><strong>{row.name}</strong></td><td>{row.invoice || '-'}</td><td>{row.quantity || '-'}</td><td>{row.amount || '-'}</td><td>{row.date || '-'}</td></tr>)}</tbody>
+              </table>
+            )}
+          </div>
+        </div>
+
+        {printOpen && <PrintPreviewModal columns={[{ key: 'name', label: t.name ?? 'Name' }, { key: 'amount', label: t.amount ?? 'Amount' }]} companyInfo={companyInfo} onClose={() => setPrintOpen(false)} printSettings={printSettings} rows={printRows} title={t.pureProfitBreakdown ?? 'Pure Profit Breakdown'} t={t} />}
+      </section>
+    )
+  }
+
+  if (metricKey === 'netProfit') {
     const revenue = filteredSales.reduce((sum, sale) => sum + parseNumber(sale.total), 0)
     const cogs = filteredSales.reduce((sum, sale) => sum + getSaleCost(sale, products), 0)
     const expenseTotal = filteredExpenses.reduce((sum, expense) => sum + parseNumber(expense.amount), 0)
@@ -669,7 +796,7 @@ function DashboardMetricDetail({ cashWallet, companyInfo, customers = [], expens
         ) : (
           <div className="metric-detail-table-wrap">
           <table className="data-table metric-detail-table">
-            <thead><tr><th>{t.invoice ?? 'Invoice'}</th><th>{t.customer ?? 'Customer'}</th><th>{t.total ?? 'Total'}</th><th>{t.date ?? 'Date'}</th><th>{t.actions}</th></tr></thead>
+            <thead><tr><th>{t.invoice ?? 'Invoice'}</th><th>{t.customer ?? 'Customer'}</th><th>{config.panel === 'receivables' ? (t.remaining ?? 'Remaining') : (t.total ?? 'Total')}</th><th>{t.date ?? 'Date'}</th><th>{t.actions}</th></tr></thead>
             <tbody>
               {rows.length === 0 ? <tr><td className="empty-cell" colSpan="5">{t.noRecordsFound}</td></tr> : rows.map((row) => (
                 <tr key={row.id}>

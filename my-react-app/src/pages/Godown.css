@@ -1,4 +1,4 @@
-.godown-content {
+q.godown-content {
   display: grid;
   gap: 24px;
 }
@@ -390,6 +390,103 @@
 
 .godown-table {
   min-width: 1040px;
+}
+
+.godown-stock-table {
+  min-width: 1240px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.godown-stock-table thead th {
+  padding-top: 14px;
+  padding-bottom: 14px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.godown-stock-table .godown-product-row {
+  background: color-mix(in srgb, var(--panel-soft) 82%, var(--panel-bg));
+}
+
+.godown-stock-table .godown-product-row td {
+  padding-top: 17px;
+  padding-bottom: 17px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.godown-stock-table .godown-product-row td:first-child {
+  border-start-start-radius: 8px;
+  border-end-start-radius: 8px;
+}
+
+.godown-stock-table .godown-product-row td:last-child {
+  border-start-end-radius: 8px;
+  border-end-end-radius: 8px;
+}
+
+.godown-stock-table .stock-count {
+  display: inline-block;
+  min-width: 1.5ch;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.godown-stock-table .stock-count-imported,
+.godown-stock-table .stock-count-current {
+  color: var(--success);
+}
+
+.godown-stock-table .stock-count-sold {
+  color: #0ea5e9;
+}
+
+.godown-stock-table td > small {
+  display: inline;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.godown-entry-table {
+  min-width: 1220px;
+}
+
+.godown-entry-table thead th {
+  padding-top: 14px;
+  padding-bottom: 14px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.godown-entry-table .godown-stock-entry-row td {
+  padding-top: 16px;
+  padding-bottom: 16px;
+  vertical-align: middle;
+}
+
+.godown-entry-table .status-pill.active {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--success) 14%, transparent);
+  color: var(--success);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.stock-entry-lines-row .purchase-history {
+  margin-inline-start: 24px;
+  background: var(--panel-bg);
+}
+
+.stock-entry-lines-row .purchase-history table {
+  min-width: 860px;
 }
 
 .godown-table td strong,
@@ -3547,4 +3644,217 @@ r {
     0 18px 45px rgba(15, 23, 42, 0.2) !important;
 
   overflow: hidden !important;
+}
+/* =====================================================
+   GODOWN HEADER ACTION BUTTONS
+===================================================== */
+
+#root .retail-shell .godown-header-actions {
+  width: auto !important;
+  min-width: 0 !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+
+  flex-wrap: nowrap !important;
+}
+
+/* مشترک میان هر دو دکمه */
+#root .retail-shell .godown-header-actions > button,
+#root .retail-shell .godown-header-actions > button:hover,
+#root .retail-shell .godown-header-actions > button:focus,
+#root .retail-shell .godown-header-actions > button:active {
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: max-content !important;
+
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+
+  flex: 0 0 auto !important;
+
+  margin: 0 !important;
+  padding: 0 13px !important;
+
+  border-radius: 9px !important;
+
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 750 !important;
+  line-height: 1 !important;
+
+  white-space: nowrap !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+
+  cursor: pointer !important;
+}
+
+/* =====================================================
+   MULTI PURCHASE BUTTON
+===================================================== */
+
+#root .retail-shell .godown-purchase-btn,
+#root .retail-shell .godown-purchase-btn:hover,
+#root .retail-shell .godown-purchase-btn:focus,
+#root .retail-shell .godown-purchase-btn:active {
+  border: 1px solid var(--accent) !important;
+
+  background: var(--accent) !important;
+  color: var(--accent-contrast) !important;
+}
+
+#root .retail-shell .godown-purchase-btn:hover {
+  filter: brightness(0.96);
+
+  box-shadow:
+    0 6px 15px
+    color-mix(
+      in srgb,
+      var(--accent) 18%,
+      transparent
+    ) !important;
+}
+
+/* =====================================================
+   PRINT BUTTON
+===================================================== */
+
+#root .retail-shell .godown-print-btn,
+#root .retail-shell .godown-print-btn:hover,
+#root .retail-shell .godown-print-btn:focus,
+#root .retail-shell .godown-print-btn:active {
+  border: 1px solid var(--border) !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+}
+
+#root .retail-shell .godown-print-btn:hover {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--accent) 50%,
+      var(--border)
+    ) !important;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--accent) 7%,
+      var(--panel-bg)
+    ) !important;
+
+  color: var(--accent) !important;
+}
+
+/* =====================================================
+   BUTTON ICONS
+===================================================== */
+
+#root .retail-shell .godown-header-actions > button > svg {
+  position: static !important;
+
+  width: 16px !important;
+  min-width: 16px !important;
+  max-width: 16px !important;
+
+  height: 16px !important;
+  min-height: 16px !important;
+  max-height: 16px !important;
+
+  display: block !important;
+  flex: 0 0 16px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: currentColor !important;
+  stroke: currentColor !important;
+  stroke-width: 1.9 !important;
+
+  transform: none !important;
+
+  pointer-events: none !important;
+}
+
+#root .retail-shell .godown-header-actions > button > span {
+  display: inline-flex !important;
+  align-items: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: inherit !important;
+
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  line-height: 1 !important;
+
+  white-space: nowrap !important;
+}
+
+/* جلوگیری از عرض اجباری استایل عمومی */
+#root .retail-shell
+.godown-content
+.entity-heading
+.entity-actions
+.godown-purchase-btn,
+#root .retail-shell
+.godown-content
+.entity-heading
+.entity-actions
+.godown-print-btn {
+  inline-size: max-content !important;
+  min-inline-size: 0 !important;
+  max-inline-size: max-content !important;
+
+  padding-inline: 13px !important;
+}
+
+/* =====================================================
+   DARK MODE
+===================================================== */
+
+#root
+.retail-shell.theme-dark
+.godown-print-btn {
+  border-color: #334155 !important;
+  background: #111827 !important;
+  color: #e5e7eb !important;
+}
+
+#root
+.retail-shell.theme-dark
+.godown-print-btn:hover {
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 640px) {
+  #root .retail-shell .godown-header-actions {
+    width: 100% !important;
+  }
+
+  #root .retail-shell .godown-header-actions > button {
+    flex: 1 1 0 !important;
+
+    width: auto !important;
+    max-width: none !important;
+
+    padding-inline: 10px !important;
+  }
 }

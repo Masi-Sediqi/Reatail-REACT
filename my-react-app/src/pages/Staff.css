@@ -185,20 +185,6 @@
   pointer-events: none;
 }
 
-.payroll-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 42px;
-  padding: 0 16px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--panel-bg);
-  color: var(--text);
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
 
 .payroll-btn:hover {
   border-color: var(--accent);
@@ -442,6 +428,22 @@
 
   box-shadow:
     0 0 0 3px var(--accent-soft);
+}
+
+.payroll-modal .field-invalid {
+  border-color: var(--danger) !important;
+  background: color-mix(in srgb, var(--panel-bg) 92%, var(--danger)) !important;
+}
+
+.payroll-modal .field-invalid:focus {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 16%, transparent) !important;
+}
+
+.payroll-modal .validation-error {
+  color: var(--danger) !important;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 /* =====================================================
@@ -722,6 +724,27 @@ body > .floating-select-menu {
   font-weight: 900;
 }
 
+.staff-summary-grid article .staff-money-lines {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  max-width: 100%;
+  color: var(--text);
+  font-size: 19px;
+  font-weight: 900;
+  line-height: 1.18;
+}
+
+.staff-summary-grid article .staff-money-lines span {
+  overflow: hidden;
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 [dir="rtl"] .staff-summary-grid article {
   padding: 20px 20px 20px 72px !important;
 }
@@ -729,15 +752,227 @@ body > .floating-select-menu {
 [dir="rtl"] .staff-summary-grid article > svg {
   inset-inline-end: auto;
   inset-inline-start: 22px;
-}.staff-content .staff-add-btn,
-.staff-content .staff-add-btn:hover {
-  min-width: 144px;
+}
 
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--accent-contrast);
+/* =====================================================
+   STAFF HEADER BUTTONS — EXACT CONTENT FIT
+===================================================== */
 
-  box-shadow: none;
+#root .retail-shell .staff-header-actions {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  flex-wrap: nowrap !important;
+  gap: 8px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Common exact-fit button */
+#root .retail-shell .staff-header-actions .staff-action-btn,
+#root .retail-shell .staff-header-actions .staff-action-btn:hover,
+#root .retail-shell .staff-header-actions .staff-action-btn:focus,
+#root .retail-shell .staff-header-actions .staff-action-btn:active {
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: max-content !important;
+
+  inline-size: max-content !important;
+  min-inline-size: 0 !important;
+  max-inline-size: max-content !important;
+
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+
+  flex: 0 0 auto !important;
+
+  margin: 0 !important;
+  padding: 0 12px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 9px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+
+  white-space: nowrap !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+
+  cursor: pointer !important;
+}
+
+/* Text */
+#root .retail-shell .staff-header-actions .staff-action-btn > span {
+  display: inline-flex !important;
+  align-items: center !important;
+
+  width: auto !important;
+  min-width: 0 !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: inherit !important;
+
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  line-height: 1 !important;
+
+  white-space: nowrap !important;
+}
+
+/* Icons */
+#root .retail-shell .staff-header-actions .staff-action-btn > svg {
+  position: static !important;
+
+  width: 16px !important;
+  min-width: 16px !important;
+  max-width: 16px !important;
+
+  height: 16px !important;
+  min-height: 16px !important;
+  max-height: 16px !important;
+
+  display: block !important;
+  flex: 0 0 16px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: currentColor !important;
+  stroke: currentColor !important;
+  stroke-width: 1.9 !important;
+
+  transform: none !important;
+
+  pointer-events: none !important;
+}
+
+/* =====================================================
+   PRINT BUTTON
+===================================================== */
+
+#root .retail-shell .staff-header-actions .staff-print-btn {
+  border-color: var(--border) !important;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+}
+
+#root .retail-shell .staff-header-actions .staff-print-btn:hover {
+  border-color: var(--accent) !important;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--accent) 7%,
+      var(--panel-bg)
+    ) !important;
+
+  color: var(--accent) !important;
+}
+
+/* =====================================================
+   PAYROLL BUTTON
+===================================================== */
+
+#root .retail-shell .staff-header-actions .staff-payroll-btn {
+  border-color: var(--border) !important;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+}
+
+#root .retail-shell .staff-header-actions .staff-payroll-btn:hover {
+  border-color: var(--accent) !important;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--accent) 7%,
+      var(--panel-bg)
+    ) !important;
+
+  color: var(--accent) !important;
+}
+
+/* =====================================================
+   ADD STAFF BUTTON
+===================================================== */
+
+#root .retail-shell .staff-header-actions .staff-add-btn {
+  border-color: var(--accent) !important;
+
+  background: var(--accent) !important;
+  color: var(--accent-contrast) !important;
+}
+
+#root .retail-shell .staff-header-actions .staff-add-btn:hover {
+  filter: brightness(0.96);
+}
+
+/* Prevent global entity button widths */
+#root .retail-shell
+.staff-content
+.entity-heading
+.entity-actions
+.staff-action-btn {
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: max-content !important;
+
+  flex-grow: 0 !important;
+  flex-shrink: 0 !important;
+
+  padding-inline: 12px !important;
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 640px) {
+  #root .retail-shell .staff-header-actions {
+    width: 100% !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+  }
+
+  #root .retail-shell .staff-header-actions .staff-action-btn {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    inline-size: auto !important;
+    max-inline-size: none !important;
+
+    padding-inline: 8px !important;
+  }
+
+  #root .retail-shell .staff-header-actions .staff-action-btn > span {
+    overflow: hidden !important;
+
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
 }
 
 .staff-content .staff-add-btn:hover {
@@ -993,4 +1228,16 @@ body > .floating-select-menu {
   .staff-content .staff-profile-summary-grid > article {
     min-height: 84px !important;
   }
+}
+.staff-print-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.staff-print-btn svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
 }

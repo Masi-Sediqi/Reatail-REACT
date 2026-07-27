@@ -47,6 +47,11 @@ const formatMoney = (value, currencyCode) => {
 const parseNumber = (value) => Number.parseFloat(value || 0) || 0
 const roundMoney = (value) => Math.round((parseNumber(value) + Number.EPSILON) * 100) / 100
 const roundQty = (value) => Math.round((parseNumber(value) + Number.EPSILON) * 10000) / 10000
+const getSaleDiscountTotal = (sale) => {
+  const billDiscount = parseNumber(sale.discountTotal ?? sale.discount)
+  const itemDiscount = (sale.items || []).reduce((sum, item) => sum + parseNumber(item.discount), 0)
+  return billDiscount + itemDiscount
+}
 
 const getGregorianLabel = (isoDate) => new Date(`${isoDate}T12:00:00`).toLocaleDateString('en-US', {
   month: 'short',
@@ -158,7 +163,7 @@ const printInvoice = (sale, companyInfo, t) => {
           </table>
           <div class="invoice-summary">
             <div><span>${escapeHtml(t.subtotal)}</span><strong>${formatMoney(sale.subtotal, sale.currency)}</strong></div>
-            <div><span>${escapeHtml(t.discount)}</span><strong>${formatMoney(sale.discountTotal, sale.currency)}</strong></div>
+            <div><span>${escapeHtml(t.discount)}</span><strong>${formatMoney(getSaleDiscountTotal(sale), sale.currency)}</strong></div>
             ${parseNumber(sale.balance) > 0 ? `<div class="remaining-total"><span>${escapeHtml(t.remaining)}</span><strong>${formatMoney(sale.balance, sale.currency)}</strong></div>` : ''}
             <div class="grand"><span>${escapeHtml(t.total)}</span><strong>${formatMoney(sale.total, sale.currency)}</strong></div>
           </div>
@@ -502,7 +507,7 @@ function InvoicePrintPreviewModal({ companyInfo, onClose, onPrint, sale, t }) {
             </table>
             <div className="invoice-summary">
               <div><span>{t.subtotal}</span><strong>{formatMoney(sale.subtotal, sale.currency)}</strong></div>
-              <div><span>{t.discount}</span><strong>{formatMoney(sale.discountTotal, sale.currency)}</strong></div>
+              <div><span>{t.discount}</span><strong>{formatMoney(getSaleDiscountTotal(sale), sale.currency)}</strong></div>
               {parseNumber(sale.balance) > 0 && <div className="remaining-total"><span>{t.remaining}</span><strong>{formatMoney(sale.balance, sale.currency)}</strong></div>}
               <div className="grand"><span>{t.total}</span><strong>{formatMoney(sale.total, sale.currency)}</strong></div>
             </div>
@@ -739,7 +744,7 @@ function SalesBillsPage({ companyInfo, onEditBill, onNotify, onProductsChange, o
   const totalSales = filteredSales.reduce((sum, sale) => sum + sale.total, 0)
   const totalPaid = filteredSales.reduce((sum, sale) => sum + sale.paidAmount, 0)
   const totalPending = filteredSales.reduce((sum, sale) => sum + sale.balance, 0)
-  const totalDiscount = filteredSales.reduce((sum, sale) => sum + sale.discountTotal, 0)
+  const totalDiscount = filteredSales.reduce((sum, sale) => sum + getSaleDiscountTotal(sale), 0)
   const displayCurrency = filteredSales[0]?.currency || sales[0]?.currency || 'AFN'
   const statusOptions = useMemo(() => [
     { value: 'all', label: t.allStatuses },
@@ -760,6 +765,7 @@ function SalesBillsPage({ companyInfo, onEditBill, onNotify, onProductsChange, o
   const reportRows = useMemo(() => filteredSales.map((sale) => ({
     ...sale,
     itemsCount: sale.items.length,
+    discountFormatted: formatMoney(getSaleDiscountTotal(sale), sale.currency),
     totalFormatted: formatMoney(sale.total, sale.currency),
     paidFormatted: formatMoney(sale.paidAmount, sale.currency),
     statusLabel: sale.paymentStatus === 'paid' ? t.paidStatus : t.loanStatus,
@@ -917,7 +923,16 @@ function SalesBillsPage({ companyInfo, onEditBill, onNotify, onProductsChange, o
     <div className="sales-content">
       <div className="entity-heading">
         <div><h1>{t.salesManagement}</h1><p>{t.salesSubtitle}</p></div>
-        <div className="entity-actions"><button type="button" onClick={() => setReportPreviewOpen(true)}><ReceiptText size={16} /> {t.printReport}</button></div>
+        <div className="entity-actions sales-page-actions">
+  <button
+    className="sales-print-report-btn"
+    type="button"
+    onClick={() => setReportPreviewOpen(true)}
+  >
+    <Printer size={16} />
+    <span>{t.printReport}</span>
+  </button>
+</div>
       </div>
 
       <div className="sales-summary-grid">
@@ -951,17 +966,18 @@ function SalesBillsPage({ companyInfo, onEditBill, onNotify, onProductsChange, o
         <h2><ShoppingCart size={19} /> {t.sales} ({filteredSales.length})</h2>
         <table className="data-table sales-table">
           <thead>
-            <tr><th>{t.invoice}</th><th>{t.customer}</th><th>{t.items}</th><th>{t.total}</th><th>{t.paid}</th><th>{t.remaining}</th><th>{t.status}</th><th>{t.date}</th><th>{t.actions}</th></tr>
+            <tr><th>{t.invoice}</th><th>{t.customer}</th><th>{t.items}</th><th>{t.total}</th><th>{t.discount}</th><th>{t.paid}</th><th>{t.remaining}</th><th>{t.status}</th><th>{t.date}</th><th>{t.actions}</th></tr>
           </thead>
           <tbody>
             {filteredSales.length === 0 ? (
-              <tr><td colSpan="9" className="empty-cell">{t.noSalesFound}</td></tr>
+              <tr><td colSpan="10" className="empty-cell">{t.noSalesFound}</td></tr>
             ) : filteredSales.map((sale) => (
               <tr key={sale.id}>
                 <td className="mono-cell">{sale.invoiceNumber}</td>
                 <td>{sale.customerName}</td>
                 <td>{sale.items.length}</td>
                 <td><strong>{formatMoney(sale.total, sale.currency)}</strong></td>
+                <td>{formatMoney(getSaleDiscountTotal(sale), sale.currency)}</td>
                 <td>{formatMoney(sale.paidAmount, sale.currency)}</td>
                 <td className={parseNumber(sale.balance) > 0 ? 'danger-text' : 'success-text'}>{formatMoney(sale.balance, sale.currency)}</td>
                 <td><span className={sale.paymentStatus === 'paid' ? 'status-pill active' : 'status-pill warning'}>{sale.paymentStatus === 'paid' ? t.paidStatus : t.loanStatus}</span></td>
@@ -996,6 +1012,7 @@ function SalesBillsPage({ companyInfo, onEditBill, onNotify, onProductsChange, o
             { key: 'customerName', label: t.customer },
             { key: 'itemsCount', label: t.items },
             { key: 'totalFormatted', label: t.total },
+            { key: 'discountFormatted', label: t.discount },
             { key: 'paidFormatted', label: t.paid },
             { key: 'statusLabel', label: t.status },
             { key: 'dateLabel', label: t.date },

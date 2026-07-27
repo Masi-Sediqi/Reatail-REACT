@@ -11,6 +11,7 @@ import {
   DollarSign,
   Eye,
   Plus,
+  Printer,
   ReceiptText,
   Search,
   SquareMenu,
@@ -31,6 +32,10 @@ const emptySupplier = {
   address: '',
   currency: 'AFN',
   items: [],
+  partnerContribution: '',
+  partnerPercent: '',
+  monthlyInvestment: '',
+  investmentReturnPercent: '',
   notes: '',
   balance: '',
   customFields: {},
@@ -112,11 +117,15 @@ export function SupplierModal({ customFields = [], initialSupplier, onClose, onS
   const [itemInput, setItemInput] = useState('')
   const [closing, setClosing] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const requiredMessage = t.requiredFieldMessage ?? 'This field is required.'
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }))
   const updateCustomField = (fieldId, value) => setForm((current) => ({
     ...current,
     customFields: { ...(current.customFields ?? {}), [fieldId]: value },
   }))
+  const isSupplierAccount = form.accountType === 'supplier'
+  const isPartnerAccount = form.accountType === 'partner'
+  const isInvestingAccount = form.accountType === 'investing'
   const requestClose = () => {
     if (closing) return
     setClosing(true)
@@ -193,9 +202,11 @@ export function SupplierModal({ customFields = [], initialSupplier, onClose, onS
           </h2>
 
           <p>
-            {form.accountType === 'partner'
-              ? 'Create and manage a partner financial account.'
-              : 'Create a supplier account for purchases and payments.'}
+            {isInvestingAccount
+              ? (t.createInvestingAccountHint ?? 'Create and manage a monthly investing account.')
+              : isPartnerAccount
+                ? (t.createPartnerAccountHint ?? 'Create and manage a partner financial account.')
+                : (t.createSupplierAccountHint ?? 'Create a supplier account for purchases and payments.')}
           </p>
         </div>
 
@@ -218,10 +229,10 @@ export function SupplierModal({ customFields = [], initialSupplier, onClose, onS
             {t.accountType ?? 'Account type'}
           </span>
 
-          <div className="supplier-form-v2-tabs">
+          <div className="supplier-form-v2-tabs grid !grid-cols-1 gap-2 sm:!grid-cols-3">
             <button
               className={
-                form.accountType !== 'partner'
+                isSupplierAccount
                   ? 'active'
                   : ''
               }
@@ -238,7 +249,7 @@ export function SupplierModal({ customFields = [], initialSupplier, onClose, onS
 
             <button
               className={
-                form.accountType === 'partner'
+                isPartnerAccount
                   ? 'active'
                   : ''
               }
@@ -252,10 +263,30 @@ export function SupplierModal({ customFields = [], initialSupplier, onClose, onS
                   'Partner accounts'}
               </span>
             </button>
+
+            <button
+              className={
+                isInvestingAccount
+                  ? 'active'
+                  : ''
+              }
+              type="button"
+              onClick={() =>
+                update('accountType', 'investing')
+              }
+            >
+              <span>
+                {t.investingAccounts ??
+                  'Investing accounts'}
+              </span>
+            </button>
           </div>
 
           <small className="supplier-form-v2-hint">
-            {form.accountType === 'partner'
+            {isInvestingAccount
+              ? (t.accountTypeInvestingHint ??
+                'Investing accounts track monthly investment and requested monthly return percent.')
+              : isPartnerAccount
               ? (t.accountTypePartnerHint ??
                 'Partner accounts track deposits, withdrawals and profit share.')
               : (t.accountTypeSupplierHint ??
@@ -284,6 +315,7 @@ export function SupplierModal({ customFields = [], initialSupplier, onClose, onS
                 update('name', event.target.value)
               }
             />
+            {submitted && !form.name.trim() && <small className="validation-error">{requiredMessage}</small>}
           </label>
 
           <label className="supplier-form-v2-field">
@@ -338,28 +370,36 @@ export function SupplierModal({ customFields = [], initialSupplier, onClose, onS
           </label>
         </section>
 
-        {/* Items */}
+        {/* Account details */}
         <section className="supplier-form-v2-items">
           <div className="supplier-form-v2-items-head">
             <div>
               <strong>
-                {t.itemsTheySupply ??
-                  'Items They Supply'}
+                {isInvestingAccount
+                  ? (t.monthlyInvestmentAmount ?? 'Monthly amount paid')
+                  : isPartnerAccount
+                    ? (t.partnerPercentAmount ?? 'Percentage amount')
+                    : (t.itemsTheySupply ?? 'Items They Supply')}
               </strong>
 
               <small>
-                Add one or more items supplied by this
-                account.
+                {isInvestingAccount
+                  ? (t.investingAccountFieldsHint ?? 'Enter the monthly amount this person gives and the percent they want back each month.')
+                  : isPartnerAccount
+                    ? (t.partnerPercentHint ?? 'Enter the ownership or profit share percentage for this partner.')
+                    : (t.itemsTheySupplyHint ?? 'Add one or more items supplied by this account.')}
               </small>
             </div>
 
-            {form.items.length > 0 && (
+            {isSupplierAccount && form.items.length > 0 && (
               <span className="supplier-form-items-count">
                 {form.items.length}
               </span>
             )}
           </div>
 
+          {isSupplierAccount ? (
+            <>
           <div className="supplier-form-v2-item-entry">
             <input
               type="text"
@@ -416,7 +456,89 @@ export function SupplierModal({ customFields = [], initialSupplier, onClose, onS
             </div>
           ) : (
             <div className="supplier-form-v2-items-empty">
-              No items added yet
+              {t.noItemsAddedYet ?? 'No items added yet'}
+            </div>
+          )}
+            </>
+          ) : isPartnerAccount ? (
+            <div className="grid gap-3 md:grid-cols-2">
+              <label className="grid gap-1.5">
+                <span className="text-xs font-semibold text-slate-900 dark:text-slate-100">
+                  {t.partnerContributionAmount ?? 'Amount paid'}
+                </span>
+                <input
+                  className="supplier-compact-input min-h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm font-bold text-slate-950 outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-slate-500 dark:focus:ring-slate-800"
+                  inputMode="decimal"
+                  min="0"
+                  placeholder="10000"
+                  type="number"
+                  value={form.partnerContribution}
+                  onChange={(event) =>
+                    update('partnerContribution', event.target.value)
+                  }
+                />
+              </label>
+
+              <label className="grid gap-1.5">
+                <span className="text-xs font-semibold text-slate-900 dark:text-slate-100">
+                  {t.partnerPercentAmount ?? 'Percentage amount'}
+                </span>
+                <div className="supplier-percent-shell flex min-h-9 items-center rounded-lg border border-slate-200 bg-white px-3 focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-slate-200 dark:border-slate-700 dark:bg-slate-950 dark:focus-within:border-slate-500 dark:focus-within:ring-slate-800">
+                  <input
+                    className="supplier-percent-input min-h-0 flex-1 border-0 bg-transparent p-0 text-sm font-bold text-slate-950 outline-none dark:text-white"
+                    inputMode="decimal"
+                    max="100"
+                    min="0"
+                    placeholder="20"
+                    type="number"
+                    value={form.partnerPercent}
+                    onChange={(event) =>
+                      update('partnerPercent', event.target.value)
+                    }
+                  />
+                  <span className="text-sm font-black text-slate-500 dark:text-slate-400">%</span>
+                </div>
+              </label>
+            </div>
+          ) : (
+            <div className="grid gap-3 md:grid-cols-2">
+              <label className="grid gap-1.5">
+                <span className="text-xs font-semibold text-slate-900 dark:text-slate-100">
+                  {t.monthlyInvestmentAmount ?? 'Monthly amount paid'}
+                </span>
+                <input
+                  className="supplier-compact-input min-h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm font-bold text-slate-950 outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-slate-500 dark:focus:ring-slate-800"
+                  inputMode="decimal"
+                  min="0"
+                  placeholder="10000"
+                  type="number"
+                  value={form.monthlyInvestment}
+                  onChange={(event) =>
+                    update('monthlyInvestment', event.target.value)
+                  }
+                />
+              </label>
+
+              <label className="grid gap-1.5">
+                <span className="text-xs font-semibold text-slate-900 dark:text-slate-100">
+                  {t.investmentReturnPercent ?? 'Percent wanted monthly'}
+                </span>
+                <div className="supplier-percent-shell flex min-h-9 items-center rounded-lg border border-slate-200 bg-white px-3 focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-slate-200 dark:border-slate-700 dark:bg-slate-950 dark:focus-within:border-slate-500 dark:focus-within:ring-slate-800">
+                  <input
+                    className="supplier-percent-input min-h-0 flex-1 border-0 bg-transparent p-0 text-sm font-bold text-slate-950 outline-none dark:text-white"
+                    inputMode="decimal"
+                    max="100"
+                    min="0"
+                    placeholder="20"
+                    type="number"
+                    value={form.investmentReturnPercent}
+                    onChange={(event) =>
+                      update('investmentReturnPercent', event.target.value)
+                    }
+                  />
+                  <span className="text-sm font-black text-slate-500 dark:text-slate-400">%</span>
+                </div>
+              </label>
             </div>
           )}
         </section>
@@ -458,6 +580,7 @@ export function SupplierModal({ customFields = [], initialSupplier, onClose, onS
           className="supplier-form-v2-custom-fields"
           fields={customFields}
           onChange={updateCustomField}
+          requiredMessage={requiredMessage}
           submitted={submitted}
           values={form.customFields}
         />
@@ -597,11 +720,12 @@ function SuppliersPage({
   const typedSuppliers = suppliers.filter((supplier) => (supplier.accountType || 'supplier') === accountTab)
   const supplierAccountCount = suppliers.filter((supplier) => (supplier.accountType || 'supplier') === 'supplier').length
   const partnerAccountCount = suppliers.filter((supplier) => supplier.accountType === 'partner').length
+  const investingAccountCount = suppliers.filter((supplier) => supplier.accountType === 'investing').length
 
   const filteredSuppliers = typedSuppliers.filter((supplier) => {
     const stat = supplierStats.get(supplier.id)
     const query = search.trim().toLowerCase()
-    const text = [supplier.name, supplier.phone, supplier.address, supplier.currency].join(' ').toLowerCase()
+    const text = [supplier.name, supplier.phone, supplier.address, supplier.currency, supplier.partnerContribution, supplier.partnerPercent, supplier.monthlyInvestment, supplier.investmentReturnPercent].join(' ').toLowerCase()
     const matchesSearch = !query || text.includes(query)
     const matchesBalance = balanceFilter === 'all' || stat?.statusKey === balanceFilter
     const matchesDate = getDateMatches(stat?.lastDate, dateFilter, customStart, customEnd)
@@ -718,11 +842,20 @@ function SuppliersPage({
       }
       onNotify?.(t.entryDeleted ?? t.delete)
     }
-    const printPdfButton = (tab = portalTab) => (
-      <button className="print-pdf-btn" type="button" onClick={() => openSupplierStatement(tab)}>
-        <ReceiptText size={16} /> {t.printPdf ?? 'PRINT & PDF'}
-      </button>
-    )
+   const printPdfButton = (tab = portalTab) => (
+  <button
+    className="print-pdf-btn"
+    type="button"
+    onClick={() =>
+      openSupplierStatement(tab)
+    }
+  >
+    <Printer size={16} />
+    <span>
+      {t.printPdf ?? 'PRINT & PDF'}
+    </span>
+  </button>
+)
     const purchaseValue = portalEntries.reduce((sum, entry) => sum + parseNumber(entry.total), 0)
     const soldValue = portalEntries.reduce((sum, entry) => sum + parseNumber(entry.selling) * parseNumber(entry.sold), 0)
     const profit = portalEntries.reduce((sum, entry) => sum + Math.max(0, parseNumber(entry.selling) - parseNumber(entry.purchase)) * parseNumber(entry.quantity), 0)
@@ -788,7 +921,17 @@ function SuppliersPage({
             <button className="back-btn" type="button" onClick={() => setPortalSupplier(null)}>‹</button>
             <div><h1>{t.supplierPortal ?? 'Supplier Portal'}: {portalSupplier.name}</h1><p>{portalSupplier.phone || '-'} · {portalSupplier.address || '-'} · {portalCurrency} · {t.accountCreated ?? 'Account Created'}: {getGregorianLabel(portalSupplier.createdAt || todayInput())}</p></div>
           </div>
-          <button type="button" onClick={() => openSupplierStatement('ledger')}><ReceiptText size={16} /> {t.printStatement ?? t.printReport}</button>
+          <button
+  type="button"
+  onClick={() =>
+    openSupplierStatement('ledger')
+  }
+>
+  <Printer size={16} />
+  <span>
+    {t.printStatement ?? t.printReport}
+  </span>
+</button>
         </div>
         <div className="supplier-account-card">
           <div><h2>{t.account}: {portalSupplier.name} - {portalCurrency}</h2><p>{t.printDate ?? 'Print Date'}: {new Date().toLocaleDateString('en-GB')}</p></div>
@@ -824,18 +967,37 @@ function SuppliersPage({
     <div className="entity-content suppliers-content">
       <div className="entity-heading">
         <div><h1>{t.suppliers}</h1><p>{t.manageSupplierLedgers}</p></div>
-        <div className="entity-actions">
-          <button type="button" onClick={() => setPrintOpen(true)}><ReceiptText size={16} /> {t.print}</button>
-          <button className="primary-btn" type="button" onClick={() => setModalOpen(true)}><Plus size={16} /> {t.createSupplierAccount}</button>
-        </div>
+       <div className="entity-actions supplier-page-actions">
+  <button
+    className="supplier-print-btn"
+    type="button"
+    onClick={() => setPrintOpen(true)}
+  >
+    <Printer size={16} />
+    <span>{t.print}</span>
+  </button>
+
+  <button
+    className="primary-btn supplier-create-btn"
+    type="button"
+    onClick={() => setModalOpen(true)}
+  >
+    <Plus size={16} />
+
+    <span>
+      {t.createSupplierAccount}
+    </span>
+  </button>
+</div>
       </div>
-      <div className="supplier-account-tabs">
-        <button className={accountTab === 'supplier' ? 'active' : ''} type="button" onClick={() => setAccountTab('supplier')}>{t.supplierAccounts ?? 'Supplier accounts'} <span>({supplierAccountCount})</span></button>
-        <button className={accountTab === 'partner' ? 'active' : ''} type="button" onClick={() => setAccountTab('partner')}>{t.partnerAccounts ?? 'Partner accounts'} <span>({partnerAccountCount})</span></button>
+      <div className="supplier-account-tabs max-w-full overflow-x-auto">
+        <button className={`${accountTab === 'supplier' ? 'active' : ''} whitespace-nowrap`} type="button" onClick={() => setAccountTab('supplier')}>{t.supplierAccounts ?? 'Supplier accounts'} <span>({supplierAccountCount})</span></button>
+        <button className={`${accountTab === 'partner' ? 'active' : ''} whitespace-nowrap`} type="button" onClick={() => setAccountTab('partner')}>{t.partnerAccounts ?? 'Partner accounts'} <span>({partnerAccountCount})</span></button>
+        <button className={`${accountTab === 'investing' ? 'active' : ''} whitespace-nowrap`} type="button" onClick={() => setAccountTab('investing')}>{t.investingAccounts ?? 'Investing accounts'} <span>({investingAccountCount})</span></button>
       </div>
       <div className="summary-grid four supplier-summary-grid">
         <article className="supplier-summary-card tone-blue">
-          <span>{accountTab === 'partner' ? (t.totalPartners ?? 'Total partners') : t.totalSuppliers}</span>
+          <span>{accountTab === 'investing' ? (t.totalInvestingAccounts ?? 'Total investing accounts') : accountTab === 'partner' ? (t.totalPartners ?? 'Total partners') : t.totalSuppliers}</span>
           <strong>{typedSuppliers.length}</strong>
           <WalletCards size={22} />
         </article>

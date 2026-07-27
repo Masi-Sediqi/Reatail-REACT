@@ -53,7 +53,7 @@ function Sidebar({ activePage, companyInfo, onNavigate, onToggle, t }) {
   }, [helpOpen])
 
   return (
-    <aside className="sidebar">
+    <aside className="sidebar w-[208px] shrink-0 max-[900px]:w-auto max-[900px]:shrink">
       <div className="brand-block">
         <div className="brand-mark">
           {companyInfo.logo ? <img src={companyInfo.logo} alt="" /> : <span>□</span>}

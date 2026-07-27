@@ -2587,3 +2587,254 @@ svg {
     padding: 12px 14px;
   }
 }
+.entity-actions > button,
+.supplier-portal-head > button,
+.print-pdf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.entity-actions > button svg,
+.supplier-portal-head > button svg,
+.print-pdf-btn svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  stroke-width: 1.9;
+}
+/* =====================================================
+   SUPPLIER PAGE HEADER ACTIONS
+===================================================== */
+
+#root .retail-shell .supplier-page-actions {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+
+  width: auto !important;
+  min-width: 0 !important;
+}
+
+/* Print button should fit its content */
+#root .retail-shell .supplier-page-actions .supplier-print-btn,
+#root .retail-shell .supplier-page-actions .supplier-print-btn:hover,
+#root .retail-shell .supplier-page-actions .supplier-print-btn:focus,
+#root .retail-shell .supplier-page-actions .supplier-print-btn:active {
+  width: fit-content !important;
+  min-width: 0 !important;
+  max-width: none !important;
+
+  height: 38px !important;
+  min-height: 38px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+
+  flex: 0 0 auto !important;
+
+  margin: 0 !important;
+  padding: 0 14px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 9px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+
+  white-space: nowrap !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root .retail-shell .supplier-page-actions .supplier-print-btn:hover {
+  border-color: var(--accent) !important;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--accent) 7%,
+      var(--panel-bg)
+    ) !important;
+
+  color: var(--accent) !important;
+}
+
+#root .retail-shell .supplier-page-actions .supplier-print-btn svg {
+  width: 16px !important;
+  height: 16px !important;
+
+  flex: 0 0 auto !important;
+}
+
+/* Create Supplier button */
+#root .retail-shell .supplier-page-actions .supplier-create-btn {
+  width: fit-content !important;
+  min-width: 0 !important;
+  max-width: none !important;
+
+  height: 38px !important;
+  min-height: 38px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+
+  flex: 0 0 auto !important;
+
+  padding: 0 15px !important;
+
+  white-space: nowrap !important;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  #root .retail-shell .supplier-page-actions {
+    width: 100% !important;
+  }
+
+  #root .retail-shell .supplier-page-actions .supplier-print-btn,
+  #root .retail-shell .supplier-page-actions .supplier-create-btn {
+    flex: 1 1 0 !important;
+    width: auto !important;
+  }
+}
+
+/* Compact supplier account modal adjustments */
+#root .retail-shell .supplier-form-v2 {
+  width: clamp(320px, 40vw, 560px) !important;
+  max-height: min(820px, calc(100dvh - 18px)) !important;
+}
+
+#root .retail-shell .supplier-form-v2-header {
+  padding: 13px 18px 11px !important;
+}
+
+#root .retail-shell .supplier-form-v2-header h2 {
+  font-size: 16px !important;
+}
+
+#root .retail-shell .supplier-form-v2-header p {
+  margin-top: 3px !important;
+  font-size: 9px !important;
+}
+
+#root .retail-shell .supplier-form-v2-body {
+  gap: 9px !important;
+  padding: 11px 18px 10px !important;
+  overflow-y: visible !important;
+}
+
+#root .retail-shell .supplier-type-section {
+  padding-bottom: 9px !important;
+}
+
+#root .retail-shell .supplier-form-v2-tabs {
+  gap: 5px !important;
+  padding: 3px !important;
+}
+
+#root .retail-shell .supplier-form-v2-tabs button,
+#root .retail-shell .supplier-form-v2-tabs button:hover,
+#root .retail-shell .supplier-form-v2-tabs button:focus,
+#root .retail-shell .supplier-form-v2-tabs button:active {
+  height: 31px !important;
+  min-height: 31px !important;
+  padding: 0 8px !important;
+  font-size: 11px !important;
+}
+
+#root .retail-shell .supplier-form-v2-hint {
+  font-size: 9px !important;
+  line-height: 1.25 !important;
+}
+
+#root .retail-shell .supplier-form-v2-grid {
+  gap: 8px !important;
+}
+
+#root .retail-shell .supplier-form-v2-field {
+  gap: 4px !important;
+}
+
+#root .retail-shell .supplier-form-v2-field > span {
+  font-size: 10px !important;
+}
+
+#root .retail-shell .supplier-form-v2-field input,
+#root .retail-shell .supplier-form-v2-field .smooth-select-btn,
+#root .retail-shell .supplier-compact-input {
+  height: 34px !important;
+  min-height: 34px !important;
+  border-radius: 8px !important;
+  font-size: 11px !important;
+}
+
+#root .retail-shell .supplier-form-v2-field textarea {
+  min-height: 45px !important;
+  max-height: 62px !important;
+  padding: 8px 10px !important;
+  font-size: 11px !important;
+  resize: none !important;
+}
+
+#root .retail-shell .supplier-form-v2-items {
+  gap: 7px !important;
+  padding: 9px !important;
+}
+
+#root .retail-shell .supplier-form-v2-items-head > div {
+  gap: 2px !important;
+}
+
+#root .retail-shell .supplier-form-v2-items-head strong {
+  font-size: 10px !important;
+}
+
+#root .retail-shell .supplier-form-v2-items-head small {
+  font-size: 8px !important;
+  line-height: 1.25 !important;
+}
+
+#root .retail-shell .supplier-percent-shell {
+  height: 34px !important;
+  min-height: 34px !important;
+}
+
+#root .retail-shell .supplier-percent-input,
+#root .retail-shell .supplier-percent-input:focus {
+  height: auto !important;
+  min-height: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+#root .retail-shell .supplier-form-v2-footer {
+  padding: 9px 18px !important;
+}
+
+#root .retail-shell .supplier-form-v2-footer button {
+  height: 34px !important;
+  min-height: 34px !important;
+  border-radius: 8px !important;
+  font-size: 11px !important;
+}
+
+@media (max-width: 640px) {
+  #root .retail-shell .supplier-form-v2-body {
+    overflow-y: auto !important;
+  }
+}

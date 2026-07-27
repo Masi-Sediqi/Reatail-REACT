@@ -1898,10 +1898,10 @@
 
   padding: 20px !important;
 
-  background: rgba(15, 23, 42, 0.58) !important;
+  background: rgba(15, 23, 42, 0.48) !important;
 
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .settings-user-modal {
@@ -1921,21 +1921,20 @@
   background: var(--panel-bg);
   color: var(--text);
 
-  box-shadow:
-    0 28px 80px rgba(15, 23, 42, 0.32);
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.22);
 
-  animation: settingsUserModalIn 180ms ease both;
+  animation: settingsUserModalIn 90ms ease both;
 }
 
 @keyframes settingsUserModalIn {
   from {
     opacity: 0;
-    transform: translateY(8px) scale(0.985);
+    transform: translateY(4px);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 .settings-user-modal-header {
@@ -4397,6 +4396,141 @@ p {
   background: rgba(0, 0, 0, 0.78) !important;
 }
 
+.clear-data-modal-backdrop {
+  z-index: 5000;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(0, 0, 0, 0.78) !important;
+}
+
+.clear-data-modal {
+  position: relative;
+  width: min(430px, calc(100vw - 28px));
+  display: grid;
+  gap: 16px;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-bg);
+  color: var(--text);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
+  animation: modalZoomIn 160ms ease both;
+}
+
+.clear-data-modal-close,
+.clear-data-modal-close:hover {
+  position: absolute !important;
+  top: 14px !important;
+  inset-inline-end: 14px !important;
+  width: 30px !important;
+  min-width: 30px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--muted) !important;
+  box-shadow: none !important;
+}
+
+.clear-data-modal-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  padding-inline-end: 34px;
+}
+
+.clear-data-modal-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 10px;
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.clear-data-modal-head h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.clear-data-modal-head p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.clear-data-modal-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, #ef4444 34%, var(--border));
+  border-radius: 8px;
+  background: color-mix(in srgb, #ef4444 7%, var(--panel-bg));
+}
+
+.clear-data-modal-list span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: var(--panel-bg);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.clear-data-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.clear-data-modal-actions button,
+.clear-data-modal-actions button:hover {
+  min-width: 92px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  padding: 0 14px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+  font-size: 12px !important;
+  font-weight: 850 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.clear-data-modal-actions .danger,
+.clear-data-modal-actions .danger:hover {
+  border-color: #dc2626 !important;
+  background: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+.retail-shell.theme-dark .clear-data-modal-icon {
+  background: rgba(239, 68, 68, 0.18);
+  color: #f87171;
+}
+
+.retail-shell.theme-dark .clear-data-modal-list {
+  background: rgba(239, 68, 68, 0.1);
+}
+
 .custom-field-modal {
   width: min(346px, calc(100vw - 28px));
   display: grid;
@@ -5676,5 +5810,543 @@ strong svg {
 
   .license-overview-grid {
     grid-template-columns: 1fr;
+  }
+}
+/* =====================================================
+   COMPANY LOGO ACTIONS
+===================================================== */
+
+#root .retail-shell .company-logo-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+
+  width: 100% !important;
+
+  margin: 0 !important;
+}
+
+#root .retail-shell .company-logo-buttons {
+  display: inline-flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 7px !important;
+
+  width: auto !important;
+  min-width: 0 !important;
+}
+
+/* Shared exact-fit style */
+#root .retail-shell .company-logo-upload-btn,
+#root .retail-shell .company-logo-remove-btn {
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: max-content !important;
+
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+
+  flex: 0 0 auto !important;
+
+  margin: 0 !important;
+  padding: 0 11px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  font-family: inherit !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+
+  white-space: nowrap !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+
+  cursor: pointer !important;
+
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease,
+    color 140ms ease !important;
+}
+
+/* Upload button */
+#root .retail-shell .company-logo-upload-btn:hover {
+  border-color: var(--accent) !important;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--accent) 7%,
+      var(--panel-bg)
+    ) !important;
+
+  color: var(--accent) !important;
+}
+
+/* Remove button */
+#root .retail-shell .company-logo-remove-btn {
+  border-color:
+    color-mix(
+      in srgb,
+      #ef4444 22%,
+      var(--border)
+    ) !important;
+
+  color: #dc2626 !important;
+}
+
+#root .retail-shell .company-logo-remove-btn:hover {
+  border-color: #ef4444 !important;
+
+  background:
+    color-mix(
+      in srgb,
+      #ef4444 7%,
+      var(--panel-bg)
+    ) !important;
+
+  color: #dc2626 !important;
+}
+
+/* Icons */
+#root .retail-shell .company-logo-upload-btn svg,
+#root .retail-shell .company-logo-remove-btn svg {
+  position: static !important;
+
+  width: 15px !important;
+  min-width: 15px !important;
+  max-width: 15px !important;
+
+  height: 15px !important;
+  min-height: 15px !important;
+  max-height: 15px !important;
+
+  display: block !important;
+  flex: 0 0 15px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: currentColor !important;
+  stroke: currentColor !important;
+  stroke-width: 1.9 !important;
+
+  transform: none !important;
+  pointer-events: none !important;
+}
+
+/* Button text */
+#root .retail-shell .company-logo-upload-btn > span,
+#root .retail-shell .company-logo-remove-btn > span {
+  display: inline-flex !important;
+  align-items: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: inherit !important;
+
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  line-height: 1 !important;
+
+  white-space: nowrap !important;
+}
+
+/* Hide file input */
+#root .retail-shell .company-logo-upload-btn input {
+  display: none !important;
+}
+
+/* Logo preview */
+#root .retail-shell .company-logo-actions .logo-preview {
+  width: 48px !important;
+  min-width: 48px !important;
+  max-width: 48px !important;
+
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+
+  flex: 0 0 48px !important;
+
+  border-radius: 8px !important;
+}
+
+#root .retail-shell .company-logo-actions .logo-preview img {
+  width: 100% !important;
+  height: 100% !important;
+
+  display: block !important;
+
+  padding: 3px !important;
+
+  object-fit: contain !important;
+  object-position: center !important;
+}
+
+/* Dark mode */
+#root
+.retail-shell.theme-dark
+.company-logo-upload-btn {
+  border-color: #334155 !important;
+  background: #111827 !important;
+  color: #e5e7eb !important;
+}
+
+#root
+.retail-shell.theme-dark
+.company-logo-remove-btn {
+  border-color: rgba(239, 68, 68, 0.35) !important;
+  background: #111827 !important;
+  color: #f87171 !important;
+}
+
+/* Mobile */
+@media (max-width: 520px) {
+  #root .retail-shell .company-logo-actions {
+    align-items: flex-start !important;
+  }
+
+  #root .retail-shell .company-logo-buttons {
+    display: flex !important;
+  }
+
+  #root .retail-shell .company-logo-upload-btn,
+  #root .retail-shell .company-logo-remove-btn {
+    height: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
+
+    padding-inline: 9px !important;
+
+    font-size: 10px !important;
+  }
+}
+/* =====================================================
+   SETTINGS TABS — SIMPLE, CENTERED, BORDERLESS
+===================================================== */
+
+#root .retail-shell .settings-content .settings-tabs {
+  position: relative !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-wrap: nowrap !important;
+
+  gap: 5px !important;
+
+  margin: 0 0 18px !important;
+  padding: 0 !important;
+
+  border: 0 !important;
+  border-radius: 0 !important;
+
+  background: transparent !important;
+
+  box-shadow: none !important;
+
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+
+  scrollbar-width: none !important;
+}
+
+#root
+.retail-shell
+.settings-content
+.settings-tabs::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* All tab buttons */
+#root
+.retail-shell
+.settings-content
+.settings-tabs
+> button,
+#root
+.retail-shell
+.settings-content
+.settings-tabs
+> button:hover,
+#root
+.retail-shell
+.settings-content
+.settings-tabs
+> button:focus,
+#root
+.retail-shell
+.settings-content
+.settings-tabs
+> button:active {
+  position: relative !important;
+
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: max-content !important;
+
+  height: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: 5px !important;
+
+  flex: 0 0 auto !important;
+
+  margin: 0 !important;
+  padding: 0 9px !important;
+
+  border: 0 !important;
+  border-radius: 7px !important;
+
+  background: transparent !important;
+  color: var(--muted) !important;
+
+  font-family: inherit !important;
+  font-size: 11px !important;
+  font-weight: 650 !important;
+  line-height: 1 !important;
+
+  white-space: nowrap !important;
+
+  outline: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+
+  cursor: pointer !important;
+
+  transition:
+    background-color 140ms ease,
+    color 140ms ease !important;
+}
+
+/* Hover */
+#root
+.retail-shell
+.settings-content
+.settings-tabs
+> button:hover {
+  background:
+    color-mix(
+      in srgb,
+      var(--panel-soft) 85%,
+      transparent
+    ) !important;
+
+  color: var(--text) !important;
+}
+
+/* Active tab */
+#root
+.retail-shell
+.settings-content
+.settings-tabs
+> button.active {
+  border: 0 !important;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--accent) 9%,
+      var(--panel-bg)
+    ) !important;
+
+  color: var(--accent) !important;
+
+  box-shadow: none !important;
+}
+
+/* Small line below active tab */
+#root
+.retail-shell
+.settings-content
+.settings-tabs
+> button.active::after {
+  content: '';
+
+  position: absolute;
+
+  inset-inline: 9px;
+  bottom: 0;
+
+  height: 2px;
+
+  border-radius: 999px;
+
+  background: var(--accent);
+}
+
+/* Icons */
+#root
+.retail-shell
+.settings-content
+.settings-tabs
+> button
+> svg {
+  position: static !important;
+
+  width: 14px !important;
+  min-width: 14px !important;
+  max-width: 14px !important;
+
+  height: 14px !important;
+  min-height: 14px !important;
+  max-height: 14px !important;
+
+  display: block !important;
+  flex: 0 0 14px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: currentColor !important;
+  stroke: currentColor !important;
+  stroke-width: 1.9 !important;
+
+  opacity: 1 !important;
+
+  pointer-events: none !important;
+}
+
+/* Text */
+#root
+.retail-shell
+.settings-content
+.settings-tabs
+> button
+> span {
+  width: auto !important;
+  min-width: 0 !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: inherit !important;
+
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  line-height: 1 !important;
+
+  white-space: nowrap !important;
+}
+
+/* Keyboard focus */
+#root
+.retail-shell
+.settings-content
+.settings-tabs
+> button:focus-visible {
+  outline: 2px solid
+    color-mix(
+      in srgb,
+      var(--accent) 40%,
+      transparent
+    ) !important;
+
+  outline-offset: 2px !important;
+}
+
+/* Dark mode */
+#root
+.retail-shell.theme-dark
+.settings-content
+.settings-tabs
+> button:hover {
+  background: #172033 !important;
+  color: #ffffff !important;
+}
+
+#root
+.retail-shell.theme-dark
+.settings-content
+.settings-tabs
+> button.active {
+  background:
+    color-mix(
+      in srgb,
+      var(--accent) 13%,
+      #111827
+    ) !important;
+
+  color: var(--accent) !important;
+}
+
+/* RTL */
+[dir="rtl"]
+#root
+.retail-shell
+.settings-content
+.settings-tabs {
+  direction: rtl !important;
+}
+
+/* Tablet */
+@media (max-width: 1100px) {
+  #root .retail-shell .settings-content .settings-tabs {
+    justify-content: flex-start !important;
+  }
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+  #root .retail-shell .settings-content .settings-tabs {
+    justify-content: flex-start !important;
+
+    gap: 4px !important;
+
+    margin-inline: 0 !important;
+    padding: 0 2px 4px !important;
+  }
+
+  #root
+  .retail-shell
+  .settings-content
+  .settings-tabs
+  > button {
+    height: 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
+
+    padding-inline: 8px !important;
+
+    font-size: 10px !important;
+  }
+
+  #root
+  .retail-shell
+  .settings-content
+  .settings-tabs
+  > button
+  > svg {
+    width: 13px !important;
+    min-width: 13px !important;
+    height: 13px !important;
+    min-height: 13px !important;
+
+    flex-basis: 13px !important;
   }
 }

@@ -1026,3 +1026,106 @@
     flex: 1;
   }
 }
+/* =====================================================
+   SALES PAGE PRINT BUTTON
+===================================================== */
+
+#root .retail-shell .sales-page-actions {
+  width: auto !important;
+  min-width: 0 !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+
+  gap: 8px !important;
+}
+
+/* Exact fit button */
+#root .retail-shell .sales-print-report-btn,
+#root .retail-shell .sales-print-report-btn:hover,
+#root .retail-shell .sales-print-report-btn:focus,
+#root .retail-shell .sales-print-report-btn:active {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: max-content !important;
+
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+
+  flex: 0 0 auto !important;
+
+  margin: 0 !important;
+  padding: 0 13px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 9px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+
+  white-space: nowrap !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+
+  cursor: pointer !important;
+}
+
+#root .retail-shell .sales-print-report-btn:hover {
+  border-color: var(--accent) !important;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--accent) 7%,
+      var(--panel-bg)
+    ) !important;
+
+  color: var(--accent) !important;
+}
+
+/* Printer icon */
+#root .retail-shell .sales-print-report-btn svg {
+  width: 16px !important;
+  min-width: 16px !important;
+  max-width: 16px !important;
+
+  height: 16px !important;
+  min-height: 16px !important;
+  max-height: 16px !important;
+
+  display: block !important;
+  flex: 0 0 16px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  stroke: currentColor !important;
+  stroke-width: 1.9 !important;
+
+  transform: none !important;
+  pointer-events: none !important;
+}
+
+#root .retail-shell .sales-print-report-btn span {
+  display: inline-flex !important;
+  align-items: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}

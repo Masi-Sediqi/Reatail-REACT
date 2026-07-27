@@ -1,12 +1,16 @@
 const STORAGE_API = import.meta.env.VITE_STORAGE_API || 'http://127.0.0.1:4178/api/storage'
 
 export const loadJsonStorage = async () => {
+  if (window.retailDesktop?.loadStorage) return window.retailDesktop.loadStorage()
+
   const response = await fetch(STORAGE_API)
   if (!response.ok) throw new Error('Unable to load JSON storage')
   return response.json()
 }
 
 export const saveJsonStorage = async (snapshot) => {
+  if (window.retailDesktop?.saveStorage) return window.retailDesktop.saveStorage(snapshot)
+
   const response = await fetch(STORAGE_API, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

@@ -12,11 +12,12 @@ import {
   Share2,
   ShoppingCart,
   Trash2,
+  BarcodeScanner,
   UserPlus,
   X,
 } from '../components/Icons.jsx'
 import CustomSelect from '../components/CustomSelect.jsx'
-import { formatBusinessCurrencyAmount } from '../utils/currencyExchange.js'
+import { formatCurrencyAmount } from '../utils/currencyExchange.js'
 import './Billing.css'
 
 const currencyOptions = [
@@ -45,7 +46,7 @@ const parseMoney = (value) => Number.parseFloat(value || 0) || 0
 const getCurrency = (code) => currencyOptions.find((item) => item.code === code) ?? currencyOptions[0]
 
 const formatMoney = (value, currencyCode) => {
-  return formatBusinessCurrencyAmount(value, getCurrency(currencyCode).code)
+  return formatCurrencyAmount(value, getCurrency(currencyCode).code)
 }
 
 const getGregorianLabel = (isoDate) => new Date(`${isoDate}T12:00:00`).toLocaleDateString('en-US', {
@@ -320,12 +321,14 @@ function CustomerSearchSelect({ customers, onChange, t, value }) {
     .slice(0, 8)
 
   useEffect(() => {
+    if (!open) return undefined
+
     const close = (event) => {
       if (!rootRef.current?.contains(event.target)) setOpen(false)
     }
-    document.addEventListener('mousedown', close)
-    return () => document.removeEventListener('mousedown', close)
-  }, [])
+    document.addEventListener('pointerdown', close)
+    return () => document.removeEventListener('pointerdown', close)
+  }, [open])
 
   return (
     <div className="customer-search-select" ref={rootRef}>
@@ -343,6 +346,17 @@ function CustomerSearchSelect({ customers, onChange, t, value }) {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
             />
+            {query && (
+              <button
+                className="customer-search-clear"
+                type="button"
+                aria-label={t.cancelSearch ?? 'Cancel search'}
+                title={t.cancelSearch ?? 'Cancel search'}
+                onClick={() => setQuery('')}
+              >
+                <X size={14} />
+              </button>
+            )}
           </div>
           <button
             className={!value ? 'selected' : ''}
@@ -400,6 +414,7 @@ function BillingPage({
   const [dateMode, setDateMode] = useState('greg')
   const [billDate, setBillDate] = useState(formatDateInput(new Date()))
   const [paymentMethod, setPaymentMethod] = useState('cash')
+  const [paymentStatusMode, setPaymentStatusMode] = useState('paid')
   const [paidAmountInput, setPaidAmountInput] = useState('')
   const [paymentError, setPaymentError] = useState('')
   const [scannerEnabled, setScannerEnabled] = useState(true)
@@ -407,6 +422,10 @@ function BillingPage({
   const [previewInvoice, setPreviewInvoice] = useState(null)
   const isEditing = Boolean(editingSale)
   const paymentMethodOptions = useMemo(() => defaultPaymentMethods.map((method) => ({ value: method, label: t[method] })), [t])
+  const paymentStatusOptions = useMemo(() => [
+    { value: 'paid', label: t.paid ?? 'Paid' },
+    { value: 'loan', label: t.loanPartially ?? `${t.loan ?? 'Loan'} / ${t.partially ?? 'Partially'}` },
+  ], [t])
 
   useEffect(() => {
     if (!editingSale) return
@@ -427,6 +446,7 @@ function BillingPage({
     setDiscount(String(editingSale.discount ?? 0))
     setBillDate(editingSale.date || formatDateInput(new Date()))
     setPaymentMethod(editingSale.paymentMethod || 'cash')
+    setPaymentStatusMode(editingSale.paymentStatus === 'paid' ? 'paid' : 'loan')
     setPaidAmountInput(String(editingSale.paidAmount ?? ''))
     setPaymentError('')
     setSearchTerm('')
@@ -450,6 +470,8 @@ function BillingPage({
       onNotify?.(t.outOfStock ?? 'Out of stock')
       return
     }
+    const productCurrency = product.currency || 'AFN'
+    if (items.length === 0) setCurrency(productCurrency)
     setItems((current) => {
       const exists = current.find((item) => item.productId === product.id)
       if (exists) {
@@ -466,6 +488,7 @@ function BillingPage({
           name: product.name || t.product,
           code: product.code || product.barcode || '-',
           unit: product.unit || 'pcs',
+          currency: productCurrency,
           price: parseMoney(product.selling),
           discount: 0,
           quantity: 1,
@@ -507,14 +530,24 @@ function BillingPage({
   const billDiscount = discountMode === 'percent' ? subtotal * (parseMoney(discount) / 100) : parseMoney(discount)
   const total = Math.max(0, subtotal - billDiscount)
   const paidAmountValue = parseMoney(paidAmountInput)
-  const paymentTooHigh = paidAmountValue > total
-  const balanceDue = Math.max(0, total - Math.min(paidAmountValue, total))
-  const autoPaymentStatus = balanceDue <= 0 ? 'paid' : 'loan'
+  const isPaidInFull = paymentStatusMode === 'paid'
+  const effectivePaidAmount = isPaidInFull ? total : Math.min(paidAmountValue, total)
+  const paymentTooHigh = !isPaidInFull && paidAmountValue > total
+  const balanceDue = isPaidInFull ? 0 : Math.max(0, total - effectivePaidAmount)
+  const autoPaymentStatus = isPaidInFull ? 'paid' : 'loan'
+
+  const changePaymentStatus = (value) => {
+    setPaymentStatusMode(value)
+    setPaymentError('')
+    if (value === 'loan') {
+      setPaidAmountInput((current) => current === '' ? '0' : current)
+    }
+  }
 
   const createInvoice = () => {
     const selectedCustomer = customers.find((customer) => customer.id === customerId)
     const invoiceNumber = editingSale?.invoiceNumber || `INV-${billDate.replaceAll('-', '').slice(2)}-${String(sales.length + 1).padStart(3, '0')}`
-    const paidAmount = Math.min(paidAmountValue, total)
+    const paidAmount = effectivePaidAmount
     const balance = Math.max(0, total - paidAmount)
     return {
       id: editingSale?.id || crypto.randomUUID(),
@@ -535,7 +568,7 @@ function BillingPage({
       paidAmount,
       balance,
       paymentMethod,
-      paymentStatus: balance <= 0 ? 'paid' : 'loan',
+      paymentStatus: isPaidInFull ? 'paid' : 'loan',
       paymentHistory: editingSale?.paymentHistory || [],
       createdAt: editingSale?.createdAt || new Date().toISOString(),
       updatedAt: isEditing ? new Date().toISOString() : undefined,
@@ -550,6 +583,11 @@ function BillingPage({
     if (paymentTooHigh) {
       setPaymentError(t.paidAmountCannotExceedTotal)
       onNotify?.(t.paidAmountCannotExceedTotal)
+      return
+    }
+    const overStockItem = items.find((item) => parseMoney(item.quantity) > parseMoney(item.stock))
+    if (overStockItem) {
+      onNotify?.(t.insufficientStock)
       return
     }
     setPaymentError('')
@@ -581,6 +619,7 @@ function BillingPage({
     setItems([])
     setDiscount('0')
     setPaidAmountInput('')
+    setPaymentStatusMode('paid')
     setWalkInName('')
     setCustomerId('')
     onEditComplete?.()
@@ -593,17 +632,53 @@ function BillingPage({
     <div className="billing-content">
       <div className="entity-heading billing-heading">
         <div><h1>{isEditing ? t.editBill : t.billing}</h1><p>{isEditing ? t.modifyExistingInvoice : t.billingSubtitle}</p></div>
-        <div className="entity-actions">
-          {isEditing && <button className="cancel-edit-btn" type="button" onClick={onCancelEdit}>{t.cancel}</button>}
-          <button
-            className={scannerEnabled ? 'scanner-active-btn' : 'scanner-active-btn scanner-off'}
-            type="button"
-            onClick={() => setScannerEnabled((current) => !current)}
-          >
-            <ReceiptText size={16} /> {scannerEnabled ? (t.scannerActive ?? 'Scanner Active') : (t.scannerOff ?? 'Scanner Off')}
-          </button>
-          <button className="camera-icon-btn" type="button" onClick={() => scannerEnabled ? setScannerOpen(true) : onNotify?.(t.scannerOff ?? 'Scanner Off')} aria-label={t.barcodeScanner}><Camera size={18} /></button>
-        </div>
+        <div className="entity-actions billing-scanner-actions">
+  {isEditing && (
+    <button
+      className="cancel-edit-btn"
+      type="button"
+      onClick={onCancelEdit}
+    >
+      {t.cancel}
+    </button>
+  )}
+
+  <button
+    className={[
+      'scanner-status-btn',
+      scannerEnabled ? 'is-active' : 'is-off',
+    ].join(' ')}
+    type="button"
+    onClick={() =>
+      setScannerEnabled((current) => !current)
+    }
+    aria-pressed={scannerEnabled}
+  >
+    <BarcodeScanner size={16} />
+
+    <span>
+      {scannerEnabled
+        ? (t.scannerActive ?? 'Scanner Active')
+        : (t.scannerOff ?? 'Scanner Off')}
+    </span>
+  </button>
+
+  <button
+    className="scanner-camera-btn"
+    type="button"
+    onClick={() =>
+      scannerEnabled
+        ? setScannerOpen(true)
+        : onNotify?.(
+            t.scannerOff ?? 'Scanner Off',
+          )
+    }
+    aria-label={t.barcodeScanner}
+    title={t.barcodeScanner}
+  >
+    <Camera size={17} />
+  </button>
+</div>
       </div>
 
       <div className="billing-layout">
@@ -624,7 +699,7 @@ function BillingPage({
                   return (
                   <button className={isUnavailable ? 'out-of-stock-result' : ''} disabled={isUnavailable} key={product.id} type="button" onClick={() => addProductToBill(product.barcode || product.code || product.name)}>
                     <strong>{product.name || t.product}</strong>
-                    <span>{product.code || '-'} · {product.barcode || '-'} · {formatMoney(product.selling, currency)}</span>
+                    <span>{product.code || '-'} · {product.barcode || '-'} · {formatMoney(product.selling, product.currency || 'AFN')}</span>
                     <small>{stock} {product.unit || 'pcs'} {isUnavailable ? (t.outOfStock ?? 'Out of stock') : (t.available ?? 'available')}</small>
                   </button>
                   )
@@ -633,31 +708,166 @@ function BillingPage({
             )}
           </div>
 
-          <div className="billing-panel bill-items-panel">
+       <div className="billing-panel bill-items-panel">
             <h2>{t.billItems}</h2>
-            {items.length === 0 ? (
-              <div className="empty-bill">
-                <ShoppingCart size={32} />
-                <strong>{t.noItemsAdded}</strong>
-                <span>{t.scanOrSearch}</span>
-              </div>
-            ) : items.map((item) => (
-              <div className="bill-item" key={item.productId}>
-                <div className="bill-item-name">
-                  <strong>{item.name}</strong>
-                  <span>{item.quantity} × {formatMoney(item.price, currency)} · {item.code}</span>
-                </div>
-                <label><small>{t.price}</small><input type="number" value={item.price} min="0" onChange={(event) => updateItem(item.productId, { price: parseMoney(event.target.value) })} /></label>
-                <label><small>{t.discount}</small><input type="number" value={item.discount} min="0" onChange={(event) => updateItem(item.productId, { discount: parseMoney(event.target.value) })} /></label>
-                <div className="qty-stepper">
-                  <button type="button" onClick={() => updateItem(item.productId, { quantity: Math.max(1, item.quantity - 1) })}>−</button>
-                  <input type="number" value={item.quantity} min="1" max={item.stock || undefined} onChange={(event) => updateItem(item.productId, { quantity: event.target.value })} />
-                  <button type="button" onClick={() => updateItem(item.productId, { quantity: item.stock ? Math.min(item.stock, item.quantity + 1) : item.quantity + 1 })}>+</button>
-                </div>
-                <strong className="line-total">{formatMoney(Math.max(0, item.price * item.quantity - parseMoney(item.discount)), currency)}</strong>
-                <button className="delete-line-btn" type="button" onClick={() => removeItem(item.productId)} aria-label={t.delete}><Trash2 size={16} /></button>
-              </div>
-            ))}
+          {items.length === 0 ? (
+  <div className="empty-bill">
+    <ShoppingCart size={32} />
+
+    <strong>{t.noItemsAdded}</strong>
+
+    <span>{t.scanOrSearch}</span>
+  </div>
+) : (
+  <div className="bill-items-list">
+    {items.map((item) => {
+      const itemTotal = Math.max(
+        0,
+        item.price * item.quantity -
+          parseMoney(item.discount),
+      )
+
+      return (
+        <article
+          className="bill-item-card"
+          key={item.productId}
+        >
+          <div className="bill-item-product">
+            <span className="bill-item-product-icon">
+              <ReceiptText size={16} />
+            </span>
+
+            <div className="bill-item-product-info">
+              <strong>{item.name}</strong>
+
+              <span>
+                {item.code || '-'}
+                {' · '}
+                {item.unit || 'pcs'}
+                {' · '}
+                {t.stock ?? 'Stock'}: {item.stock}
+              </span>
+            </div>
+          </div>
+
+          <label className="bill-item-field">
+            <span>
+              {t.sellingPrice ??
+                t.salePrice ??
+                'Sale Price'}
+            </span>
+
+            <input
+              type="number"
+              min="0"
+              value={item.price}
+              onChange={(event) =>
+                updateItem(item.productId, {
+                  price: parseMoney(
+                    event.target.value,
+                  ),
+                })
+              }
+            />
+          </label>
+
+          <label className="bill-item-field">
+            <span>{t.discount}</span>
+
+            <input
+              type="number"
+              min="0"
+              value={item.discount}
+              onChange={(event) =>
+                updateItem(item.productId, {
+                  discount: parseMoney(
+                    event.target.value,
+                  ),
+                })
+              }
+            />
+          </label>
+
+          <div className="bill-item-quantity">
+            <span>{t.quantity ?? 'Quantity'}</span>
+
+            <div className="bill-item-stepper">
+              <button
+                type="button"
+                onClick={() =>
+                  updateItem(item.productId, {
+                    quantity: Math.max(
+                      1,
+                      item.quantity - 1,
+                    ),
+                  })
+                }
+                aria-label={
+                  t.decreaseQuantity ??
+                  'Decrease quantity'
+                }
+              >
+                −
+              </button>
+
+              <input
+                type="number"
+                min="1"
+                max={item.stock || undefined}
+                value={item.quantity}
+                onChange={(event) =>
+                  updateItem(item.productId, {
+                    quantity: event.target.value,
+                  })
+                }
+              />
+
+              <button
+                type="button"
+                onClick={() =>
+                  updateItem(item.productId, {
+                    quantity: item.stock
+                      ? Math.min(
+                          item.stock,
+                          item.quantity + 1,
+                        )
+                      : item.quantity + 1,
+                  })
+                }
+                aria-label={
+                  t.increaseQuantity ??
+                  'Increase quantity'
+                }
+              >
+                +
+              </button>
+            </div>
+          </div>
+
+          <div className="bill-item-total">
+            <span>{t.total}</span>
+
+            <strong>
+              {formatMoney(itemTotal, currency)}
+            </strong>
+          </div>
+
+          <button
+            className="bill-item-delete"
+            type="button"
+            onClick={() =>
+              removeItem(item.productId)
+            }
+            aria-label={t.delete}
+            title={t.delete}
+          >
+            <Trash2 size={15} />
+          </button>
+        </article>
+      )
+    })}
+  </div>
+)}
           </div>
         </section>
 
@@ -701,33 +911,45 @@ function BillingPage({
               <CustomSelect ariaLabel={t.paymentMethod} options={paymentMethodOptions} value={paymentMethod} onChange={setPaymentMethod} />
             </label>
             <label className="billing-field">
-              <span>{t.paidAmount}</span>
-              <input
-                className={paymentTooHigh || paymentError ? 'field-invalid' : ''}
-                max={total}
-                min="0"
-                type="number"
-                value={paidAmountInput}
-                onChange={(event) => {
-                  setPaidAmountInput(event.target.value)
-                  setPaymentError('')
-                }}
-                placeholder="0"
-              />
-              <small className={paymentTooHigh || paymentError ? 'payment-error' : ''}>
-                {paymentTooHigh || paymentError ? t.paidAmountCannotExceedTotal : `${t.remaining}: ${formatMoney(balanceDue, currency)} · ${autoPaymentStatus === 'paid' ? t.paid : t.loan}`}
-              </small>
+              <span>{t.paymentStatus ?? 'Payment Status'}</span>
+              <CustomSelect ariaLabel={t.paymentStatus ?? 'Payment Status'} options={paymentStatusOptions} value={paymentStatusMode} onChange={changePaymentStatus} />
             </label>
+            {isPaidInFull ? (
+              <div className="payment-status-summary paid">
+                <span>{t.paidAmount ?? 'Paid Amount'}</span>
+                <strong>{formatMoney(total, currency)}</strong>
+                <small>{t.paidInFullHint ?? 'The full bill amount will be marked as paid.'}</small>
+              </div>
+            ) : (
+              <label className="billing-field">
+                <span>{t.paidAmount}</span>
+                <input
+                  className={paymentTooHigh || paymentError ? 'field-invalid' : ''}
+                  max={total}
+                  min="0"
+                  type="number"
+                  value={paidAmountInput}
+                  onChange={(event) => {
+                    setPaidAmountInput(event.target.value)
+                    setPaymentError('')
+                  }}
+                  placeholder="0"
+                />
+                <small className={paymentTooHigh || paymentError ? 'payment-error' : ''}>
+                  {paymentTooHigh || paymentError ? t.paidAmountCannotExceedTotal : `${t.remaining}: ${formatMoney(balanceDue, currency)} · ${autoPaymentStatus === 'paid' ? t.paid : t.loan}`}
+                </small>
+              </label>
+            )}
           </div>
 
           <div className="billing-panel totals-card">
             <div><span>{t.subtotal}</span><strong>{formatMoney(subtotal, currency)}</strong></div>
             <div><span>{t.discount}</span><strong>{formatMoney(billDiscount, currency)}</strong></div>
-            {paidAmountInput !== '' && balanceDue > 0 && <div className="remaining-total"><span>{t.remaining}</span><strong>{formatMoney(balanceDue, currency)}</strong></div>}
+            {!isPaidInFull && paidAmountInput !== '' && balanceDue > 0 && <div className="remaining-total"><span>{t.remaining}</span><strong>{formatMoney(balanceDue, currency)}</strong></div>}
             <div className="grand-total"><span>{t.total}</span><strong>{formatMoney(total, currency)}</strong></div>
             <div className="billing-actions">
-              <button type="button" onClick={() => saveInvoice(false)}>{isEditing ? t.updateBill : t.saveBill}</button>
-              <button className="primary-btn" type="button" onClick={() => saveInvoice(true)}>{isEditing ? t.updateAndPrint : t.saveAndPrint}</button>
+              <button className="inline-flex items-center justify-center gap-2" type="button" onClick={() => saveInvoice(false)}><ReceiptText size={16} /> {isEditing ? t.updateBill : t.saveBill}</button>
+              <button className="primary-btn inline-flex items-center justify-center gap-2" type="button" onClick={() => saveInvoice(true)}><Printer size={16} /> {isEditing ? t.updateAndPrint : t.saveAndPrint}</button>
             </div>
           </div>
         </aside>

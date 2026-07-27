@@ -1,7 +1,7 @@
 import CustomSelect from './CustomSelect.jsx'
 import './CustomFieldInputs.css'
 
-function CustomFieldInputs({ className = '', fields = [], onChange, submitted = false, title = 'CUSTOM FIELDS', values = {} }) {
+function CustomFieldInputs({ className = '', fields = [], onChange, requiredMessage = 'This field is required.', submitted = false, title = 'CUSTOM FIELDS', values = {} }) {
   if (!fields.length) return null
 
   return (
@@ -21,6 +21,7 @@ function CustomFieldInputs({ className = '', fields = [], onChange, submitted = 
             {field.type === 'dropdown' && dropdownOptions.length ? (
               <CustomSelect
                 ariaLabel={field.label}
+                buttonClassName={isInvalid ? 'field-invalid' : ''}
                 options={[{ value: '', label: field.placeholder || 'Select option' }, ...dropdownOptions]}
                 value={value}
                 onChange={(nextValue) => onChange(field.id, nextValue)}
@@ -34,6 +35,7 @@ function CustomFieldInputs({ className = '', fields = [], onChange, submitted = 
                 onChange={(event) => onChange(field.id, event.target.value)}
               />
             )}
+            {isInvalid && <small className="validation-error">{requiredMessage}</small>}
           </label>
         )
       })}

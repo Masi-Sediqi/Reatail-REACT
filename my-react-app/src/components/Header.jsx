@@ -4,7 +4,6 @@ import CustomSelect from './CustomSelect.jsx'
 import {
   Archive,
   Download,
-  History,
   Moon,
   Search,
   Sun,
@@ -552,6 +551,7 @@ function NotificationPanel({
 }
 
 function Header({
+  activePage = 'dashboard',
   baseCurrency = 'AFN',
   businessCurrencyFilter = 'all',
   exchangeCurrency = 'original',
@@ -702,6 +702,9 @@ function Header({
 
   const selectedBusinessCurrency = getCurrencyMeta(businessCurrencyFilter)
   const selectedExchangeCurrency = getCurrencyMeta(exchangeCurrency)
+  const visibleHeaderActions = headerActions.filter((action) => (
+    action.key !== 'sync' || activePage === 'dashboard'
+  ))
 
   const chooseBusinessCurrency = (currencyCode) => {
     onBusinessCurrencyFilterChange?.(currencyCode)
@@ -798,23 +801,101 @@ function Header({
     )
 
   return (
-    <header className="app-header">
-      <label className="search-shell" aria-label={t.search} onClick={() => setSearchOpen(true)}>
-        <SearchIcon size={22} />
-        <input
-          value={headerSearchQuery}
-          onClick={() => setSearchOpen(true)}
-          onFocus={() => setSearchOpen(true)}
-          onChange={(event) => {
-            setHeaderSearchQuery(event.target.value)
-            setSearchOpen(true)
-          }}
-          placeholder={t.searchEverythingPlaceholder ?? t.search}
-        />
-      </label>
+  <header
+  className="
+    app-header
+    sticky
+    top-0
+    z-40
+    w-full
+    min-w-0
+    border-b
+    border-slate-200
+    bg-white
+    px-2
+    py-1
+    text-slate-900
+    dark:border-slate-800
+    dark:bg-slate-950
+    dark:text-white
 
-      <div className="header-tools">
-        {headerActions.map((action) => {
+    md:top-2
+    md:mx-2
+    md:mt-2
+    md:w-[calc(100%-1rem)]
+    md:rounded-xl
+    md:border
+    md:px-3
+    md:py-1
+  "
+>
+  <div
+    className="
+      grid
+      h-9
+      w-full
+      min-w-0
+      items-center
+      grid-cols-8
+      gap-1
+      sm:flex
+      sm:gap-1.5
+    "
+  >
+    <button
+      type="button"
+      className="
+        search-shell
+        col-span-1
+        flex
+        h-8
+        min-w-0
+        items-center
+        justify-center
+        gap-2
+        overflow-hidden
+        rounded-lg
+        border-0
+        bg-transparent
+        px-0
+        text-start
+        text-slate-500
+        outline-none
+        transition-colors
+        hover:bg-slate-100
+        dark:text-slate-400
+        dark:hover:bg-slate-900/80
+        sm:flex-1
+        sm:justify-start
+        sm:px-2
+      "
+      aria-label={t.search}
+      onClick={() => setSearchOpen(true)}
+    >
+      <SearchIcon className="h-4 w-4 shrink-0" />
+
+      <span className="hidden min-w-0 flex-1 truncate text-xs sm:block">
+        {t.searchEverythingPlaceholder ?? t.search}
+      </span>
+    </button>
+
+    <div
+      className="
+  header-tools
+  col-span-7
+  grid
+  min-w-0
+  grid-cols-7
+  items-center
+  gap-2
+  sm:flex
+  sm:w-auto
+  sm:shrink-0
+  sm:justify-end
+  sm:gap-2
+"
+    >
+        {visibleHeaderActions.map((action) => {
           const isLanguage =
             action.key === 'language' ||
             action.action === 'language'
@@ -835,6 +916,9 @@ function Header({
             <div
               className={[
                 'tool-wrap',
+                'min-w-0',
+                'w-full',
+                'sm:w-auto',
                 `header-tool-${action.key}`,
                 isLanguage ? 'language-tool-wrap' : '',
                 isBusinessCurrency ? 'business-currency-wrap' : '',
@@ -847,15 +931,33 @@ function Header({
               <button
                 ref={isLanguage ? languageButtonRef : isBusinessCurrency ? businessCurrencyButtonRef : isExchangeCurrency ? exchangeCurrencyButtonRef : undefined}
                 className={[
-                  'icon-btn',
-                  action.key === 'notifications' ? 'notification-trigger' : '',
-                  isLanguage && languageOpen ? 'active' : '',
-                  isBusinessCurrency && businessCurrencyOpen ? 'active' : '',
-                  isExchangeCurrency && exchangeCurrencyOpen ? 'active' : '',
-                  isTheme ? 'theme-toggle-btn' : '',
-                ]
-                  .filter(Boolean)
-                  .join(' ')}
+  'icon-btn',
+  'header-action-btn',
+  isBusinessCurrency
+    ? 'header-currency-action'
+    : '',
+  isExchangeCurrency
+    ? 'header-exchange-action'
+    : '',
+  action.key === 'wallet'
+    ? 'header-wallet-action'
+    : '',
+  action.key === 'notifications'
+    ? 'notification-trigger'
+    : '',
+  isLanguage && languageOpen
+    ? 'active'
+    : '',
+  isBusinessCurrency && businessCurrencyOpen
+    ? 'active'
+    : '',
+  isExchangeCurrency && exchangeCurrencyOpen
+    ? 'active'
+    : '',
+  isTheme ? 'theme-toggle-btn' : '',
+]
+  .filter(Boolean)
+  .join(' ')}
                 type="button"
                 title={
                   isTheme
@@ -924,7 +1026,10 @@ function Header({
                   }
                 }}
               >
-                <ActionIcon size={20} />
+                <ActionIcon
+  className="header-action-icon"
+  size={19}
+/>
 
                 {isBusinessCurrency && (
                   <span className="pill-mini business-currency-pill">
@@ -1027,10 +1132,15 @@ function Header({
           )
         })}
 
-        <div className="account-wrap">
+        <div className="account-wrap min-w-0 w-full sm:w-auto">
           <button
             ref={accountButtonRef}
-            className={`avatar-btn ${accountOpen ? 'active' : ''}`}
+           className={[
+  'avatar-btn',
+  accountOpen ? 'active' : '',
+]
+  .filter(Boolean)
+  .join(' ')}
             type="button"
             aria-label={t.myAccount ?? 'My Account'}
             aria-haspopup="menu"
@@ -1123,10 +1233,10 @@ function Header({
               title={
                 licenseStatus?.expired
                   ? 'License expired'
-                  : `Time remaining: ${licenseCountdown}`
+                  : `Project validity: ${licenseCountdown}`
               }
             >
-              <span>Time Out</span>
+              <span>Validity</span>
 
               <strong>
                 {licenseStatus?.expired
@@ -1143,7 +1253,9 @@ function Header({
               portalRoot,
             )}
         </div>
+             </div>
       </div>
+
       <span className="theme-state" aria-hidden="true">
         {theme === 'dark' ? 'dark' : 'light'}
       </span>

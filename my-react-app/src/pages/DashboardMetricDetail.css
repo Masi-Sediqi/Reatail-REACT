@@ -17,6 +17,10 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.summary-grid.four.metric-detail-summary {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .detail-summary-card {
   position: relative;
   min-height: 96px;
@@ -302,6 +306,10 @@
   color: var(--muted);
 }
 
+.net-profit-rows > div.danger-row {
+  background: rgba(239, 68, 68, 0.08);
+}
+
 .net-profit-rows strong {
   white-space: nowrap;
   font-size: 15px;
@@ -316,6 +324,14 @@
 .net-profit-rows > div:nth-child(4) strong,
 .net-profit-rows > div:nth-child(5) strong,
 .net-profit-rows > div:nth-child(6) strong {
+  color: #ef4444;
+}
+
+.pure-profit-detail .net-profit-rows > div:nth-child(4) strong {
+  color: var(--text);
+}
+
+.pure-profit-detail .net-profit-rows > div.danger-row strong {
   color: #ef4444;
 }
 
@@ -375,8 +391,30 @@
   min-width: 980px;
 }
 
+.pure-profit-detail .entity-heading {
+  align-items: start;
+}
+
+.pure-profit-formula .net-profit-rows > div.success strong {
+  font-size: 20px;
+}
+
+.pure-source-tabs {
+  grid-template-columns: repeat(4, max-content) !important;
+}
+
+@media (max-width: 1180px) {
+  .summary-grid.four.metric-detail-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 900px) {
   .summary-grid.three.metric-detail-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-grid.four.metric-detail-summary {
     grid-template-columns: 1fr;
   }
 }

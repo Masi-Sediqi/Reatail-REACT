@@ -20,23 +20,235 @@
   font-family: inherit;
 }
 
-.scanner-active-btn,
-.camera-icon-btn,
-.cancel-edit-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 36px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: #dcfce7;
-  color: #166534;
-  padding: 0 14px;
-  cursor: pointer;
-  font-weight: 800;
+/* =====================================================
+   BILLING SCANNER ACTIONS
+===================================================== */
+
+#root .retail-shell .billing-scanner-actions {
+  width: auto !important;
+  min-width: 0 !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 7px !important;
 }
 
+/* Scanner status button */
+#root .retail-shell .scanner-status-btn,
+#root .retail-shell .scanner-status-btn:hover,
+#root .retail-shell .scanner-status-btn:focus,
+#root .retail-shell .scanner-status-btn:active {
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: max-content !important;
+
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+
+  flex: 0 0 auto !important;
+
+  margin: 0 !important;
+  padding: 0 12px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 9px !important;
+
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 750 !important;
+  line-height: 1 !important;
+
+  white-space: nowrap !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+
+  cursor: pointer !important;
+}
+
+/* Active scanner */
+#root .retail-shell .scanner-status-btn.is-active {
+  border-color:
+    color-mix(
+      in srgb,
+      #16a34a 28%,
+      var(--border)
+    ) !important;
+
+  background:
+    color-mix(
+      in srgb,
+      #22c55e 10%,
+      var(--panel-bg)
+    ) !important;
+
+  color: #15803d !important;
+}
+
+#root .retail-shell .scanner-status-btn.is-active:hover {
+  border-color: #22c55e !important;
+
+  background:
+    color-mix(
+      in srgb,
+      #22c55e 15%,
+      var(--panel-bg)
+    ) !important;
+}
+
+/* Disabled scanner */
+#root .retail-shell .scanner-status-btn.is-off {
+  border-color:
+    color-mix(
+      in srgb,
+      #ef4444 25%,
+      var(--border)
+    ) !important;
+
+  background:
+    color-mix(
+      in srgb,
+      #ef4444 8%,
+      var(--panel-bg)
+    ) !important;
+
+  color: #dc2626 !important;
+}
+
+/* Scanner icon */
+#root .retail-shell .scanner-status-btn svg {
+  width: 16px !important;
+  min-width: 16px !important;
+  max-width: 16px !important;
+
+  height: 16px !important;
+  min-height: 16px !important;
+  max-height: 16px !important;
+
+  display: block !important;
+  flex: 0 0 16px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  stroke: currentColor !important;
+  stroke-width: 1.9 !important;
+
+  pointer-events: none !important;
+}
+
+#root .retail-shell .scanner-status-btn span {
+  display: inline-flex !important;
+  align-items: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  line-height: 1 !important;
+}
+
+/* Camera scanner button */
+#root .retail-shell .scanner-camera-btn,
+#root .retail-shell .scanner-camera-btn:hover,
+#root .retail-shell .scanner-camera-btn:focus,
+#root .retail-shell .scanner-camera-btn:active {
+  width: 38px !important;
+  min-width: 38px !important;
+  max-width: 38px !important;
+
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  flex: 0 0 38px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 9px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+
+  cursor: pointer !important;
+}
+
+#root .retail-shell .scanner-camera-btn:hover {
+  border-color: var(--accent) !important;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--accent) 7%,
+      var(--panel-bg)
+    ) !important;
+
+  color: var(--accent) !important;
+}
+
+#root .retail-shell .scanner-camera-btn svg {
+  width: 17px !important;
+  height: 17px !important;
+
+  display: block !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  stroke: currentColor !important;
+  stroke-width: 1.9 !important;
+
+  pointer-events: none !important;
+}
+
+/* Dark mode */
+#root
+.retail-shell.theme-dark
+.scanner-status-btn.is-active {
+  border-color: rgba(34, 197, 94, 0.35) !important;
+  background: rgba(34, 197, 94, 0.1) !important;
+  color: #4ade80 !important;
+}
+
+#root
+.retail-shell.theme-dark
+.scanner-status-btn.is-off {
+  border-color: rgba(239, 68, 68, 0.35) !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+  color: #f87171 !important;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  #root .retail-shell .billing-scanner-actions {
+    width: 100% !important;
+  }
+
+  #root .retail-shell .scanner-status-btn {
+    flex: 1 1 auto !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+
+  #root .retail-shell .scanner-camera-btn {
+    flex: 0 0 38px !important;
+  }
+}
 .scanner-active-btn.scanner-off {
   border-color: #fecaca;
   background: #fee2e2;
@@ -106,6 +318,17 @@
 .currency-trigger:focus {
   border-color: var(--border);
   box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.16);
+}
+
+.billing-panel input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.billing-panel input[type="number"]::-webkit-outer-spin-button,
+.billing-panel input[type="number"]::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
 }
 
 .search-panel button,
@@ -203,93 +426,528 @@
   color: var(--text);
 }
 
-.bill-item {
-  display: grid;
-  grid-template-columns: minmax(170px, 1fr) 100px 100px 132px 122px 36px;
-  align-items: end;
-  gap: 10px;
-  min-height: 72px;
-  padding: 12px 14px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--panel-soft);
-}
-
 .bill-item + .bill-item {
   margin-top: 10px;
 }
 
-.bill-item-name {
-  align-self: center;
-  display: grid;
-  gap: 4px;
-  min-width: 0;
+/* =====================================================
+   MODERN BILL ITEMS
+===================================================== */
+
+#root .retail-shell .bill-items-panel {
+  min-height: 150px;
+
+  padding: 16px;
+
+  border-radius: 13px;
 }
 
-.bill-item-name strong,
-.bill-item-name span {
+#root .retail-shell .bill-items-panel > h2 {
+  margin: 0 0 12px;
+
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+#root .retail-shell .bill-items-list {
+  display: grid;
+  gap: 10px;
+}
+
+/* Main item card */
+#root .retail-shell .bill-item-card {
+  position: relative;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 82px;
+
+  display: grid;
+  grid-template-columns:
+    minmax(190px, 1.45fr)
+    minmax(105px, 0.65fr)
+    minmax(100px, 0.6fr)
+    minmax(132px, 0.78fr)
+    minmax(112px, 0.65fr)
+    36px;
+
+  align-items: end;
+  gap: 12px;
+
+  padding: 13px 14px;
+
+  border: 1px solid var(--border);
+  border-radius: 11px;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--panel-soft) 72%,
+      var(--panel-bg)
+    );
+
+  color: var(--text);
+
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.025);
+
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    box-shadow 150ms ease,
+    transform 150ms ease;
+}
+
+#root .retail-shell .bill-item-card:hover {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--accent) 25%,
+      var(--border)
+    );
+
+  background: var(--panel-bg);
+
+  box-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.07);
+
+  transform: translateY(-1px);
+}
+
+/* =====================================================
+   PRODUCT INFORMATION
+===================================================== */
+
+#root .retail-shell .bill-item-product {
+  min-width: 0;
+  min-height: 42px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  align-self: center;
+}
+
+#root .retail-shell .bill-item-product-icon {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  background: var(--panel-bg);
+  color: var(--accent);
+}
+
+#root .retail-shell .bill-item-product-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+#root .retail-shell .bill-item-product-info {
+  min-width: 0;
+
+  display: grid;
+  gap: 4px;
+}
+
+#root .retail-shell .bill-item-product-info strong {
   overflow: hidden;
+
+  color: var(--text);
+
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.25;
+
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.bill-item-name span,
-.bill-item small,
-.billing-field small {
+#root .retail-shell .bill-item-product-info span {
+  overflow: hidden;
+
   color: var(--muted);
-  font-size: 12px;
+
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.35;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.bill-item label,
-.billing-field {
+/* =====================================================
+   FIELDS
+===================================================== */
+
+#root .retail-shell .bill-item-field,
+#root .retail-shell .bill-item-quantity {
+  min-width: 0;
+
   display: grid;
   gap: 6px;
 }
 
-.bill-item input,
-.qty-stepper input {
-  min-height: 36px;
+#root .retail-shell .bill-item-field > span,
+#root .retail-shell .bill-item-quantity > span,
+#root .retail-shell .bill-item-total > span {
+  color: var(--muted);
+
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
-.payment-error {
-  color: #ef4444 !important;
-  font-weight: 800;
+#root .retail-shell .bill-item-field input {
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  min-height: 38px;
+
+  padding: 0 10px;
+
+  border: 1px solid var(--border);
+  border-radius: 8px;
+
+  background: var(--panel-bg);
+  color: var(--text);
+
+  font-size: 12px;
+  font-weight: 700;
+
+  outline: none;
+  box-shadow: none;
+
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease;
 }
 
-.qty-stepper {
-  align-self: end;
+#root .retail-shell .bill-item-field input:focus {
+  border-color: var(--accent);
+
+  box-shadow:
+    0 0 0 3px
+    color-mix(
+      in srgb,
+      var(--accent) 11%,
+      transparent
+    );
+}
+
+/* =====================================================
+   QUANTITY STEPPER
+===================================================== */
+
+#root .retail-shell .bill-item-stepper {
+  min-width: 0;
+
   display: grid;
-  grid-template-columns: 34px minmax(44px, 1fr) 34px;
+  grid-template-columns: 32px minmax(42px, 1fr) 32px;
+  align-items: center;
   gap: 4px;
 }
 
-.qty-stepper button,
-.delete-line-btn {
-  min-height: 36px;
+#root .retail-shell .bill-item-stepper button,
+#root .retail-shell .bill-item-stepper input {
+  height: 38px;
+  min-height: 38px;
+
   border: 1px solid var(--border);
   border-radius: 8px;
+
   background: var(--panel-bg);
   color: var(--text);
-  cursor: pointer;
-  font-weight: 900;
+
+  box-shadow: none;
 }
 
-.line-total {
-  align-self: end;
-  min-height: 36px;
+#root .retail-shell .bill-item-stepper button {
+  width: 32px;
+  min-width: 32px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  font-size: 16px;
+  font-weight: 750;
+
+  cursor: pointer;
+
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease,
+    color 140ms ease;
+}
+
+#root .retail-shell .bill-item-stepper button:hover {
+  border-color: var(--accent);
+
+  background:
+    color-mix(
+      in srgb,
+      var(--accent) 7%,
+      var(--panel-bg)
+    );
+
+  color: var(--accent);
+}
+
+#root .retail-shell .bill-item-stepper input {
+  width: 100%;
+  min-width: 0;
+
+  padding: 0 4px;
+
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+
+  outline: none;
+}
+
+/* =====================================================
+   TOTAL
+===================================================== */
+
+#root .retail-shell .bill-item-total {
+  min-width: 0;
+
+  display: grid;
+  align-content: end;
+  gap: 7px;
+
+  padding-bottom: 1px;
+}
+
+#root .retail-shell .bill-item-total strong {
+  min-height: 38px;
+
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  text-align: end;
+
+  overflow: hidden;
+
+  color: var(--text);
+
+  font-size: 13px;
+  font-weight: 850;
+  line-height: 1;
+
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.delete-line-btn {
+/* =====================================================
+   DELETE BUTTON
+===================================================== */
+
+#root .retail-shell .bill-item-delete,
+#root .retail-shell .bill-item-delete:hover,
+#root .retail-shell .bill-item-delete:focus,
+#root .retail-shell .bill-item-delete:active {
   align-self: end;
-  width: 36px;
-  color: #ef4444;
+
+  width: 36px !important;
+  min-width: 36px !important;
+  max-width: 36px !important;
+
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 1px solid
+    color-mix(
+      in srgb,
+      #ef4444 20%,
+      var(--border)
+    ) !important;
+
+  border-radius: 8px !important;
+
+  background:
+    color-mix(
+      in srgb,
+      #ef4444 5%,
+      var(--panel-bg)
+    ) !important;
+
+  color: #ef4444 !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+
+  cursor: pointer;
 }
 
+#root .retail-shell .bill-item-delete:hover {
+  border-color: #ef4444 !important;
+
+  background:
+    color-mix(
+      in srgb,
+      #ef4444 10%,
+      var(--panel-bg)
+    ) !important;
+}
+
+#root .retail-shell .bill-item-delete svg {
+  width: 15px;
+  height: 15px;
+
+  display: block;
+
+  pointer-events: none;
+}
+
+/* =====================================================
+   DARK MODE
+===================================================== */
+
+#root
+.retail-shell.theme-dark
+.bill-item-card {
+  border-color: #263244;
+
+  background:
+    color-mix(
+      in srgb,
+      #111827 92%,
+      #1e293b
+    );
+}
+
+#root
+.retail-shell.theme-dark
+.bill-item-card:hover {
+  border-color: #3b4a60;
+
+  background: #111827;
+
+  box-shadow:
+    0 10px 26px rgba(0, 0, 0, 0.26);
+}
+
+#root
+.retail-shell.theme-dark
+.bill-item-product-icon,
+#root
+.retail-shell.theme-dark
+.bill-item-field input,
+#root
+.retail-shell.theme-dark
+.bill-item-stepper button,
+#root
+.retail-shell.theme-dark
+.bill-item-stepper input {
+  border-color: #334155;
+
+  background: #0f172a;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 1280px) {
+  #root .retail-shell .bill-item-card {
+    grid-template-columns:
+      minmax(170px, 1.3fr)
+      94px
+      90px
+      122px
+      100px
+      36px;
+
+    gap: 8px;
+
+    padding: 12px;
+  }
+}
+
+@media (max-width: 1050px) {
+  #root .retail-shell .bill-item-card {
+    grid-template-columns:
+      minmax(190px, 1fr)
+      repeat(2, minmax(100px, 0.5fr))
+      minmax(130px, 0.65fr)
+      110px
+      36px;
+
+    min-width: 820px;
+  }
+
+  #root .retail-shell .bill-items-list {
+    overflow-x: auto;
+
+    padding-bottom: 5px;
+
+    overscroll-behavior-inline: contain;
+  }
+}
+
+@media (max-width: 700px) {
+  #root .retail-shell .bill-items-panel {
+    padding: 12px;
+  }
+
+  #root .retail-shell .bill-items-list {
+    overflow: visible;
+  }
+
+  #root .retail-shell .bill-item-card {
+    min-width: 0;
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    align-items: end;
+
+    gap: 11px;
+
+    padding: 13px;
+  }
+
+  #root .retail-shell .bill-item-product {
+    grid-column: 1 / -1;
+  }
+
+  #root .retail-shell .bill-item-quantity {
+    grid-column: 1 / -1;
+  }
+
+  #root .retail-shell .bill-item-total {
+    grid-column: 1;
+  }
+
+  #root .retail-shell .bill-item-delete {
+    grid-column: 2;
+
+    justify-self: end;
+  }
+
+  #root .retail-shell .bill-item-card:hover {
+    transform: none;
+  }
+}
 .side-card,
 .totals-card {
   padding: 20px;
@@ -324,14 +982,13 @@
 }
 
 .customer-search-menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  inset-inline: 0;
-  z-index: 10010;
+  position: static;
+  z-index: 1;
   display: grid;
   gap: 6px;
   max-height: 280px;
   overflow-y: auto;
+  margin-top: 8px;
   padding: 8px;
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -342,7 +999,8 @@
 }
 
 .customer-search-input {
-  display: flex;
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) auto;
   align-items: center;
   gap: 8px;
   min-height: 38px;
@@ -354,9 +1012,37 @@
 
 .customer-search-input input {
   min-height: 36px;
-  border: 0;
-  background: transparent;
-  padding: 0;
+  height: 36px !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.customer-search-clear {
+  width: 26px !important;
+  min-width: 26px !important;
+  height: 26px !important;
+  min-height: 26px !important;
+  display: inline-grid !important;
+  place-items: center !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 7px !important;
+  background: transparent !important;
+  color: var(--muted) !important;
+  box-shadow: none !important;
+}
+
+.customer-search-clear:hover {
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+
+.customer-search-clear svg {
+  width: 14px;
+  height: 14px;
 }
 
 .customer-search-menu > button {
@@ -917,12 +1603,23 @@
 
 @media (max-width: 900px) {
   .bill-item {
-    grid-template-columns: minmax(0, 1fr) 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .line-total,
-  .delete-line-btn {
-    justify-self: end;
+  .bill-item-controls {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .bill-item-actions {
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr) 38px;
+    justify-content: stretch;
+  }
+
+  .line-total {
+    justify-content: flex-start;
+    text-align: start;
   }
 
   .billing-right {
@@ -962,10 +1659,14 @@
 
   .bill-item label,
   .qty-stepper,
-  .line-total,
-  .delete-line-btn {
+  .bill-item-controls,
+  .bill-item-actions {
     width: 100%;
     justify-self: stretch;
+  }
+
+  .bill-item-controls {
+    grid-template-columns: 1fr;
   }
 
   .line-total {
@@ -1128,4 +1829,668 @@
 #root#root#root .retail-shell .billing-right .date-field .date-input-shell strong,
 #root#root#root .retail-shell .billing-right .date-field .date-input-shell small {
   display: none !important;
+}
+/* =====================================================
+   COMPACT BILL ITEM INPUTS + FIX TOTAL POSITION
+===================================================== */
+
+/* Smaller fields */
+#root .retail-shell .bill-item-field input {
+  height: 32px !important;
+  min-height: 32px !important;
+
+  padding: 0 9px !important;
+
+  border-radius: 7px !important;
+
+  font-size: 11px !important;
+  font-weight: 700 !important;
+}
+
+/* Smaller quantity controls */
+#root .retail-shell .bill-item-stepper {
+  grid-template-columns: 28px minmax(38px, 1fr) 28px !important;
+  gap: 4px !important;
+}
+
+#root .retail-shell .bill-item-stepper button,
+#root .retail-shell .bill-item-stepper input {
+  height: 32px !important;
+  min-height: 32px !important;
+
+  border-radius: 7px !important;
+}
+
+#root .retail-shell .bill-item-stepper button {
+  width: 28px !important;
+  min-width: 28px !important;
+
+  font-size: 14px !important;
+}
+
+#root .retail-shell .bill-item-stepper input {
+  padding: 0 3px !important;
+
+  font-size: 11px !important;
+}
+
+/* Make labels smaller and aligned */
+#root .retail-shell .bill-item-field > span,
+#root .retail-shell .bill-item-quantity > span,
+#root .retail-shell .bill-item-total > span {
+  min-height: 13px;
+
+  display: flex;
+  align-items: center;
+
+  margin: 0 !important;
+
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+}
+
+/* Fix Total column */
+#root .retail-shell .bill-item-total {
+  min-width: 0;
+
+  display: grid !important;
+  grid-template-rows: 13px 32px !important;
+  align-content: end !important;
+  align-items: stretch !important;
+  gap: 6px !important;
+
+  padding: 0 !important;
+}
+
+/* Total label position */
+#root .retail-shell .bill-item-total > span {
+  justify-content: flex-start !important;
+
+  color: var(--muted) !important;
+  text-align: start !important;
+}
+
+/* Total value position */
+#root .retail-shell .bill-item-total strong {
+  width: 100%;
+  min-height: 32px !important;
+  height: 32px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+
+  margin: 0 !important;
+  padding: 0 2px !important;
+
+  font-size: 12px !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+
+  text-align: end !important;
+}
+
+/* Delete button same height as fields */
+#root .retail-shell .bill-item-delete,
+#root .retail-shell .bill-item-delete:hover,
+#root .retail-shell .bill-item-delete:focus,
+#root .retail-shell .bill-item-delete:active {
+  align-self: end !important;
+
+  width: 32px !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+
+  border-radius: 7px !important;
+}
+
+/* Slightly shorter card */
+#root .retail-shell .bill-item-card {
+  min-height: 72px !important;
+
+  align-items: end !important;
+
+  gap: 10px !important;
+
+  padding: 10px 12px !important;
+}
+
+/* Product section centered against smaller controls */
+#root .retail-shell .bill-item-product {
+  min-height: 32px !important;
+
+  align-self: end !important;
+
+  padding-bottom: 0 !important;
+}
+
+#root .retail-shell .bill-item-product-icon {
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 34px !important;
+
+  border-radius: 8px !important;
+}
+
+/* Tight bill-item layout requested for the billing screen */
+
+
+#root .retail-shell .bill-item-total {
+  min-width: 74px;
+  justify-self: end;
+
+  grid-template-rows: auto auto !important;
+  justify-items: end !important;
+  gap: 3px !important;
+}
+
+#root .retail-shell .bill-item-total > span {
+  width: 100%;
+
+  justify-content: flex-end !important;
+  text-align: end !important;
+}
+
+#root .retail-shell .bill-item-delete,
+#root .retail-shell .bill-item-delete:hover,
+#root .retail-shell .bill-item-delete:focus,
+#root .retail-shell .bill-item-delete:active {
+  width: 30px !important;
+  min-width: 30px !important;
+  max-width: 30px !important;
+}
+
+@media (max-width: 1280px) {
+  #root .retail-shell .bill-item-card {
+    grid-template-columns:
+      minmax(160px, 1fr)
+      80px
+      72px
+      102px
+      max-content
+      30px !important;
+  }
+
+  #root .retail-shell .bill-item-field {
+    max-width: 80px;
+  }
+
+  #root .retail-shell .bill-item-field:nth-of-type(2) {
+    max-width: 72px;
+  }
+
+  #root .retail-shell .bill-item-quantity {
+    max-width: 102px;
+  }
+}
+
+@media (max-width: 1050px) {
+  #root .retail-shell .bill-item-card {
+    min-width: 630px;
+  }
+}
+
+@media (max-width: 700px) {
+  #root .retail-shell .bill-item-field,
+  #root .retail-shell .bill-item-field:nth-of-type(2),
+  #root .retail-shell .bill-item-quantity {
+    max-width: none;
+  }
+
+  #root .retail-shell .bill-item-total {
+    justify-self: start;
+    justify-items: start !important;
+    text-align: start;
+  }
+
+  #root .retail-shell .bill-item-total > span {
+    justify-content: flex-start !important;
+    text-align: start !important;
+  }
+}
+/* =====================================================
+   BILL ITEMS — CLEAN BALANCED STANDARD LAYOUT
+===================================================== */
+
+#root .retail-shell .bill-items-panel {
+  padding: 16px !important;
+}
+
+#root .retail-shell .bill-items-list {
+  width: 100%;
+  display: grid;
+  gap: 10px;
+}
+
+/* Main row */
+#root .retail-shell .bill-item-card {
+  width: 100%;
+  min-width: 0;
+  min-height: 78px !important;
+
+  display: grid !important;
+
+  /*
+   * Product gets the remaining space.
+   * Selling, Discount, Quantity and Total
+   * have balanced standard widths.
+   */
+  grid-template-columns:
+    minmax(220px, 1fr)
+    110px
+    110px
+    150px
+    120px
+    36px !important;
+
+  align-items: end !important;
+
+  column-gap: 16px !important;
+  row-gap: 8px !important;
+
+  padding: 12px 14px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 11px !important;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--panel-soft) 70%,
+      var(--panel-bg)
+    ) !important;
+
+  box-shadow: none !important;
+}
+
+/* Equal spacing between all direct sections */
+#root .retail-shell .bill-item-card > * {
+  min-width: 0;
+  margin: 0 !important;
+}
+
+/* =====================================================
+   PRODUCT
+===================================================== */
+
+#root .retail-shell .bill-item-product {
+  min-width: 0;
+  min-height: 36px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  align-self: end !important;
+
+  gap: 10px !important;
+
+  padding: 0 !important;
+}
+
+#root .retail-shell .bill-item-product-icon {
+  width: 36px !important;
+  min-width: 36px !important;
+  height: 36px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  flex: 0 0 36px !important;
+
+  border-radius: 9px !important;
+}
+
+#root .retail-shell .bill-item-product-info {
+  min-width: 0;
+
+  display: grid;
+  gap: 3px;
+}
+
+#root .retail-shell .bill-item-product-info strong {
+  overflow: hidden;
+
+  font-size: 13px !important;
+  line-height: 1.25 !important;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#root .retail-shell .bill-item-product-info span {
+  overflow: hidden;
+
+  font-size: 10px !important;
+  line-height: 1.25 !important;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =====================================================
+   LABELS
+===================================================== */
+
+#root .retail-shell .bill-item-field,
+#root .retail-shell .bill-item-quantity,
+#root .retail-shell .bill-item-total {
+  width: 100% !important;
+  max-width: none !important;
+
+  display: grid !important;
+  grid-template-rows: 13px 34px !important;
+
+  align-content: end !important;
+  gap: 5px !important;
+
+  padding: 0 !important;
+}
+
+#root .retail-shell .bill-item-field > span,
+#root .retail-shell .bill-item-quantity > span,
+#root .retail-shell .bill-item-total > span {
+  width: 100%;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+
+  min-height: 13px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: var(--muted);
+
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+
+  text-align: start !important;
+}
+
+/* =====================================================
+   INPUTS
+===================================================== */
+
+#root .retail-shell .bill-item-field input {
+  width: 100% !important;
+  min-width: 0 !important;
+
+  height: 34px !important;
+  min-height: 34px !important;
+
+  margin: 0 !important;
+  padding: 0 10px !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 7px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  font-size: 11px !important;
+  font-weight: 700 !important;
+
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+#root .retail-shell .bill-item-field input:focus {
+  border-color: var(--accent) !important;
+
+  box-shadow:
+    0 0 0 3px
+    color-mix(
+      in srgb,
+      var(--accent) 10%,
+      transparent
+    ) !important;
+}
+
+/* =====================================================
+   QUANTITY
+===================================================== */
+
+#root .retail-shell .bill-item-stepper {
+  width: 100% !important;
+  min-width: 0 !important;
+
+  display: grid !important;
+  grid-template-columns:
+    34px
+    minmax(48px, 1fr)
+    34px !important;
+
+  align-items: center !important;
+  gap: 5px !important;
+}
+
+#root .retail-shell .bill-item-stepper button,
+#root .retail-shell .bill-item-stepper input {
+  height: 34px !important;
+  min-height: 34px !important;
+
+  margin: 0 !important;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 7px !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+}
+
+#root .retail-shell .bill-item-stepper button {
+  width: 34px !important;
+  min-width: 34px !important;
+  max-width: 34px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 0 !important;
+
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+#root .retail-shell .bill-item-stepper input {
+  width: 100% !important;
+  min-width: 0 !important;
+
+  padding: 0 4px !important;
+
+  font-size: 11px !important;
+  font-weight: 800 !important;
+
+  text-align: center !important;
+}
+
+/* =====================================================
+   TOTAL
+===================================================== */
+
+#root .retail-shell .bill-item-total {
+  justify-self: stretch !important;
+  justify-items: stretch !important;
+}
+
+#root .retail-shell .bill-item-total > span {
+  justify-content: flex-start !important;
+  text-align: start !important;
+}
+
+#root .retail-shell .bill-item-total strong {
+  width: 100% !important;
+  height: 34px !important;
+  min-height: 34px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+
+  margin: 0 !important;
+  padding: 0 4px !important;
+
+  color: var(--text) !important;
+
+  font-size: 12px !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+
+  text-align: end !important;
+  white-space: nowrap !important;
+}
+
+/* =====================================================
+   DELETE BUTTON
+===================================================== */
+
+#root .retail-shell .bill-item-delete,
+#root .retail-shell .bill-item-delete:hover,
+#root .retail-shell .bill-item-delete:focus,
+#root .retail-shell .bill-item-delete:active {
+  align-self: end !important;
+  justify-self: center !important;
+
+  width: 34px !important;
+  min-width: 34px !important;
+  max-width: 34px !important;
+
+  height: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 1px solid
+    color-mix(
+      in srgb,
+      #ef4444 22%,
+      var(--border)
+    ) !important;
+
+  border-radius: 7px !important;
+
+  background:
+    color-mix(
+      in srgb,
+      #ef4444 5%,
+      var(--panel-bg)
+    ) !important;
+
+  color: #ef4444 !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root .retail-shell .bill-item-delete:hover {
+  border-color: #ef4444 !important;
+
+  background:
+    color-mix(
+      in srgb,
+      #ef4444 10%,
+      var(--panel-bg)
+    ) !important;
+}
+
+#root .retail-shell .bill-item-delete svg {
+  width: 14px !important;
+  height: 14px !important;
+
+  display: block !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* =====================================================
+   MEDIUM SCREENS
+===================================================== */
+
+@media (max-width: 1280px) {
+  #root .retail-shell .bill-item-card {
+    grid-template-columns:
+      minmax(180px, 1fr)
+      96px
+      96px
+      136px
+      106px
+      34px !important;
+
+    column-gap: 12px !important;
+  }
+}
+
+@media (max-width: 1050px) {
+  #root .retail-shell .bill-items-list {
+    overflow-x: auto;
+
+    padding-bottom: 5px;
+  }
+
+  #root .retail-shell .bill-item-card {
+    min-width: 760px !important;
+  }
+}
+
+@media (min-width: 701px) {
+  #root .retail-shell .bill-item-total > span {
+    justify-content: flex-end !important;
+    text-align: end !important;
+  }
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 700px) {
+  #root .retail-shell .bill-items-list {
+    overflow: visible;
+  }
+
+  #root .retail-shell .bill-item-card {
+    min-width: 0 !important;
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+
+    gap: 12px !important;
+
+    padding: 13px !important;
+  }
+
+  #root .retail-shell .bill-item-product {
+    grid-column: 1 / -1;
+  }
+
+  #root .retail-shell .bill-item-quantity {
+    grid-column: 1 / -1;
+  }
+
+  #root .retail-shell .bill-item-total {
+    grid-column: 1;
+  }
+
+  #root .retail-shell .bill-item-delete {
+    grid-column: 2;
+
+    justify-self: end !important;
+  }
 }

@@ -351,7 +351,7 @@
   padding: 24px;
   overflow: hidden;
 
-  background: #020407;
+  background: #f8fafc;
   isolation: isolate;
 }
 
@@ -373,6 +373,7 @@
   background-size: auto 100%;
 
   opacity: 0.82;
+  display: none;
   filter:
     saturate(0.78)
     contrast(1.06)
@@ -396,17 +397,7 @@
   inset: 0;
   z-index: -1;
 
-  background:
-    radial-gradient(
-      circle at 50% 46%,
-      rgba(56, 89, 135, 0.18),
-      transparent 38%
-    ),
-    linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0.3),
-      rgba(0, 0, 0, 0.58)
-    );
+  background: none;
 }
 
 /* Soft center glow */
@@ -416,12 +407,7 @@
   inset: 0;
   z-index: -1;
 
-  background:
-    radial-gradient(
-      circle at center,
-      rgba(255, 255, 255, 0.05),
-      transparent 32%
-    );
+  background: none;
 
   pointer-events: none;
 }
@@ -452,24 +438,16 @@
 
   padding: 30px 28px 26px;
 
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 18px;
+  border: 1px solid #dfe6ef;
+  border-radius: 12px;
 
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.18),
-      rgba(255, 255, 255, 0.08)
-    );
+  background: #ffffff;
+  color: #172137;
 
-  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
 
-  box-shadow:
-    0 30px 90px rgba(0, 0, 0, 0.48),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
-
-  backdrop-filter: blur(22px) saturate(1.15);
-  -webkit-backdrop-filter: blur(22px) saturate(1.15);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 /* =====================================================
@@ -487,15 +465,14 @@
 
   overflow: hidden;
 
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid #e5eaf2;
   border-radius: 999px;
 
-  background: rgba(255, 255, 255, 0.92);
+  background: #f1f5f9;
   color: #172554;
 
   box-shadow:
-    0 10px 26px rgba(0, 0, 0, 0.22),
-    0 0 0 5px rgba(255, 255, 255, 0.06);
+    0 10px 22px rgba(15, 23, 42, 0.08);
 }
 
 .app-lock-logo img {
@@ -520,7 +497,7 @@
 .app-lock-card h1 {
   margin: 0 0 8px;
 
-  color: #ffffff;
+  color: #172137;
 
   font-size: 24px;
   font-weight: 800;
@@ -531,7 +508,7 @@
 .app-lock-card > p {
   margin: 0 0 22px;
 
-  color: rgba(255, 255, 255, 0.74);
+  color: #64748b;
 
   font-size: 13px;
   font-weight: 500;
@@ -539,6 +516,86 @@
   text-align: center;
 
   user-select: none;
+}
+
+.app-account-list {
+  width: 100%;
+  display: grid;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+#root#root#root .retail-shell .app-account-card,
+#root#root#root .retail-shell .app-selected-account {
+  width: 100%;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px;
+  border: 1px solid #dfe6ef;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #172137;
+  text-align: start;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+#root#root#root .retail-shell .app-account-card:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+#root#root#root .retail-shell .app-account-card:first-child {
+  border-style: dashed;
+}
+
+.app-account-avatar {
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #eef2f7;
+  color: #172137;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.app-account-avatar.admin {
+  background: #fff7e6;
+  color: #f59e0b;
+}
+
+.app-account-card > span:last-child,
+.app-selected-account > span:last-child {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.app-account-card strong,
+.app-selected-account strong {
+  color: #172137;
+  font-size: 13px;
+  font-weight: 850;
+  line-height: 1.2;
+}
+
+.app-account-card small,
+.app-selected-account small {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+#root#root#root .retail-shell .app-selected-account {
+  margin-bottom: 12px;
+  background: #f8fafc;
 }
 
 /* =====================================================
@@ -943,5 +1000,6 @@
   .app-splash-card,
   .app-splash-line::after {
     animation: none;
+    transition: none;
   }
 }

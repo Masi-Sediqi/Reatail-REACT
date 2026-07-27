@@ -9,6 +9,14 @@ const DEVICE_API =
 
 export const loadDeviceIdentity = async () => {
   try {
+    if (window.retailDesktop?.getDeviceIdentity) {
+      return await window.retailDesktop.getDeviceIdentity()
+    }
+  } catch {
+    // Fall back to browser identity if the desktop bridge is unavailable.
+  }
+
+  try {
     const response = await fetch(DEVICE_API)
 
     if (response.ok) {

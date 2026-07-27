@@ -554,8 +554,6 @@
 
 .retail-shell .notification-trigger {
   position: relative;
-  width: 34px;
-  min-width: 34px;
   height: 34px;
   padding: 0;
   overflow: visible !important;
@@ -597,7 +595,6 @@
 }
 
 .avatar-btn {
-  width: 34px;
   height: 34px;
   border-radius: 999px;
   background: #11224b;
@@ -3647,94 +3644,6 @@
 }
 
 @media (max-width: 760px) {
-  #root#root#root .retail-shell .app-header {
-    height: 44px !important;
-    min-height: 44px !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 5px !important;
-    margin: 8px 8px 0 !important;
-    padding: 5px 6px !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    overscroll-behavior-x: contain;
-    scrollbar-width: none;
-  }
-
-  #root#root#root .retail-shell .app-header .search-shell {
-    flex: 0 0 32px !important;
-    width: 32px !important;
-    min-width: 32px !important;
-    max-width: 32px !important;
-    height: 32px !important;
-    min-height: 32px !important;
-    max-height: 32px !important;
-    display: inline-grid !important;
-    place-items: center !important;
-    padding: 0 !important;
-    border: 1px solid var(--border) !important;
-    border-radius: 10px !important;
-    background: var(--panel-soft) !important;
-  }
-
-  #root#root#root .retail-shell .app-header .search-shell input {
-    position: absolute !important;
-    width: 1px !important;
-    min-width: 1px !important;
-    height: 1px !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-  }
-
-  #root#root#root .retail-shell .app-header .search-shell svg {
-    width: 18px !important;
-    height: 18px !important;
-  }
-
-  #root#root#root .retail-shell .app-header .header-tools {
-    flex: 1 1 auto !important;
-    width: auto !important;
-    min-width: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    gap: 4px !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    overscroll-behavior-x: contain;
-    scrollbar-width: none;
-  }
-
-  #root#root#root .retail-shell .app-header :is(.tool-wrap, .account-wrap) {
-    flex: 0 0 32px !important;
-    width: 32px !important;
-    min-width: 32px !important;
-    max-width: 32px !important;
-  }
-
-  #root#root#root .retail-shell .app-header .account-wrap {
-    margin-inline-start: auto !important;
-  }
-
-  #root#root#root .retail-shell .app-header :is(.icon-btn, .avatar-btn) {
-    flex: 0 0 32px !important;
-    width: 32px !important;
-    min-width: 32px !important;
-    max-width: 32px !important;
-    height: 32px !important;
-    min-height: 32px !important;
-    max-height: 32px !important;
-  }
-
-  #root#root#root .retail-shell .app-header :is(.pill-mini, .theme-state) {
-    display: none !important;
-  }
-
-  #root#root#root .retail-shell .app-header::-webkit-scrollbar,
-  #root#root#root .retail-shell .app-header .header-tools::-webkit-scrollbar {
-    display: none;
-  }
-
   #root#root#root .retail-shell .header-shared-modal:has(.search-modal-body) {
     width: calc(100vw - 20px) !important;
     max-height: calc(100dvh - 20px) !important;
@@ -4714,5 +4623,813 @@ label.wide {
 
   .account-license-status-copy strong {
     font-size: 12px;
+  }
+}
+/* =====================================================
+   MODERN COMPACT HEADER
+   Add this code at the END of Header.css
+===================================================== */
+
+#root .retail-shell .app-header {
+  position: sticky;
+  top: 4px;
+  z-index: 1000;
+
+  width: calc(100% - 16px);
+  height: 48px;
+  min-height: 48px;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  margin: 4px 8px 0;
+  padding: 0 12px 0 18px;
+
+  border: 1px solid var(--border);
+  border-radius: 11px;
+
+  background: var(--panel-bg);
+  color: var(--text);
+
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.03),
+    0 3px 10px rgba(15, 23, 42, 0.025);
+
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* RTL padding */
+#root .retail-shell[dir="rtl"] .app-header,
+#root .retail-shell[dir="rtl"] .app-header {
+  padding: 0 18px 0 12px;
+}
+
+/* =====================================================
+   SEARCH AREA
+===================================================== */
+
+#root .retail-shell .search-shell {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 0;
+
+  border: 0;
+  border-radius: 0;
+
+  background: transparent;
+  color: var(--muted);
+
+  cursor: text;
+  overflow: hidden;
+}
+
+/* Search icon */
+#root .retail-shell .search-shell > svg {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+
+  color: #64748b;
+  stroke-width: 2;
+}
+
+/* Search input */
+#root .retail-shell .search-shell input {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+
+  padding: 0;
+
+  border: 0 !important;
+  outline: 0 !important;
+
+  background: transparent !important;
+  color: var(--text);
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1;
+
+  box-shadow: none !important;
+}
+
+/* Search placeholder */
+#root .retail-shell .search-shell input::placeholder {
+  color: #94a3b8;
+  opacity: 1;
+}
+
+/* Remove input focus border */
+#root .retail-shell .search-shell:focus-within,
+#root .retail-shell .search-shell input:focus {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+/* =====================================================
+   RIGHT-SIDE HEADER TOOLS
+===================================================== */
+
+#root .retail-shell .header-tools {
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 3px;
+
+  height: 100%;
+}
+
+/* RTL tools */
+#root .retail-shell[dir="rtl"] .header-tools {
+  justify-content: flex-start;
+}
+
+/* Tool wrappers */
+#root .retail-shell .tool-wrap,
+#root .retail-shell .account-wrap {
+  position: relative;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 auto;
+}
+
+/* All header icon buttons */
+#root .retail-shell .app-header .icon-btn {
+  position: relative;
+
+  height: 30px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+
+  padding: 0;
+
+  border: 0 !important;
+  border-radius: 7px;
+
+  background: transparent !important;
+  color: #334155;
+
+  cursor: pointer;
+  box-shadow: none !important;
+
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+/* Header icon sizes */
+#root .retail-shell .app-header .icon-btn > svg {
+  width: 15px;
+  height: 15px;
+  stroke-width: 1.9;
+}
+
+/* Tool hover */
+#root .retail-shell .app-header .icon-btn:hover {
+  border: 0 !important;
+  background: var(--panel-soft) !important;
+  color: var(--accent);
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Active tool */
+#root .retail-shell .app-header .icon-btn.active {
+  background: var(--panel-soft) !important;
+  color: var(--accent);
+}
+
+/* =====================================================
+   SMALL ALL / CURRENCY LABEL
+===================================================== */
+
+#root .retail-shell .app-header .pill-mini {
+  min-width: auto;
+  height: 15px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 4px;
+
+  border-radius: 4px;
+
+  background: #fbbf24;
+  color: #111827;
+
+  font-size: 8px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* =====================================================
+   NOTIFICATION BUTTON
+===================================================== */
+
+#root .retail-shell .notification-trigger {
+  position: relative;
+
+  height: 30px;
+
+  padding: 0;
+  overflow: visible !important;
+}
+
+#root .retail-shell .notification-trigger > svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Notification count */
+#root .retail-shell .notification-trigger .notification-badge {
+  position: absolute;
+  top: -2px;
+  inset-inline-end: -2px;
+  z-index: 3;
+
+  min-width: 14px;
+  height: 14px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 3px;
+
+  border: 2px solid var(--panel-bg);
+  border-radius: 999px;
+
+  background: #ef4444;
+  color: #ffffff;
+
+  font-size: 7px;
+  font-weight: 800;
+  line-height: 1;
+
+  transform: none;
+}
+
+/* =====================================================
+   USER AVATAR
+===================================================== */
+
+#root .retail-shell .avatar-btn {
+  height: 28px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 0;
+  border-radius: 50%;
+
+  background: #123f68;
+  color: #ffffff;
+
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+
+  cursor: pointer;
+  box-shadow: none;
+
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+}
+
+#root .retail-shell .avatar-btn:hover {
+  opacity: 0.9;
+  transform: scale(1.03);
+  box-shadow: none !important;
+}
+
+/* =====================================================
+   DARK MODE
+===================================================== */
+
+#root .retail-shell.theme-dark .app-header {
+  border-color: #263244;
+  background: #111827;
+  color: #f8fafc;
+
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.2),
+    0 4px 14px rgba(0, 0, 0, 0.16);
+}
+
+#root .retail-shell.theme-dark .search-shell {
+  color: #94a3b8;
+}
+
+#root .retail-shell.theme-dark .search-shell > svg {
+  color: #94a3b8;
+}
+
+#root .retail-shell.theme-dark .search-shell input {
+  color: #f8fafc;
+}
+
+#root .retail-shell.theme-dark .search-shell input::placeholder {
+  color: #64748b;
+}
+
+#root .retail-shell.theme-dark .app-header .icon-btn {
+  color: #cbd5e1;
+}
+
+#root .retail-shell.theme-dark .app-header .icon-btn:hover,
+#root .retail-shell.theme-dark .app-header .icon-btn.active {
+  background: #1e293b !important;
+  color: #ffffff;
+}
+
+#root .retail-shell.theme-dark .notification-trigger .notification-badge {
+  border-color: #111827;
+}
+
+#root .retail-shell.theme-dark .avatar-btn {
+  background: #0e7490;
+  color: #ffffff;
+}
+/* =====================================================
+   FINAL RESPONSIVE HEADER OVERRIDES
+===================================================== */
+
+#root .retail-shell .app-header {
+  box-sizing: border-box;
+  max-width: 100%;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+#root .retail-shell .app-header .search-shell {
+  cursor: pointer;
+}
+
+#root .retail-shell .app-header .search-shell:hover {
+  border-color: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root .retail-shell .app-header .icon-btn {
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root .retail-shell .app-header .icon-btn:hover {
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  #root .retail-shell .app-header {
+    position: sticky !important;
+    top: 0 !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 56px !important;
+    height: auto !important;
+
+    margin: 0 !important;
+    padding: 8px !important;
+
+    border-width: 0 0 1px !important;
+    border-radius: 0 !important;
+
+    background: var(--panel-bg) !important;
+    box-shadow: none !important;
+  }
+
+  #root .retail-shell .app-header > div {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  #root .retail-shell .search-shell {
+    min-width: 0 !important;
+    height: 36px !important;
+  }
+
+  #root .retail-shell .header-tools {
+    min-width: 0 !important;
+  }
+
+  #root .retail-shell .app-header .icon-btn > svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  #root .retail-shell .pill-mini {
+    max-width: 26px;
+    overflow: hidden;
+    padding: 0 3px !important;
+    font-size: 7px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  #root,
+  .retail-shell,
+  .workspace,
+  .main-area,
+  .content,
+  .dashboard-content,
+  .entity-content,
+  .settings-content {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .workspace {
+    display: block !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .main-area {
+    margin-inline: 0 !important;
+    padding-inline: 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  .sidebar {
+    display: none !important;
+  }
+}
+/* =====================================================
+   HEADER ACTION ICONS — CLEAN AND LARGER
+===================================================== */
+
+#root .retail-shell .header-tools {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+}
+
+/* Wrapper */
+#root .retail-shell .header-tools .tool-wrap {
+  width: auto !important;
+  min-width: 0 !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+/* Main icon buttons */
+#root .retail-shell .header-action-btn,
+#root .retail-shell .header-action-btn:focus,
+#root .retail-shell .header-action-btn:active {
+  position: relative !important;
+
+  width: 36px !important;
+  min-width: 36px !important;
+  max-width: 36px !important;
+
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: 0 !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  /*
+   * Border exists structurally but is transparent.
+   * Therefore the button does not move when hovering.
+   */
+  border: 1px solid transparent !important;
+  border-radius: 9px !important;
+
+  background: transparent !important;
+  background-image: none !important;
+
+  color: var(--text) !important;
+
+  outline: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+
+  cursor: pointer !important;
+
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease,
+    color 140ms ease !important;
+}
+
+/* Show border only on hover */
+#root .retail-shell .header-action-btn:hover {
+  border-color: var(--border) !important;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--panel-soft) 80%,
+      transparent
+    ) !important;
+
+  color: var(--text) !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Open menu state */
+#root .retail-shell .header-action-btn.active {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--accent) 32%,
+      var(--border)
+    ) !important;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--accent) 8%,
+      var(--panel-bg)
+    ) !important;
+
+  color: var(--accent) !important;
+
+  box-shadow: none !important;
+}
+
+/* Actual SVG icon */
+#root .retail-shell .header-action-btn .header-action-icon,
+#root .retail-shell .header-action-btn > svg {
+  position: static !important;
+
+  width: 19px !important;
+  min-width: 19px !important;
+  max-width: 19px !important;
+
+  height: 19px !important;
+  min-height: 19px !important;
+  max-height: 19px !important;
+
+  display: block !important;
+  flex: 0 0 19px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: currentColor !important;
+  stroke: currentColor !important;
+  stroke-width: 1.9 !important;
+
+  opacity: 1 !important;
+  visibility: visible !important;
+
+  transform: none !important;
+
+  pointer-events: none !important;
+}
+
+/* Prevent pseudo elements from creating extra shapes */
+#root .retail-shell .header-action-btn::before,
+#root .retail-shell .header-action-btn::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Theme button */
+#root .retail-shell .theme-toggle-btn {
+  color: var(--text) !important;
+}
+
+/* Wallet and exchange icons */
+#root .retail-shell .header-wallet-action,
+#root .retail-shell .header-exchange-action {
+  color: var(--text) !important;
+}
+
+/* =====================================================
+   CURRENCY PILLS
+===================================================== */
+
+#root .retail-shell .header-action-btn .pill-mini {
+  position: absolute !important;
+
+  top: -2px !important;
+  inset-inline-end: -3px !important;
+
+  min-width: 17px;
+  height: 14px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0 !important;
+  padding: 0 4px !important;
+
+  border: 2px solid var(--panel-bg);
+  border-radius: 999px !important;
+
+  font-size: 8px !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+
+  pointer-events: none !important;
+}
+
+/* Remove old negative spacing */
+#root .retail-shell .exchange-currency-pill {
+  margin-inline-start: 0 !important;
+}
+
+/* =====================================================
+   NOTIFICATION BUTTON
+===================================================== */
+
+#root .retail-shell .notification-trigger {
+  width: 36px !important;
+  min-width: 36px !important;
+  height: 36px !important;
+
+  padding: 0 !important;
+
+  overflow: visible !important;
+}
+
+#root .retail-shell .notification-trigger > svg {
+  width: 19px !important;
+  height: 19px !important;
+}
+
+/* Notification badge */
+#root
+.retail-shell
+.notification-trigger
+.notification-badge {
+  top: -3px !important;
+  inset-inline-end: -4px !important;
+
+  min-width: 16px !important;
+  height: 16px !important;
+
+  padding: 0 4px !important;
+
+  border: 2px solid var(--panel-bg) !important;
+
+  font-size: 8px !important;
+
+  transform: none !important;
+}
+
+/* =====================================================
+   ACCOUNT AVATAR
+===================================================== */
+
+#root .retail-shell .header-tools .avatar-btn,
+#root .retail-shell .header-tools .avatar-btn:focus,
+#root .retail-shell .header-tools .avatar-btn:active {
+  width: 36px !important;
+  min-width: 36px !important;
+  max-width: 36px !important;
+
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 1px solid transparent !important;
+  border-radius: 999px !important;
+
+  background: transparent !important;
+  color: var(--text) !important;
+
+  font-size: 13px !important;
+  font-weight: 800 !important;
+
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Avatar border only on hover */
+#root .retail-shell .header-tools .avatar-btn:hover {
+  border-color: var(--border) !important;
+
+  background: var(--panel-soft) !important;
+  color: var(--text) !important;
+}
+
+/* Avatar open state */
+#root .retail-shell .header-tools .avatar-btn.active {
+  border-color: var(--accent) !important;
+
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
+
+  box-shadow: none !important;
+}
+
+/* =====================================================
+   DARK MODE
+===================================================== */
+
+#root
+.retail-shell.theme-dark
+.header-action-btn {
+  color: #dbe4f0 !important;
+}
+
+#root
+.retail-shell.theme-dark
+.header-action-btn:hover {
+  border-color: #334155 !important;
+
+  background: #172033 !important;
+
+  color: #ffffff !important;
+}
+
+#root
+.retail-shell.theme-dark
+.header-action-btn.active {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--accent) 50%,
+      #334155
+    ) !important;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--accent) 12%,
+      #111827
+    ) !important;
+
+  color: var(--accent) !important;
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 640px) {
+  #root .retail-shell .header-tools {
+    gap: 6px !important;
+  }
+
+  #root .retail-shell .header-action-btn,
+  #root .retail-shell .header-tools .avatar-btn {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+
+    height: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
+  }
+
+  #root .retail-shell .header-action-btn .header-action-icon,
+  #root .retail-shell .header-action-btn > svg {
+    width: 18px !important;
+    min-width: 18px !important;
+    height: 18px !important;
+    min-height: 18px !important;
+
+    flex-basis: 18px !important;
   }
 }

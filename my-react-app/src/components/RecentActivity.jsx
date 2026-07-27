@@ -2,8 +2,8 @@ import { activities } from '../data/dashboardData.js'
 
 function RecentActivity({ t }) {
   return (
-    <section className="panel activity-panel">
-      <h2>{t.recentActivity}</h2>
+    <section className="panel activity-panel rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:shadow-none sm:p-6">
+      <h2 className="mb-4 text-base font-black text-slate-950 dark:text-white sm:text-lg">{t.recentActivity}</h2>
       <div className="activity-list">
         {activities.map((activity) => {
           const ActivityIcon = activity.icon

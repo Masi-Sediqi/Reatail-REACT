@@ -5,6 +5,7 @@ import CustomFieldInputs from '../components/CustomFieldInputs.jsx'
 import DateRangePicker from '../components/DateRangePicker.jsx'
 import FloatingActionMenu from '../components/FloatingActionMenu.jsx'
 import { currencies } from '../data/dashboardData.js'
+import { formatBusinessCurrencyAmount } from '../utils/currencyExchange.js'
 import {
   BriefcaseBusiness,
   ChevronLeft,
@@ -12,7 +13,7 @@ import {
   DollarSign,
   Eye,
   Plus,
-  ReceiptText,
+  Printer,
   SquareMenu,
   Trash2,
   UserPlus,
@@ -39,6 +40,40 @@ const emptyStaff = {
 }
 
 const parseNumber = (value) => Number.parseFloat(value || 0) || 0
+const formatMoney = (value, currency = 'AFN') => formatBusinessCurrencyAmount(value, currency)
+const payrollPeriodKey = (entry) => `${entry.start || ''}__${entry.end || ''}`
+const getPayrollPaidTotal = (history = []) => history.reduce((sum, entry) => sum + parseNumber(entry.paidAmount), 0)
+const getPayrollPayableTotal = (history = []) => {
+  const latestPayableByPeriod = new Map()
+  history.forEach((entry) => {
+    latestPayableByPeriod.set(payrollPeriodKey(entry), parseNumber(entry.payable))
+  })
+  return [...latestPayableByPeriod.values()].reduce((sum, amount) => sum + amount, 0)
+}
+const groupMoneyByCurrency = (items = [], getAmount, getCurrency) => {
+  const totals = new Map()
+  items.forEach((item) => {
+    const amount = parseNumber(getAmount(item))
+    if (!amount) return
+    const currency = getCurrency(item) || 'AFN'
+    totals.set(currency, (totals.get(currency) || 0) + amount)
+  })
+  return totals
+}
+const formatMoneyLines = (totals) => {
+  const lines = [...totals.entries()]
+    .filter(([, amount]) => Math.abs(amount) > 0.000001)
+    .sort(([currencyA], [currencyB]) => currencyA.localeCompare(currencyB))
+    .map(([currency, amount]) => formatMoney(amount, currency))
+  return lines.length ? lines : [formatMoney(0, 'AFN')]
+}
+function MoneyLines({ lines }) {
+  return (
+    <strong className="staff-money-lines">
+      {lines.map((line) => <span key={line}>{line}</span>)}
+    </strong>
+  )
+}
 const parseDateInput = (value) => (value ? new Date(`${value}T12:00:00`) : null)
 const formatDateInput = (date) => {
   const year = date.getFullYear()
@@ -78,6 +113,7 @@ function StaffModal({ customFields = [], initialStaff, onClose, onSave, t }) {
   const [form, setForm] = useState(() => ({ ...emptyStaff, ...(initialStaff ?? {}), customFields: { ...(initialStaff?.customFields ?? {}) } }))
   const [submitted, setSubmitted] = useState(false)
   const [closing, setClosing] = useState(false)
+  const requiredMessage = t.requiredFieldMessage ?? 'This field is required.'
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }))
   const updateCustomField = (fieldId, value) => setForm((current) => ({
     ...current,
@@ -127,6 +163,7 @@ function StaffModal({ customFields = [], initialStaff, onClose, onSave, t }) {
             value={form.name}
             onChange={(event) => update('name', event.target.value)}
           />
+          {submitted && !form.name.trim() && <small className="validation-error">{requiredMessage}</small>}
         </label>
         <label><span>{t.phoneNumber}</span><input placeholder={t.phonePlaceholder} value={form.phone} onChange={(event) => update('phone', event.target.value)} /></label>
         <label><span>{t.email}</span><input placeholder={t.email} value={form.email} onChange={(event) => update('email', event.target.value)} /></label>
@@ -142,6 +179,7 @@ function StaffModal({ customFields = [], initialStaff, onClose, onSave, t }) {
             value={form.role}
             onChange={(event) => update('role', event.target.value)}
           />
+          {submitted && !form.role.trim() && <small className="validation-error">{requiredMessage}</small>}
         </label>
         <label><span>{t.department}</span><input placeholder={t.department} value={form.department} onChange={(event) => update('department', event.target.value)} /></label>
         <label className="wide">
@@ -150,7 +188,7 @@ function StaffModal({ customFields = [], initialStaff, onClose, onSave, t }) {
         </label>
         <label><span>{t.monthlySalary}</span><input inputMode="decimal" placeholder="0" value={form.salary} onChange={(event) => update('salary', event.target.value)} /></label>
         <label><span>{t.baseCurrency}</span><CustomSelect ariaLabel={t.baseCurrency} options={currencyOptions} value={form.currency} onChange={(value) => update('currency', value)} /></label>
-        <CustomFieldInputs fields={customFields} onChange={updateCustomField} submitted={submitted} values={form.customFields} />
+        <CustomFieldInputs fields={customFields} onChange={updateCustomField} requiredMessage={requiredMessage} submitted={submitted} values={form.customFields} />
         <button className="primary-btn wide" type="submit">{initialStaff ? t.saveChanges : t.addStaffMember}</button>
       </form>
     </div>
@@ -187,11 +225,15 @@ function PayrollModal({ initialStaff, lockedStaff = false, onClose, onSave, staf
   const suggested = period === 'monthly'
     ? monthlySalary
     : (monthlySalary / 30) * days
+  const payableBase = Math.min(monthlySalary, suggested)
   const alreadyPaid = (selectedStaff?.payrollHistory || [])
     .filter((entry) => entry.start === start && entry.end === end)
     .reduce((sum, entry) => sum + parseNumber(entry.paidAmount), 0)
-  const remaining = Math.max(0, suggested - alreadyPaid - parseNumber(paidAmount))
-  const canSave = selectedStaff && parseNumber(paidAmount) > 0 && parseNumber(paidAmount) <= Math.max(0, suggested - alreadyPaid)
+  const maxPayable = Math.max(0, payableBase - alreadyPaid)
+  const paidValue = parseNumber(paidAmount)
+  const paidAmountTooHigh = paidValue > maxPayable
+  const remaining = Math.max(0, suggested - alreadyPaid - paidValue)
+  const canSave = selectedStaff && paidValue > 0 && !paidAmountTooHigh
 
   const setPeriodRange = (nextPeriod) => {
     setPeriod(nextPeriod)
@@ -233,7 +275,7 @@ function PayrollModal({ initialStaff, lockedStaff = false, onClose, onSave, staf
             currency,
             suggested: Number(suggested.toFixed(2)),
             paidAmount: parseNumber(paidAmount),
-            payable: Number(Math.max(0, suggested - alreadyPaid - parseNumber(paidAmount)).toFixed(2)),
+            payable: Number(Math.max(0, payableBase - alreadyPaid - parseNumber(paidAmount)).toFixed(2)),
             method,
             notes: notes.trim(),
             createdAt: new Date().toISOString(),
@@ -257,9 +299,18 @@ function PayrollModal({ initialStaff, lockedStaff = false, onClose, onSave, staf
         <label><span>{t.baseSalary ?? 'Base Salary'}</span><input inputMode="decimal" value={baseSalary} onChange={(event) => setBaseSalary(event.target.value)} /></label>
         <label><span>{t.currency}</span><CustomSelect ariaLabel={t.currency} options={currencyOptions} value={currency} onChange={setCurrency} /></label>
         <label className="wide">
-          <span>{t.paidAmount} <small>({t.suggested ?? 'Suggested'}: {suggested.toFixed(2)} {currency} • {days} {t.days ?? 'days'})</small></span>
-          <input inputMode="decimal" value={paidAmount} onChange={(event) => setPaidAmount(event.target.value)} />
-          <small>{t.alreadyPaidForPeriod ?? 'Already paid for this period'}: <strong>{alreadyPaid.toFixed(2)} {currency}</strong> · {t.remainingForPeriod ?? 'Remaining for this period'}: <strong className="success-text">{remaining.toFixed(2)} {currency}</strong></small>
+          <span>{t.paidAmount} <small>({t.suggested ?? 'Suggested'}: {formatMoney(suggested, currency)} • {days} {t.days ?? 'days'})</small></span>
+          <input
+            className={paidAmountTooHigh ? 'field-invalid' : ''}
+            inputMode="decimal"
+            max={maxPayable}
+            min="0"
+            type="number"
+            value={paidAmount}
+            onChange={(event) => setPaidAmount(event.target.value)}
+          />
+          {paidAmountTooHigh && <small className="validation-error">{t.paidAmountCannotExceedSalary ?? 'Paid amount cannot be greater than the payable salary.'}</small>}
+          <small>{t.alreadyPaidForPeriod ?? 'Already paid for this period'}: <strong>{formatMoney(alreadyPaid, currency)}</strong> · {t.remainingForPeriod ?? 'Remaining for this period'}: <strong className="success-text">{formatMoney(remaining, currency)}</strong></small>
         </label>
         <label className="wide">
           <span>{t.paymentMethod}</span>
@@ -277,8 +328,8 @@ function PayrollModal({ initialStaff, lockedStaff = false, onClose, onSave, staf
 
 function StaffProfile({ onBack, onDeletePayroll, onPaySalary, staff, t }) {
   const history = staff.payrollHistory || []
-  const paid = history.reduce((sum, entry) => sum + parseNumber(entry.paidAmount), 0)
-  const payable = Math.max(0, parseNumber(staff.payable))
+  const paid = getPayrollPaidTotal(history)
+  const payable = getPayrollPayableTotal(history)
 
   return (
     <div className="entity-content staff-content">
@@ -288,9 +339,9 @@ function StaffProfile({ onBack, onDeletePayroll, onPaySalary, staff, t }) {
         <button className="primary-btn" type="button" onClick={() => onPaySalary(staff)}><Plus size={16} /> {t.paySalary ?? 'Pay Salary'}</button>
       </div>
       <div className="summary-grid four staff-profile-summary-grid">
-        <article className="tone-blue"><span>{t.baseSalary ?? 'Base Salary'}</span><strong>{Number(staff.salary || 0).toFixed(2)} {staff.currency}</strong><UserPlus size={22} /></article>
-        <article className="tone-green"><span>{t.staffPaid}</span><strong>{paid.toFixed(2)} {staff.currency}</strong><DollarSign size={22} /></article>
-        <article className="tone-orange"><span>{t.staffPayable}</span><strong>{payable.toFixed(2)} {staff.currency}</strong><BriefcaseBusiness size={22} /></article>
+        <article className="tone-blue"><span>{t.baseSalary ?? 'Base Salary'}</span><strong>{formatMoney(staff.salary, staff.currency)}</strong><UserPlus size={22} /></article>
+        <article className="tone-green"><span>{t.staffPaid}</span><strong>{formatMoney(paid, staff.currency)}</strong><DollarSign size={22} /></article>
+        <article className="tone-orange"><span>{t.staffPayable}</span><strong>{formatMoney(payable, staff.currency)}</strong><BriefcaseBusiness size={22} /></article>
         <article className="tone-navy"><span>{t.payrollHistory ?? 'Payroll History'}</span><strong>{history.length}</strong><CreditCard size={22} /></article>
       </div>
       <div className="data-panel staff-panel">
@@ -304,9 +355,9 @@ function StaffProfile({ onBack, onDeletePayroll, onPaySalary, staff, t }) {
               <tr key={entry.id}>
                 <td>{getDateLabel(entry.createdAt.slice(0, 10))}</td>
                 <td>{getDateLabel(entry.start)} – {getDateLabel(entry.end)}</td>
-                <td>{Number(entry.baseSalary || 0).toFixed(2)} {entry.currency}</td>
-                <td><strong>{Number(entry.paidAmount || 0).toFixed(2)} {entry.currency}</strong></td>
-                <td className="success-text">{Number(entry.payable || 0).toFixed(2)} {entry.currency}</td>
+                <td>{formatMoney(entry.baseSalary, entry.currency)}</td>
+                <td><strong>{formatMoney(entry.paidAmount, entry.currency)}</strong></td>
+                <td className="success-text">{formatMoney(entry.payable, entry.currency)}</td>
                 <td><span className="status-pill active">{t.paid}</span></td>
                 <td>{t[entry.method] ?? entry.method}</td>
                 <td><button className="payroll-delete-btn" type="button" onClick={() => onDeletePayroll(staff, entry)} aria-label={t.delete}><Trash2 size={15} /></button></td>
@@ -319,7 +370,7 @@ function StaffProfile({ onBack, onDeletePayroll, onPaySalary, staff, t }) {
   )
 }
 
-function StaffPage({ companyInfo, onMoveToRecycle, onNotify, onStaffChange, printSettings, staffMembers, t }) {
+function StaffPage({ companyInfo, onCashWalletChange, onMoveToRecycle, onNotify, onStaffChange, onWalletEntriesChange, printSettings, staffMembers, t, walletEntries = [] }) {
   const [modalOpen, setModalOpen] = useState(false)
   const [editingStaff, setEditingStaff] = useState(null)
   const [payrollStaff, setPayrollStaff] = useState(null)
@@ -354,9 +405,17 @@ function StaffPage({ companyInfo, onMoveToRecycle, onNotify, onStaffChange, prin
     return matchesSearch && matchesStatus && matchesDate
   }), [customEndDate, customStartDate, dateFilter, search, staffMembers, statusFilter])
 
-  const monthlyPayroll = staffMembers.reduce((sum, staff) => sum + Number(staff.salary || 0), 0)
-  const staffPaid = staffMembers.reduce((sum, staff) => sum + (staff.payrollHistory || []).reduce((total, entry) => total + Number(entry.paidAmount || 0), 0), 0)
-  const staffPayable = staffMembers.reduce((sum, staff) => sum + Number(staff.payable || 0), 0)
+  const monthlyPayrollLines = formatMoneyLines(groupMoneyByCurrency(staffMembers, (staff) => staff.salary, (staff) => staff.currency))
+  const staffPaidLines = formatMoneyLines(groupMoneyByCurrency(
+    staffMembers.flatMap((staff) => (staff.payrollHistory || []).map((entry) => ({ ...entry, fallbackCurrency: staff.currency }))),
+    (entry) => entry.paidAmount,
+    (entry) => entry.currency || entry.fallbackCurrency,
+  ))
+  const staffPayableLines = formatMoneyLines(groupMoneyByCurrency(
+    staffMembers,
+    (staff) => getPayrollPayableTotal(staff.payrollHistory || []),
+    (staff) => staff.currency,
+  ))
   const statusOptions = useMemo(() => [
     { value: 'all', label: t.allStatuses },
     { value: 'active', label: t.active },
@@ -388,24 +447,53 @@ function StaffPage({ companyInfo, onMoveToRecycle, onNotify, onStaffChange, prin
   }
 
   const savePayroll = (staff, entry) => {
+    const paidAmountValue = parseNumber(entry.paidAmount)
     onStaffChange((current) => current.map((item) => {
       if (item.id !== staff.id) return item
       const history = [...(item.payrollHistory || []), entry]
-      const paid = history.reduce((sum, currentEntry) => sum + parseNumber(currentEntry.paidAmount), 0)
-      return { ...item, paid: paid.toFixed(2), payable: String(entry.payable), payrollHistory: history }
+      const paid = getPayrollPaidTotal(history)
+      const payable = getPayrollPayableTotal(history)
+      return { ...item, paid: paid.toFixed(2), payable: payable.toFixed(2), payrollHistory: history }
     }))
+    if (paidAmountValue > 0) {
+      const createdAt = entry.createdAt || new Date().toISOString()
+      onCashWalletChange?.((current) => parseNumber(current) - paidAmountValue)
+      onWalletEntriesChange?.((current) => [
+        {
+          amount: paidAmountValue.toFixed(2),
+          createdAt,
+          currency: entry.currency || staff.currency || 'AFN',
+          date: createdAt.slice(0, 10),
+          id: crypto.randomUUID(),
+          note: `${t.paySalary ?? 'Pay Salary'}: ${staff.name}`,
+          payrollId: entry.id,
+          source: 'staff-payroll',
+          staffId: staff.id,
+          type: 'withdraw',
+        },
+        ...current,
+      ])
+    }
     setPayrollOpen(false)
     setPayrollStaff(null)
     onNotify?.(t.paymentRecorded ?? t.savedSuccessfully)
   }
 
   const deletePayroll = (staff, entry) => {
+    const paidAmountValue = parseNumber(entry.paidAmount)
     onStaffChange((current) => current.map((item) => {
       if (item.id !== staff.id) return item
       const history = (item.payrollHistory || []).filter((record) => record.id !== entry.id)
-      const paid = history.reduce((sum, currentEntry) => sum + parseNumber(currentEntry.paidAmount), 0)
-      return { ...item, paid: paid.toFixed(2), payable: String(Math.max(0, parseNumber(item.payable) + parseNumber(entry.paidAmount))), payrollHistory: history }
+      const paid = getPayrollPaidTotal(history)
+      const payable = getPayrollPayableTotal(history)
+      return { ...item, paid: paid.toFixed(2), payable: payable.toFixed(2), payrollHistory: history }
     }))
+    const hasWalletEntry = walletEntries.some((walletEntry) => walletEntry.payrollId === entry.id)
+    if (paidAmountValue > 0 && hasWalletEntry) {
+      onWalletEntriesChange?.((current) => current.filter((walletEntry) => walletEntry.payrollId !== entry.id))
+      onCashWalletChange?.((current) => parseNumber(current) + paidAmountValue)
+    }
+    onNotify?.(t.deletedSuccessfully ?? t.deleted)
   }
 
   const deleteStaff = (staff) => {
@@ -431,31 +519,34 @@ function StaffPage({ companyInfo, onMoveToRecycle, onNotify, onStaffChange, prin
     <div className="entity-content staff-content">
       <div className="entity-heading">
         <div><h1>{t.staff}</h1><p>{t.staffOverview}</p></div>
-        <div className="entity-actions staff-header-actions">
+       <div className="entity-actions staff-header-actions">
   <button
-    className="staff-print-btn"
+    className="staff-action-btn staff-print-btn"
     type="button"
     onClick={() => setPrintOpen(true)}
   >
-    <ReceiptText size={16} />
+    <Printer size={16} />
+
     <span>{t.printReport}</span>
   </button>
 
   <button
-    className="payroll-btn staff-payroll-btn"
+    className="staff-action-btn staff-payroll-btn"
     type="button"
     onClick={() => openPayroll()}
   >
     <CreditCard size={16} />
+
     <span>{t.payroll}</span>
   </button>
 
   <button
-    className="primary-btn staff-add-btn"
+    className="staff-action-btn staff-add-btn"
     type="button"
     onClick={() => setModalOpen(true)}
   >
     <UserPlus size={16} />
+
     <span>{t.addStaffMember}</span>
   </button>
 </div>
@@ -470,19 +561,19 @@ function StaffPage({ companyInfo, onMoveToRecycle, onNotify, onStaffChange, prin
 
         <article className="tone-orange">
           <span>{t.monthlyPayroll}</span>
-          <strong>{monthlyPayroll.toFixed(2)} ؋</strong>
+          <MoneyLines lines={monthlyPayrollLines} />
           <DollarSign size={22} />
         </article>
 
         <article className="tone-green">
           <span>{t.staffPaid}</span>
-          <strong>{staffPaid.toFixed(2)} ؋</strong>
+          <MoneyLines lines={staffPaidLines} />
           <CreditCard size={22} />
         </article>
 
         <article className="tone-orange">
           <span>{t.staffPayable}</span>
-          <strong>{staffPayable.toFixed(2)} ؋</strong>
+          <MoneyLines lines={staffPayableLines} />
           <BriefcaseBusiness size={22} />
         </article>
       </div>
@@ -522,7 +613,7 @@ function StaffPage({ companyInfo, onMoveToRecycle, onNotify, onStaffChange, prin
                   <td><span className="stacked-cell">{staff.phone}<small>{staff.email}</small></span></td>
                   <td>{staff.role}</td>
                   <td>{staff.department}</td>
-                  <td>{Number(staff.salary || 0).toFixed(2)} {staff.currency}</td>
+                  <td>{formatMoney(staff.salary, staff.currency)}</td>
                   <td><span className={String(staff.status || 'Active').toLowerCase() === 'inactive' ? 'status-pill warning' : 'status-pill active'}>{String(staff.status || 'Active').toLowerCase() === 'inactive' ? (t.inactive ?? 'Inactive') : t.active}</span></td>
                   <td>
                     <StaffActionMenu

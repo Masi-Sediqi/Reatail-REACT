@@ -11,7 +11,9 @@ import {
   Search,
   Trash2,
   WalletCards,
+  X,
 } from '../components/Icons.jsx'
+import { formatBusinessCurrencyAmount } from '../utils/currencyExchange.js'
 import './Expenses.css'
 
 const defaultExpenseCategories = ['Miscellaneous', 'Rent', 'Utilities', 'Transport', 'Salary', 'Inventory', 'Maintenance', 'Marketing', 'Food', 'Office Supplies']
@@ -48,6 +50,7 @@ function EditIcon({ size = 15 }) {
 }
 
 const getCategoryLabel = (category, t) => t.expenseCategories?.[category] ?? category
+const formatMoney = (value, currency = 'AFN') => formatBusinessCurrencyAmount(value, currency)
 
 const parseExpenseDate = (value) => {
   if (!value) return null
@@ -109,6 +112,7 @@ function ExpenseModal({ categories, customFields = [], initialExpense, onCategor
   const [categoryMode, setCategoryMode] = useState(false)
   const [newCategory, setNewCategory] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const requiredMessage = t.requiredFieldMessage ?? 'This field is required.'
   const [closing, setClosing] = useState(false)
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }))
   const updateCustomField = (fieldId, value) => setForm((current) => ({
@@ -145,24 +149,56 @@ function ExpenseModal({ categories, customFields = [], initialExpense, onCategor
           onSave({ ...form, id: form.id ?? crypto.randomUUID(), date: form.date || new Date().toISOString() })
         }}
       >
-        <button className="modal-close" type="button" onClick={requestClose}>×</button>
+       <button
+  className="expense-modal-close"
+  type="button"
+  onClick={requestClose}
+  aria-label={t.close ?? 'Close'}
+  title={t.close ?? 'Close'}
+>
+  <X size={16} />
+</button>
         <h2>{initialExpense ? t.editExpense : t.addExpense}</h2>
         <label className="wide">
           <span className="label-row">{t.category}<button className="tiny-plus" type="button" onClick={() => setCategoryMode(true)}>+ {t.custom}</button></span>
           {categoryMode ? (
-            <div className="inline-field">
-              <input autoFocus placeholder={t.categoryName} value={newCategory} onChange={(event) => setNewCategory(event.target.value)} />
-              <button type="button" onClick={saveCategory}>{t.add}</button>
-              <button type="button" onClick={() => setCategoryMode(false)}>{t.cancel}</button>
-            </div>
+            <div className="inline-field expense-category-editor">
+  <input
+    autoFocus
+    placeholder={t.categoryName}
+    value={newCategory}
+    onChange={(event) =>
+      setNewCategory(event.target.value)
+    }
+  />
+
+  <button
+    className="expense-category-add-btn"
+    type="button"
+    onClick={saveCategory}
+  >
+    {t.add}
+  </button>
+
+  <button
+    className="expense-category-cancel-btn"
+    type="button"
+    onClick={() => {
+      setCategoryMode(false)
+      setNewCategory('')
+    }}
+  >
+    {t.cancel}
+  </button>
+</div>
           ) : <CustomSelect ariaLabel={t.category} options={categoryOptions} value={form.category} onChange={(value) => update('category', value)} />}
         </label>
-        <label className="wide"><span>{t.description} *</span><input className={submitted && !form.description.trim() ? 'field-invalid' : ''} placeholder={t.expenseDescriptionPlaceholder} value={form.description} onChange={(event) => update('description', event.target.value)} /></label>
-        <label><span>{t.amount} *</span><input className={submitted && !String(form.amount).trim() ? 'field-invalid' : ''} inputMode="decimal" placeholder="0" value={form.amount} onChange={(event) => update('amount', event.target.value)} /></label>
+        <label className="wide"><span>{t.description} *</span><input className={submitted && !form.description.trim() ? 'field-invalid' : ''} placeholder={t.expenseDescriptionPlaceholder} value={form.description} onChange={(event) => update('description', event.target.value)} />{submitted && !form.description.trim() && <small className="validation-error">{requiredMessage}</small>}</label>
+        <label><span>{t.amount} *</span><input className={submitted && !String(form.amount).trim() ? 'field-invalid' : ''} inputMode="decimal" placeholder="0" value={form.amount} onChange={(event) => update('amount', event.target.value)} />{submitted && !String(form.amount).trim() && <small className="validation-error">{requiredMessage}</small>}</label>
         <label><span>{t.currency}</span><CustomSelect ariaLabel={t.currency} options={currencyOptions} value={form.currency} onChange={(value) => update('currency', value)} /></label>
         <label className="wide"><span>{t.paymentMethod}</span><CustomSelect ariaLabel={t.paymentMethod} options={methodOptions} value={form.method} onChange={(value) => update('method', value)} /></label>
         <label className="wide"><span>{t.notes}</span><textarea placeholder={t.additionalNotes} value={form.notes} onChange={(event) => update('notes', event.target.value)} /></label>
-        <CustomFieldInputs fields={customFields} onChange={updateCustomField} submitted={submitted} values={form.customFields} />
+        <CustomFieldInputs fields={customFields} onChange={updateCustomField} requiredMessage={requiredMessage} submitted={submitted} values={form.customFields} />
         <button className="primary-btn wide" type="submit">{initialExpense ? t.saveChanges : t.addExpense}</button>
       </form>
     </div>
@@ -278,8 +314,8 @@ function ExpensesPage({ companyInfo, expenseCategories = defaultExpenseCategorie
       </div>
 
       <div className="summary-grid three expenses-summary">
-        <article className="tone-red"><span>{t.filteredTotal}</span><strong>{filteredTotal.toFixed(2)} ؋</strong></article>
-        <article className="tone-orange"><span>{t.thisMonth}</span><strong>{thisMonthTotal.toFixed(2)} ؋</strong></article>
+        <article className="tone-red"><span>{t.filteredTotal}</span><strong>{formatMoney(filteredTotal)}</strong></article>
+        <article className="tone-orange"><span>{t.thisMonth}</span><strong>{formatMoney(thisMonthTotal)}</strong></article>
         <article className="tone-blue"><span>{t.expenseCount}</span><strong>{filteredExpenses.length}</strong></article>
       </div>
 
@@ -323,7 +359,7 @@ function ExpensesPage({ companyInfo, expenseCategories = defaultExpenseCategorie
                 <tr key={expense.id}>
                   <td><span className="soft-pill">{getCategoryLabel(expense.category, t)}</span></td>
                   <td>{expense.description}</td>
-                  <td className="danger-text">{Number(expense.amount || 0).toFixed(2)} {expense.currency}</td>
+                  <td className="danger-text">{formatMoney(expense.amount, expense.currency)}</td>
                   <td>{t.paymentMethods?.[expense.method] ?? expense.method}</td>
                   <td>{expense.date ? new Date(expense.date).toLocaleDateString() : '-'}</td>
                   <td>

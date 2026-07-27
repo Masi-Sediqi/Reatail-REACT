@@ -61,7 +61,7 @@ const permissionActions = ['create', 'read', 'update', 'delete']
 const permissionModules = [
   { key: 'dashboard', label: 'Dashboard' },
   ...sidebarItems
-    .filter((item) => item.key !== 'agent' && item.key !== 'dashboard')
+    .filter((item) => !['agent', 'dashboard', 'bundlesManagement'].includes(item.key))
     .map((item) => ({ key: item.key, label: item.key === 'bundlesManagement' ? 'Bundles' : item.key === 'salesBills' ? 'Sales/Bills' : item.key === 'suppliers' ? 'Suppliers' : item.key.charAt(0).toUpperCase() + item.key.slice(1) })),
   { key: 'settings', label: 'Settings' },
 ]
@@ -147,12 +147,15 @@ function SettingsPage({
   onImportBackupData,
   onLanguageChange,
   onNotify,
+  onNavigate,
   onPrintSettingsChange,
   printSettings,
+  initialTab = 'general',
+  standaloneUserManagement = false,
   t,
 }) {
 
-  const [activeTab, setActiveTab] = useState('general')
+  const [activeTab, setActiveTab] = useState(initialTab)
   const visibleSettingsTabs = useMemo(() => {
     const licenseTab = {
       key: 'license',
@@ -189,6 +192,7 @@ function SettingsPage({
     secondary: { current: '', password: '', confirm: '', removeCurrent: '' },
   })
   const [showSecurityPasswords, setShowSecurityPasswords] = useState({ primary: false, secondary: false })
+  const [clearDataModalOpen, setClearDataModalOpen] = useState(false)
   const [backupHistoryType, setBackupHistoryType] = useState('all')
   const [backupHistoryStatus, setBackupHistoryStatus] = useState('all')
   const fileInputRef = useRef(null)
@@ -312,6 +316,7 @@ const formatRemainingLicenseTime = (milliseconds = 0) => {
     { value: 'all', label: t.allTypes ?? 'All types' },
     { value: 'import', label: t.import ?? 'Import' },
     { value: 'export', label: t.export ?? 'Export' },
+    { value: 'clear', label: t.clear ?? 'Clear' },
   ]
   const backupStatusOptions = [
     { value: 'all', label: t.allStatuses ?? 'All statuses' },
@@ -323,6 +328,10 @@ const formatRemainingLicenseTime = (milliseconds = 0) => {
     { value: 'fifo', label: t.fifoCosting ?? 'FIFO — oldest lot first' },
     { value: 'wac', label: t.wacCosting ?? 'WAC — weighted average cost' },
   ]
+
+  useEffect(() => {
+    setActiveTab(initialTab)
+  }, [initialTab])
 
   const backupSelectOptions = backupFrequencyOptions.map((option) => ({
     value: option.value,
@@ -591,8 +600,8 @@ const formatRemainingLicenseTime = (milliseconds = 0) => {
     setUserForm(user ? {
       username: user.username ?? '',
       displayName: user.displayName ?? '',
-      password: user.password ?? '',
-      confirmPassword: user.password ?? '',
+      password: '',
+      confirmPassword: '',
       permissions: {
         ...emptyUserForm().permissions,
         ...(user.permissions ?? {}),
@@ -634,22 +643,31 @@ const formatRemainingLicenseTime = (milliseconds = 0) => {
     })
   }
 
-  const saveUser = () => {
+  const saveUser = async () => {
     const username = userForm.username.trim()
     const displayName = userForm.displayName.trim()
-    if (!username || !displayName || !userForm.password || userForm.password !== userForm.confirmPassword) {
+    const isChangingPassword = Boolean(userForm.password || userForm.confirmPassword)
+    if (!username || !displayName || (!editingUserId && !userForm.password) || (isChangingPassword && userForm.password !== userForm.confirmPassword)) {
       onNotify?.(t.completeUserFields ?? 'Please complete user fields and confirm password')
       return
     }
+    const duplicateUser = systemUsers.find((user) => user.id !== editingUserId && user.username?.trim().toLowerCase() === username.toLowerCase())
+    if (duplicateUser) {
+      onNotify?.(t.usernameAlreadyExists ?? 'This username already exists')
+      return
+    }
+    const existingUser = systemUsers.find((user) => user.id === editingUserId)
+    const passwordHash = isChangingPassword ? await hashPassword(userForm.password) : existingUser?.passwordHash
 
     const savedUser = {
-      id: editingUserId ?? crypto.randomUUID(),
+      id: editingUserId ?? (globalThis.crypto?.randomUUID?.() || `user-${Date.now()}-${Math.random().toString(16).slice(2)}`),
       username,
       displayName,
-      password: userForm.password,
+      password: isChangingPassword ? '' : (existingUser?.password && !existingUser?.passwordHash ? existingUser.password : ''),
+      passwordHash,
       permissions: userForm.permissions,
       updatedAt: new Date().toISOString(),
-      createdAt: systemUsers.find((user) => user.id === editingUserId)?.createdAt ?? new Date().toISOString(),
+      createdAt: existingUser?.createdAt ?? new Date().toISOString(),
     }
 
     onCompanyInfoChange((current) => {
@@ -815,9 +833,22 @@ const formatRemainingLicenseTime = (milliseconds = 0) => {
   }
 
   const clearData = () => {
-    if (window.confirm(t.confirmClearAllData ?? 'Clear all business data? This cannot be undone.')) {
-      onClearBusinessData?.()
-    }
+    setClearDataModalOpen(true)
+  }
+
+  const confirmClearData = () => {
+    onClearBusinessData?.()
+    pushBackupHistory({
+      type: 'clear',
+      mode: 'full',
+      file: '-',
+      duration: '-',
+      changes: 'All business data, Cash Wallet, and recycle bin cleared',
+      status: 'success',
+    })
+    pushLiveActivity('All business data cleared, including Cash Wallet', 'error')
+    setClearDataModalOpen(false)
+    onNotify?.(t.dataCleared ?? 'Data cleared')
   }
 
   const uploadLogo = (event) => {
@@ -840,48 +871,56 @@ const formatRemainingLicenseTime = (milliseconds = 0) => {
   }, [backupSettings.automatic, backupSettings.frequency, backupSettings.customMinutes, notificationSettings.sound, appBackupData])
 
   return (
-    <div className="settings-content">
-      <div className="settings-heading">
+    <div className={`settings-content min-w-0 ${standaloneUserManagement ? 'user-management-page' : ''}`}>
+      <div className="settings-heading flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1>{t.settings}</h1>
-          <p>{t.manageSystemPreferences}</p>
+          <h1>{standaloneUserManagement ? (t.userManagement ?? 'User Management') : t.settings}</h1>
+          <p>{standaloneUserManagement ? (t.createUsersWithPermissions ?? 'Create users with specific module access and CRUD permissions') : t.manageSystemPreferences}</p>
         </div>
-        <button className="save-btn" type="button" onClick={notifySaved}>
-          <SaveIcon size={18} />
-          <span>{t.saveChanges}</span>
+        <button className="save-btn" type="button" onClick={standaloneUserManagement ? () => openUserModal() : notifySaved}>
+          {standaloneUserManagement ? <Plus size={18} /> : <SaveIcon size={18} />}
+          <span>{standaloneUserManagement ? (t.addUser ?? 'Add User') : t.saveChanges}</span>
         </button>
       </div>
 
-      <div
-        className="settings-tabs"
-        role="tablist"
-        aria-label={t.settings}
-      >
-        {visibleSettingsTabs.map((tab) => {
-          const TabIcon = tab.icon
-          const isActive = activeTab === tab.key
+      {!standaloneUserManagement && (
+        <div
+          className="settings-tabs"
+          role="tablist"
+          aria-label={t.settings}
+        >
+          {visibleSettingsTabs.map((tab) => {
+            const TabIcon = tab.icon
+            const isActive = activeTab === tab.key
 
-          return (
-            <button
-              className={isActive ? 'active' : ''}
-              type="button"
-              role="tab"
-              aria-selected={isActive}
-              tabIndex={isActive ? 0 : -1}
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-            >
-              <TabIcon size={17} />
+            return (
+              <button
+                className={isActive ? 'active' : ''}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                tabIndex={isActive ? 0 : -1}
+                key={tab.key}
+                onClick={() => {
+                  if (tab.key === 'users') {
+                    onNavigate?.('userManagement')
+                    return
+                  }
+                  setActiveTab(tab.key)
+                }}
+              >
+                <TabIcon size={17} />
 
-              <span>
-                {tab.key === 'license'
-                  ? 'Your License Key'
-                  : t[tab.key] ?? tab.label}
-              </span>
-            </button>
-          )
-        })}
-      </div>
+                <span>
+                  {tab.key === 'license'
+                    ? 'Your License Key'
+                    : t[tab.key] ?? tab.label}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      )}
 
       {activeTab === 'currency' ? (
         <section className="settings-card exchange-rates-card">
@@ -902,7 +941,7 @@ const formatRemainingLicenseTime = (milliseconds = 0) => {
           </label>
 
           <h3 className="settings-subtitle">
-            {t.exchangeRates ?? 'Exchange Rates'} (1 {baseCurrency} = ?)
+            {t.exchangeRates ?? 'Exchange Rates'} (1 {t.currency ?? 'Currency'} = ? {baseCurrency})
           </h3>
           <div className="exchange-grid">
             {currencies
@@ -1916,7 +1955,7 @@ const formatRemainingLicenseTime = (milliseconds = 0) => {
             <div className="backup-action-row danger">
               <div>
                 <strong><Trash2 size={17} /> {t.clearAllData ?? 'Clear All Data'}</strong>
-                <span>{t.clearAllDataHint ?? 'Permanently delete all data (settings will be preserved)'}</span>
+                <span>{t.clearAllDataHint ?? 'Permanently delete business data, Cash Wallet, and recycle bin records'}</span>
               </div>
               <button className="danger-btn" type="button" onClick={clearData}>
                 <Trash2 size={17} />
@@ -2019,18 +2058,48 @@ const formatRemainingLicenseTime = (milliseconds = 0) => {
                 <strong>{t.companyLogo}</strong>
                 <span>{t.companyLogoHint}</span>
               </div>
-              <div className="logo-actions">
-                <div className="logo-preview">
-                  {companyInfo.logo ? <img src={companyInfo.logo} alt="" /> : <span>▣</span>}
-                </div>
-                <button type="button" onClick={() => fileInputRef.current?.click()}>
-                  {t.uploadLogo}
-                </button>
-                <button className="danger-link" type="button" onClick={() => updateField('logo', '')}>
-                  {t.remove}
-                </button>
-                <input ref={fileInputRef} type="file" accept="image/*" onChange={uploadLogo} />
-              </div>
+              <div className="logo-actions company-logo-actions">
+  <div className="logo-preview">
+    {companyInfo.logo ? (
+      <img
+        src={companyInfo.logo}
+        alt={companyInfo.name || 'Company logo'}
+      />
+    ) : (
+      <span>—</span>
+    )}
+  </div>
+
+  <div className="company-logo-buttons">
+    <label className="company-logo-upload-btn">
+      <Upload size={15} />
+
+      <span>
+        {t.uploadLogo ?? 'Upload Logo'}
+      </span>
+
+      <input
+        type="file"
+        accept="image/png,image/jpeg,image/webp,image/svg+xml"
+        onChange={uploadLogo}
+      />
+    </label>
+
+    {companyInfo.logo && (
+      <button
+        className="company-logo-remove-btn"
+        type="button"
+        onClick={() => updateField('logo', '')}
+      >
+        <Trash2 size={15} />
+
+        <span>
+          {t.removeLogo ?? 'Remove Logo'}
+        </span>
+      </button>
+    )}
+  </div>
+</div>
             </div>
 
             <form className="settings-form">
@@ -2158,6 +2227,46 @@ const formatRemainingLicenseTime = (milliseconds = 0) => {
           <p>{t.settingsComingSoon}</p>
         </section>
       )}
+      {clearDataModalOpen &&
+        createPortal(
+          <div className="modal-backdrop clear-data-modal-backdrop" onClick={() => setClearDataModalOpen(false)}>
+            <section className="clear-data-modal" onClick={(event) => event.stopPropagation()}>
+              <button className="clear-data-modal-close" type="button" aria-label={t.close ?? 'Close'} onClick={() => setClearDataModalOpen(false)}>
+                <X size={16} />
+              </button>
+
+              <header className="clear-data-modal-head">
+                <span className="clear-data-modal-icon">
+                  <Trash2 size={20} />
+                </span>
+                <div>
+                  <h2>{t.clearAllData ?? 'Clear All Data'}</h2>
+                  <p>{t.confirmClearAllData ?? 'This will permanently delete all business data. This action cannot be undone.'}</p>
+                </div>
+              </header>
+
+              <div className="clear-data-modal-list">
+                <span>{t.products ?? 'Products'}</span>
+                <span>{t.customers ?? 'Customers'}</span>
+                <span>{t.salesBills ?? 'Sales/Bills'}</span>
+                <span>{t.expenses ?? 'Expenses'}</span>
+                <span>{t.staff ?? 'Staff'}</span>
+                <span>{t.godown ?? 'Godown'}</span>
+                <span>{t.recycleBin ?? 'Recycle Bin'}</span>
+                <span>{t.cashWallet ?? 'Cash Wallet'}</span>
+              </div>
+
+              <footer className="clear-data-modal-actions">
+                <button type="button" onClick={() => setClearDataModalOpen(false)}>{t.cancel ?? 'Cancel'}</button>
+                <button className="danger" type="button" onClick={confirmClearData}>
+                  <Trash2 size={16} />
+                  <span>{t.clearAllData ?? 'Clear All Data'}</span>
+                </button>
+              </footer>
+            </section>
+          </div>,
+          document.querySelector('.retail-shell') ?? document.body,
+        )}
       {customFieldModalOpen &&
         createPortal(
           <div className="modal-backdrop custom-field-modal-backdrop" onClick={closeCustomFieldModal}>
@@ -2258,8 +2367,8 @@ const formatRemainingLicenseTime = (milliseconds = 0) => {
 
                     <p>
                       {editingUserId
-                        ? 'Update account details and module permissions.'
-                        : 'Create a new account and assign module permissions.'}
+                        ? (t.updateUserHint ?? 'Update account details and module permissions.')
+                        : (t.createUserHint ?? 'Create a new account and assign module permissions.')}
                     </p>
                   </div>
                 </div>
@@ -2275,147 +2384,167 @@ const formatRemainingLicenseTime = (milliseconds = 0) => {
                 </button>
               </header>
 
-              {/* Account information */}
-              <div className="settings-user-section">
-                <div className="settings-user-section-head">
-                  <div>
-                    <h3>Account Information</h3>
-                    <p>Enter the login and display information for this user.</p>
+              <div className="settings-user-modal-body">
+                {/* Account information */}
+                <div className="settings-user-section">
+                  <div className="settings-user-section-head">
+                    <div>
+                      <h3>{t.accountInfo ?? 'Account Information'}</h3>
+                      <p>{t.userAccountDetailsHint ?? 'Enter the login and display information for this user.'}</p>
+                    </div>
+
+                    <span>{t.requiredFields ?? 'Required fields'} *</span>
                   </div>
 
-                  <span>Required fields *</span>
-                </div>
+                  <div className="settings-user-form-grid">
+                    <label>
+                      <span className="settings-user-field-label">
+                        {t.username ?? 'Username'}
+                        <b>*</b>
+                      </span>
 
-                <div className="settings-user-form-grid">
-                  <label>
-                    <span className="settings-user-field-label">
-                      {t.username ?? 'Username'}
-                      <b>*</b>
-                    </span>
+                      <input
+                        autoFocus
+                        autoComplete="username"
+                        placeholder={t.usernamePlaceholder ?? 'Enter username'}
+                        value={userForm.username}
+                        onChange={(event) =>
+                          updateUserField('username', event.target.value)
+                        }
+                      />
+                    </label>
 
-                    <input
-                      autoFocus
-                      autoComplete="username"
-                      placeholder="Enter username"
-                      value={userForm.username}
-                      onChange={(event) =>
-                        updateUserField('username', event.target.value)
-                      }
-                    />
-                  </label>
+                    <label>
+                      <span className="settings-user-field-label">
+                        {t.displayName ?? 'Display Name'}
+                        <b>*</b>
+                      </span>
 
-                  <label>
-                    <span className="settings-user-field-label">
-                      {t.displayName ?? 'Display Name'}
-                      <b>*</b>
-                    </span>
+                      <input
+                        autoComplete="name"
+                        placeholder={t.displayNamePlaceholder ?? 'Enter display name'}
+                        value={userForm.displayName}
+                        onChange={(event) =>
+                          updateUserField('displayName', event.target.value)
+                        }
+                      />
+                    </label>
 
-                    <input
-                      autoComplete="name"
-                      placeholder="Enter display name"
-                      value={userForm.displayName}
-                      onChange={(event) =>
-                        updateUserField('displayName', event.target.value)
-                      }
-                    />
-                  </label>
+                    <label>
+                      <span className="settings-user-field-label">
+                        {t.password ?? 'Password'}
+                        {!editingUserId && <b>*</b>}
+                      </span>
 
-                  <label>
-                    <span className="settings-user-field-label">
-                      {t.password ?? 'Password'}
-                      {!editingUserId && <b>*</b>}
-                    </span>
+                      <input
+                        type="password"
+                        autoComplete="new-password"
+                        placeholder={
+                          editingUserId
+                            ? (t.keepCurrentPasswordHint ?? 'Leave empty to keep current password')
+                            : (t.passwordPlaceholder ?? 'Enter password')
+                        }
+                        value={userForm.password}
+                        onChange={(event) =>
+                          updateUserField('password', event.target.value)
+                        }
+                      />
+                    </label>
 
-                    <input
-                      type="password"
-                      autoComplete="new-password"
-                      placeholder={
-                        editingUserId
-                          ? 'Leave empty to keep current password'
-                          : 'Enter password'
-                      }
-                      value={userForm.password}
-                      onChange={(event) =>
-                        updateUserField('password', event.target.value)
-                      }
-                    />
-                  </label>
+                    <label>
+                      <span className="settings-user-field-label">
+                        {t.confirmPassword ?? 'Confirm Password'}
+                        {!editingUserId && <b>*</b>}
+                      </span>
 
-                  <label>
-                    <span className="settings-user-field-label">
-                      {t.confirmPassword ?? 'Confirm Password'}
-                      {!editingUserId && <b>*</b>}
-                    </span>
-
-                    <input
-                      type="password"
-                      autoComplete="new-password"
-                      placeholder="Repeat password"
-                      value={userForm.confirmPassword}
-                      onChange={(event) =>
-                        updateUserField(
-                          'confirmPassword',
-                          event.target.value,
-                        )
-                      }
-                    />
-                  </label>
-                </div>
-              </div>
-
-              {/* Permissions */}
-              <div className="settings-user-section permissions-section">
-                <div className="settings-user-section-head">
-                  <div>
-                    <h3>{t.modulePermissions ?? 'Module Permissions'}</h3>
-                    <p>
-                      Select which actions this user can perform in each module.
-                    </p>
+                      <input
+                        type="password"
+                        autoComplete="new-password"
+                        placeholder={t.repeatPasswordPlaceholder ?? 'Repeat password'}
+                        value={userForm.confirmPassword}
+                        onChange={(event) =>
+                          updateUserField(
+                            'confirmPassword',
+                            event.target.value,
+                          )
+                        }
+                      />
+                    </label>
                   </div>
                 </div>
 
-                <div className="settings-permissions-table-wrap">
-                  <table className="settings-permissions-table">
-                    <thead>
-                      <tr>
-                        <th>{t.modulesAccess ?? 'Module'}</th>
-                        <th>{t.createPermission ?? 'Create'}</th>
-                        <th>{t.readPermission ?? 'Read'}</th>
-                        <th>{t.updatePermission ?? 'Update'}</th>
-                        <th>{t.delete ?? 'Delete'}</th>
-                        <th>{t.allPermissions ?? 'All'}</th>
-                      </tr>
-                    </thead>
+                {/* Permissions */}
+                <div className="settings-user-section permissions-section">
+                  <div className="settings-user-section-head">
+                    <div>
+                      <h3>{t.modulePermissions ?? 'Module Permissions'}</h3>
+                      <p>
+                        {t.permissionsHint ?? 'Select which actions this user can perform in each module.'}
+                      </p>
+                    </div>
+                  </div>
 
-                    <tbody>
-                      {permissionModules.map((module) => {
-                        const modulePermissions =
-                          userForm.permissions[module.key] ?? {}
+                  <div className="settings-permissions-table-wrap">
+                    <table className="settings-permissions-table">
+                      <thead>
+                        <tr>
+                          <th>{t.modulesAccess ?? 'Module'}</th>
+                          <th>{t.createPermission ?? 'Create'}</th>
+                          <th>{t.readPermission ?? 'Read'}</th>
+                          <th>{t.updatePermission ?? 'Update'}</th>
+                          <th>{t.delete ?? 'Delete'}</th>
+                          <th>{t.allPermissions ?? 'All'}</th>
+                        </tr>
+                      </thead>
 
-                        const allChecked = permissionActions.every(
-                          (action) => modulePermissions[action],
-                        )
+                      <tbody>
+                        {permissionModules.map((module) => {
+                          const modulePermissions =
+                            userForm.permissions[module.key] ?? {}
 
-                        return (
-                          <tr key={module.key}>
-                            <td>
-                              <strong>
-                                {t[module.key] ?? module.label}
-                              </strong>
-                            </td>
+                          const allChecked = permissionActions.every(
+                            (action) => modulePermissions[action],
+                          )
 
-                            {permissionActions.map((action) => (
-                              <td key={action}>
-                                <label className="settings-permission-check">
+                          return (
+                            <tr key={module.key}>
+                              <td>
+                                <strong>
+                                  {t[module.key] ?? module.label}
+                                </strong>
+                              </td>
+
+                              {permissionActions.map((action) => (
+                                <td key={action}>
+                                  <label className="settings-permission-check">
+                                    <input
+                                      type="checkbox"
+                                      checked={Boolean(
+                                        modulePermissions[action],
+                                      )}
+                                      onChange={(event) =>
+                                        setModulePermission(
+                                          module.key,
+                                          action,
+                                          event.target.checked,
+                                        )
+                                      }
+                                    />
+
+                                    <span />
+                                  </label>
+                                </td>
+                              ))}
+
+                              <td>
+                                <label className="settings-permission-check all">
                                   <input
                                     type="checkbox"
-                                    checked={Boolean(
-                                      modulePermissions[action],
-                                    )}
+                                    checked={allChecked}
                                     onChange={(event) =>
                                       setModulePermission(
                                         module.key,
-                                        action,
+                                        'all',
                                         event.target.checked,
                                       )
                                     }
@@ -2424,30 +2553,12 @@ const formatRemainingLicenseTime = (milliseconds = 0) => {
                                   <span />
                                 </label>
                               </td>
-                            ))}
-
-                            <td>
-                              <label className="settings-permission-check all">
-                                <input
-                                  type="checkbox"
-                                  checked={allChecked}
-                                  onChange={(event) =>
-                                    setModulePermission(
-                                      module.key,
-                                      'all',
-                                      event.target.checked,
-                                    )
-                                  }
-                                />
-
-                                <span />
-                              </label>
-                            </td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
 

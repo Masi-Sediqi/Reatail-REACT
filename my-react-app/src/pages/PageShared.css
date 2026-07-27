@@ -99,6 +99,20 @@
   white-space: nowrap;
 }
 
+.metric-card .metric-value-list {
+  display: grid;
+  gap: 4px;
+  white-space: normal;
+}
+
+.metric-card .metric-value-list b {
+  display: block;
+  font-size: 21px;
+  line-height: 1.05;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
 .metric-icon {
   flex: 0 0 auto;
   width: 40px;
@@ -1068,6 +1082,52 @@
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.14);
 }
 
+.entity-modal .smooth-select-btn.field-invalid,
+.entity-modal .category-search.is-invalid input,
+.entity-modal .unit-search.is-invalid input {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.14) !important;
+}
+
+.entity-modal .validation-error,
+.custom-field-inputs .validation-error,
+.godown-purchase-modal .validation-error {
+  margin-top: -3px;
+  color: #ef4444;
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.retail-shell.theme-dark .entity-modal .field-invalid,
+.retail-shell.theme-dark .entity-modal .smooth-select-btn.field-invalid,
+.retail-shell.theme-dark .entity-modal .category-search.is-invalid input,
+.retail-shell.theme-dark .entity-modal .unit-search.is-invalid input,
+.retail-shell.theme-dark .godown-purchase-modal .field-invalid {
+  background: rgba(239, 68, 68, 0.08) !important;
+}
+
+.godown-purchase-modal .field-invalid {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.14) !important;
+}
+
+.purchase-quantity-field,
+.product-pick {
+  min-width: 0;
+}
+
+.purchase-quantity-field {
+  display: grid;
+  gap: 5px;
+}
+
+.purchase-line-error {
+  display: block;
+  margin-top: 3px;
+  white-space: normal;
+}
+
 .entity-modal h2 {
   grid-column: 1 / -1;
   margin: 0 0 4px;
@@ -1537,35 +1597,84 @@
   z-index: 3600;
   place-items: center;
   padding: 24px;
+  background: rgba(15, 23, 42, 0.54);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
-.app-confirm-modal {
+.app-confirm-modal,
+.confirm-delete-modal,
+.bundle-delete-modal {
   width: min(512px, calc(100vw - 32px));
   display: grid;
-  gap: 14px;
-  padding: 28px 24px 24px;
+  gap: 12px;
+  padding: 24px;
   border: 1px solid var(--border);
   border-radius: 12px;
   background: var(--panel-bg);
   color: var(--text);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
-  animation: modalZoomIn 160ms ease both;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.22);
+  animation: modalZoomIn 110ms ease both;
 }
 
-.app-confirm-modal h2 {
+.app-confirm-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.app-confirm-icon.danger {
+  border: 1px solid #fecaca;
+}
+
+.app-confirm-modal h2,
+.confirm-delete-modal h2,
+.bundle-delete-modal h2 {
   margin: 0;
   font-size: 18px;
   font-weight: 900;
+  line-height: 1.25;
 }
 
-.app-confirm-modal p {
+.app-confirm-modal p,
+.confirm-delete-modal p,
+.bundle-delete-modal p {
   margin: 0;
   color: var(--muted);
   font-size: 14px;
   line-height: 1.6;
 }
 
-.app-confirm-modal .danger-btn {
+.app-confirm-modal .modal-actions,
+.confirm-delete-modal .modal-actions,
+.bundle-delete-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.app-confirm-modal .modal-actions button,
+.confirm-delete-modal .modal-actions button,
+.bundle-delete-actions button {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--panel-bg);
+  color: var(--text);
+  box-shadow: none;
+  cursor: pointer;
+  font-weight: 850;
+}
+
+.app-confirm-modal .danger-btn,
+.confirm-delete-modal .danger-btn,
+.bundle-delete-confirm {
   min-height: 40px;
   border: 1px solid #ef4444;
   border-radius: 9px;
@@ -1574,6 +1683,14 @@
   padding: 0 16px;
   cursor: pointer;
   font-weight: 900;
+}
+
+.app-confirm-modal .danger-btn:hover,
+.confirm-delete-modal .danger-btn:hover,
+.bundle-delete-confirm:hover {
+  border-color: #dc2626;
+  background: #dc2626;
+  color: #fff;
 }
 
 .entity-actions button,

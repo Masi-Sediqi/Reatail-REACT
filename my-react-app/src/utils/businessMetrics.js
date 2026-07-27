@@ -1,6 +1,18 @@
 import { formatBusinessCurrencyAmount } from './currencyExchange.js'
 
 export const parseNumber = (value) => Number.parseFloat(value || 0) || 0
+const payrollPeriodKey = (entry) => `${entry.start || ''}__${entry.end || ''}`
+const getPayrollPaidTotal = (staffMembers = []) => staffMembers.reduce((sum, staff) => (
+  sum + (staff.payrollHistory || []).reduce((historySum, entry) => historySum + parseNumber(entry.paidAmount), 0)
+), 0)
+const getPayrollPayableTotal = (staffMembers = []) => staffMembers.reduce((sum, staff) => {
+  const latestPayableByPeriod = new Map()
+  ;(staff.payrollHistory || []).forEach((entry) => {
+    latestPayableByPeriod.set(payrollPeriodKey(entry), parseNumber(entry.payable))
+  })
+  const historyPayable = [...latestPayableByPeriod.values()].reduce((total, amount) => total + amount, 0)
+  return sum + historyPayable
+}, 0)
 
 export const formatMoney = (value, currency = 'AFN') => {
   return formatBusinessCurrencyAmount(value, currency)
@@ -60,20 +72,32 @@ export const calculateBusinessMetrics = ({
   const expenseTotal = expenses.reduce((sum, expense) => sum + parseNumber(expense.amount), 0)
   const refundTotal = sales.reduce((sum, sale) => sum + (sale.refundHistory || []).reduce((refundSum, refund) => refundSum + parseNumber(refund.amount), 0), 0)
   const discountTotal = sales.reduce((sum, sale) => sum + parseNumber(sale.discountTotal), 0)
+  const productPurchaseById = new Map(products.map((product) => [product.id, parseNumber(product.purchase)]))
+  const productProfit = sales.reduce((saleSum, sale) => {
+    const paidAmount = parseNumber(sale.paidAmount)
+    const total = parseNumber(sale.total)
+    const paidRatio = total > 0 ? Math.min(1, paidAmount / total) : 1
+    const saleProfit = (sale.items || []).reduce((itemSum, item) => {
+      const quantity = parseNumber(item.quantity)
+      const lineTotal = parseNumber(item.lineTotal || (parseNumber(item.price) * quantity))
+      const purchase = parseNumber(item.purchase ?? productPurchaseById.get(item.productId))
+      return itemSum + Math.max(0, lineTotal - purchase * quantity)
+    }, 0)
+    return saleSum + saleProfit * paidRatio
+  }, 0)
   const stockValue = products.reduce((sum, product) => sum + parseNumber(product.quantity) * parseNumber(product.purchase), 0)
   const stockQuantity = products.reduce((sum, product) => sum + parseNumber(product.quantity), 0)
-  const staffPayroll = staffMembers.reduce((sum, staff) => sum + parseNumber(staff.salary), 0)
-  const staffPaid = expenses
-    .filter((expense) => ['salary', 'payroll', 'staff'].some((word) => getExpenseCategory(expense).toLowerCase().includes(word)))
-    .reduce((sum, expense) => sum + parseNumber(expense.amount), 0)
-  const grossProfit = Math.max(0, revenue - discountTotal)
-  const netProfit = revenue - expenseTotal - refundTotal
-  const pureProfit = revenue - expenseTotal - refundTotal - pendingPayments
+  const staffPaid = getPayrollPaidTotal(staffMembers)
+  const staffPayable = getPayrollPayableTotal(staffMembers)
+  const grossProfit = productProfit
+  const netProfit = productProfit - expenseTotal - staffPaid - refundTotal
+  const pureProfit = Math.max(0, productProfit - refundTotal)
+  const cashWalletValue = cashWallet + paidRevenue - expenseTotal
 
   return {
     activeProducts: String(products.length),
-    cashWallet,
-    currentCashWallet: formatMoney(cashWallet, currency),
+    cashWallet: cashWalletValue,
+    currentCashWallet: formatMoney(cashWalletValue, currency),
     discountTotal,
     expenseTotal,
     globalStockValue: formatMoney(stockValue, currency),
@@ -86,7 +110,7 @@ export const calculateBusinessMetrics = ({
     revenue,
     refundTotal,
     staffPaid,
-    staffPayable: Math.max(0, staffPayroll - staffPaid),
+    staffPayable,
     stockQuantity,
     stockValue,
     totalCustomers: String(new Set(sales.map((sale) => sale.customerId || sale.customerName).filter(Boolean)).size),
@@ -106,7 +130,7 @@ export const calculateBusinessMetrics = ({
       pureProfit: formatMoney(pureProfit, currency),
       revenue: formatMoney(revenue, currency),
       staffPaid: formatMoney(staffPaid, currency),
-      staffPayable: formatMoney(Math.max(0, staffPayroll - staffPaid), currency),
+      staffPayable: formatMoney(staffPayable, currency),
       stockValue: formatMoney(stockValue, currency),
     },
   }

@@ -1,32 +1,32 @@
-﻿import { useEffect, useMemo, useRef, useState } from 'react'
-import Dashboard from './pages/Dashboard.jsx'
-import DashboardMetricDetail from './pages/DashboardMetricDetail.jsx'
-import CashWalletPage from './pages/CashWalletPage.jsx'
-import Profile from './pages/Profile.jsx'
-import SettingsPage from './pages/Settings.jsx'
-import ProductsPage from './pages/Products.jsx'
-import SuppliersPage from './pages/Suppliers.jsx'
-import BundlesPage from './pages/Bundles.jsx'
-import CustomersPage from './pages/Customers.jsx'
-import ExpensesPage from './pages/Expenses.jsx'
-import RecycleBinPage from './pages/RecycleBin.jsx'
-import StaffPage from './pages/Staff.jsx'
-import BillingPage from './pages/Billing.jsx'
-import SalesBillsPage from './pages/SalesBills.jsx'
-import GodownPage from './pages/Godown.jsx'
-import LoansPage from './pages/Loans.jsx'
-import FinancialsPage from './pages/Financials.jsx'
-import ReportsPage from './pages/Reports.jsx'
-import TermsPrivacy from './pages/TermsPrivacy.jsx'
-import AgentPage from './pages/Agent.jsx'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import Header from './components/Header.jsx'
 import Sidebar from './components/Sidebar.jsx'
-import UserGuide from './pages/UserGuide.jsx'
-import HelpCenter from './pages/HelpCenter.jsx'
-import { Eye, Lock, Shield } from './components/Icons.jsx'
-import About from './pages/About.jsx'
-import FAQ from './pages/FAQ.jsx'
-import Workflows from './pages/Workflows.jsx'
+
+const Dashboard = lazy(() => import('./pages/Dashboard.jsx'))
+const DashboardMetricDetail = lazy(() => import('./pages/DashboardMetricDetail.jsx'))
+const CashWalletPage = lazy(() => import('./pages/CashWalletPage.jsx'))
+const Profile = lazy(() => import('./pages/Profile.jsx'))
+const SettingsPage = lazy(() => import('./pages/Settings.jsx'))
+const ProductsPage = lazy(() => import('./pages/Products.jsx'))
+const SuppliersPage = lazy(() => import('./pages/Suppliers.jsx'))
+const CustomersPage = lazy(() => import('./pages/Customers.jsx'))
+const ExpensesPage = lazy(() => import('./pages/Expenses.jsx'))
+const RecycleBinPage = lazy(() => import('./pages/RecycleBin.jsx'))
+const StaffPage = lazy(() => import('./pages/Staff.jsx'))
+const BillingPage = lazy(() => import('./pages/Billing.jsx'))
+const SalesBillsPage = lazy(() => import('./pages/SalesBills.jsx'))
+const GodownPage = lazy(() => import('./pages/Godown.jsx'))
+const LoansPage = lazy(() => import('./pages/Loans.jsx'))
+const FinancialsPage = lazy(() => import('./pages/Financials.jsx'))
+const ReportsPage = lazy(() => import('./pages/Reports.jsx'))
+const TermsPrivacy = lazy(() => import('./pages/TermsPrivacy.jsx'))
+const UserGuide = lazy(() => import('./pages/UserGuide.jsx'))
+const HelpCenter = lazy(() => import('./pages/HelpCenter.jsx'))
+const About = lazy(() => import('./pages/About.jsx'))
+const FAQ = lazy(() => import('./pages/FAQ.jsx'))
+const Workflows = lazy(() => import('./pages/Workflows.jsx'))
+
+import { AlertTriangle, Eye, Lock, Shield } from './components/Icons.jsx'
 import { colorThemes, productCategories } from './data/dashboardData.js'
 import { translations } from './data/translations.js'
 import { getCurrencyMeta } from './utils/currencyExchange.js'
@@ -48,11 +48,11 @@ const getPageFromPath = () => {
   if (window.location.pathname === '/faq') return 'faq'
   if (window.location.pathname === '/workflows') return 'workflows'
   if (window.location.pathname === '/profile') return 'profile'
+  if (window.location.pathname === '/settings/users') return 'userManagement'
   if (window.location.pathname === '/settings') return 'settings'
   if (window.location.pathname === '/terms') return 'terms'
   if (window.location.pathname === '/products') return 'products'
   if (window.location.pathname === '/suppliers') return 'suppliers'
-  if (window.location.pathname === '/bundles') return 'bundles'
   if (window.location.pathname === '/customers') return 'customers'
   if (window.location.pathname === '/staff') return 'staff'
   if (window.location.pathname === '/expenses') return 'expenses'
@@ -61,7 +61,6 @@ const getPageFromPath = () => {
   if (window.location.pathname === '/loans') return 'loans'
   if (window.location.pathname === '/financials') return 'financials'
   if (window.location.pathname === '/reports') return 'reports'
-  if (window.location.pathname === '/agent') return 'agent'
   if (window.location.pathname === '/sales-bills') return 'salesBills'
   if (window.location.pathname === '/recycle-bin') return 'recycleBin'
   return 'dashboard'
@@ -303,6 +302,11 @@ const normalizeDeletedItems = (items) => asArray(items).map((item) => ({
   data: item.data ?? item,
 }))
 
+const normalizeCashWalletBalance = (value, entries = []) => {
+  const amount = toNumber(value, 0)
+  return amount === 120 && !entries.length ? 0 : amount
+}
+
 const normalizeBackupData = (backup) => {
   const data = backup?.data ?? backup
   if (!data || typeof data !== 'object') return null
@@ -334,7 +338,7 @@ const normalizeBackupData = (backup) => {
     staffMembers: Array.isArray(data.staffMembers) ? data.staffMembers : normalizeStaffBackup(data.staff, data.staff_payments),
     salesBills: Array.isArray(data.salesBills) ? data.salesBills : asArray(data.sales).map(normalizeSaleBackup),
     godownEntries: Array.isArray(data.godownEntries) ? data.godownEntries : normalizeGodownBackup(data.godown),
-    cashWallet: toNumber(data.cashWallet, 120),
+    cashWallet: normalizeCashWalletBalance(data.cashWallet, cashWalletEntries),
     cashWalletEntries,
     deletedItems: Array.isArray(data.deletedItems) ? data.deletedItems : normalizeDeletedItems(data.recycle_bin),
     categories: mergeCategories(data.categories ?? asArray(data.products).map((product) => product.category).filter(Boolean)),
@@ -364,6 +368,7 @@ function ConfirmActionModal({ confirmText, message, onCancel, onConfirm, title, 
   return (
     <div className="modal-backdrop app-confirm-backdrop" onClick={onCancel}>
       <div className="app-confirm-modal" onClick={(event) => event.stopPropagation()}>
+        <span className="app-confirm-icon danger"><AlertTriangle size={20} /></span>
         <h2>{title}</h2>
         <p>{message}</p>
         <footer className="modal-actions">
@@ -384,10 +389,39 @@ function LockScreen({
   t,
 }) {
   const [password, setPassword] = useState('')
+  const [selectedAccountId, setSelectedAccountId] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [checking, setChecking] = useState(false)
   const isLicenseMode = mode === 'license'
+  const adminHashes = useMemo(() => [
+    companyInfo.securitySettings?.passwordHashes?.primary || companyInfo.securitySettings?.passwordHash,
+    companyInfo.securitySettings?.passwordHashes?.secondary,
+  ].filter(Boolean), [companyInfo.securitySettings])
+  const loginAccounts = useMemo(() => {
+    if (isLicenseMode) return []
+    const adminAccount = adminHashes.length
+      ? [{
+        id: 'administrator',
+        displayName: 'Administrator',
+        username: 'admin',
+        subtitle: t.fullSystemAccess ?? 'Full system access',
+        type: 'admin',
+      }]
+      : []
+    const userAccounts = (companyInfo.systemUsers ?? [])
+      .filter((user) => user?.id && (user.username || user.displayName) && (user.password || user.passwordHash))
+      .map((user) => ({
+        ...user,
+        id: `user:${user.id}`,
+        displayName: user.displayName || user.username,
+        username: user.username || user.displayName,
+        subtitle: user.username ? `@${user.username}` : (t.user ?? 'User'),
+        type: 'user',
+      }))
+    return [...adminAccount, ...userAccounts]
+  }, [adminHashes.length, companyInfo.systemUsers, isLicenseMode, t.fullSystemAccess, t.user])
+  const selectedAccount = loginAccounts.find((account) => account.id === selectedAccountId)
 
   const unlock = async (event) => {
     event.preventDefault()
@@ -408,11 +442,16 @@ function LockScreen({
     }
 
     const passwordHash = await hashPassword(password)
-    const allowedHashes = [
-      companyInfo.securitySettings?.passwordHashes?.primary || companyInfo.securitySettings?.passwordHash,
-      companyInfo.securitySettings?.passwordHashes?.secondary,
-    ].filter(Boolean)
-    if (allowedHashes.includes(passwordHash)) {
+    const activeAccount = selectedAccount || loginAccounts[0]
+    const matchedAdmin = activeAccount?.type === 'admin' && adminHashes.includes(passwordHash)
+    const userId = activeAccount?.type === 'user' ? activeAccount.id.replace(/^user:/, '') : ''
+    const user = (companyInfo.systemUsers ?? []).find((item) => item.id === userId)
+    const matchedUser = Boolean(user && (
+      (user.passwordHash && user.passwordHash === passwordHash)
+      || (!user.passwordHash && user.password === password)
+    ))
+
+    if (matchedAdmin || matchedUser) {
       setPassword('')
       setError('')
       onUnlock()
@@ -434,7 +473,9 @@ function LockScreen({
         <p>
           {isLicenseMode
             ? (t.licenseExpiredMessage ?? 'Your project validity period has expired. Please renew or purchase a license to continue.')
-            : (t.welcomeBackAdministrator ?? 'Welcome back, Administrator')}
+            : selectedAccount
+              ? (t.enterPasswordToContinue ?? 'Enter password to continue')
+              : (t.selectAccountToContinue ?? 'Select your account to continue')}
         </p>
         {isLicenseMode && (
           <div className="app-license-device">
@@ -442,34 +483,69 @@ function LockScreen({
             <strong>{deviceId || 'Loading...'}</strong>
           </div>
         )}
-        <label className="app-lock-input">
-          <input
-            autoFocus
-            placeholder={isLicenseMode ? 'Enter license key' : ''}
-            type={isLicenseMode || showPassword ? 'text' : 'password'}
-            value={password}
-            onChange={(event) => {
-              setPassword(event.target.value)
-              setError('')
-            }}
-          />
-          {!isLicenseMode && (
-            <button type="button" aria-label={t.showPassword ?? 'Show password'} onClick={() => setShowPassword((current) => !current)}>
-              <Eye size={16} />
+        {!isLicenseMode && loginAccounts.length > 0 && !selectedAccount ? (
+          <div className="app-account-list">
+            {loginAccounts.map((account) => (
+              <button
+                className="app-account-card"
+                key={account.id}
+                type="button"
+                onClick={() => {
+                  setSelectedAccountId(account.id)
+                  setPassword('')
+                  setError('')
+                }}
+              >
+                <span className={`app-account-avatar ${account.type === 'admin' ? 'admin' : ''}`}>
+                  {account.type === 'admin' ? <Shield size={18} /> : account.displayName.slice(0, 1).toUpperCase()}
+                </span>
+                <span>
+                  <strong>{account.displayName}</strong>
+                  <small>{account.subtitle}</small>
+                </span>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <>
+            {selectedAccount && (
+              <button className="app-selected-account" type="button" onClick={() => { setSelectedAccountId(''); setPassword(''); setError('') }}>
+                <span className={`app-account-avatar ${selectedAccount.type === 'admin' ? 'admin' : ''}`}>
+                  {selectedAccount.type === 'admin' ? <Shield size={16} /> : selectedAccount.displayName.slice(0, 1).toUpperCase()}
+                </span>
+                <span><strong>{selectedAccount.displayName}</strong><small>{t.changeAccount ?? 'Change account'}</small></span>
+              </button>
+            )}
+            <label className="app-lock-input">
+              <input
+                autoFocus
+                placeholder={isLicenseMode ? 'Enter license key' : (t.password ?? 'Password')}
+                type={isLicenseMode || showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(event) => {
+                  setPassword(event.target.value)
+                  setError('')
+                }}
+              />
+              {!isLicenseMode && (
+                <button type="button" aria-label={t.showPassword ?? 'Show password'} onClick={() => setShowPassword((current) => !current)}>
+                  <Eye size={16} />
+                </button>
+              )}
+            </label>
+            {error && <span className="app-lock-error">{error}</span>}
+            <button className="app-lock-submit" type="submit" disabled={checking || !password || (isLicenseMode && !deviceId)}>
+              <Shield size={15} />
+              <span>
+                {checking
+                  ? (t.checking ?? 'Checking...')
+                  : isLicenseMode
+                    ? (t.activateLicense ?? 'Activate License')
+                    : (t.unlock ?? 'Unlock')}
+              </span>
             </button>
-          )}
-        </label>
-        {error && <span className="app-lock-error">{error}</span>}
-        <button className="app-lock-submit" type="submit" disabled={checking || !password || (isLicenseMode && !deviceId)}>
-          <Shield size={15} />
-          <span>
-            {checking
-              ? (t.checking ?? 'Checking...')
-              : isLicenseMode
-                ? (t.activateLicense ?? 'Activate License')
-                : (t.unlock ?? 'Unlock')}
-          </span>
-        </button>
+          </>
+        )}
         <small>
           {isLicenseMode
             ? (t.licenseRenewalHelp ?? 'Send this Device ID to receive a new monthly license key.')
@@ -511,7 +587,12 @@ function App() {
   const [salesBills, setSalesBills] = useState(() => readStorage('retail-sales-bills', []))
   const [godownEntries, setGodownEntries] = useState(() => readStorage('retail-godown-entries', []))
   const [bundles, setBundles] = useState(() => readStorage('retail-bundles', []))
-  const [cashWallet, setCashWallet] = useState(() => readStorage('retail-cash-wallet', 120))
+  const [cashWallet, setCashWallet] = useState(() =>
+    normalizeCashWalletBalance(
+      readStorage('retail-cash-wallet', 0),
+      readStorage('retail-cash-wallet-entries', []),
+    )
+  )
   const [cashWalletEntries, setCashWalletEntries] = useState(() => readStorage('retail-cash-wallet-entries', []))
   const [editingSale, setEditingSale] = useState(null)
   const [deletedItems, setDeletedItems] = useState(() => readStorage('retail-recycle-bin', []))
@@ -551,6 +632,8 @@ function App() {
     securitySettings.passwordHashes?.primary ||
     securitySettings.passwordHashes?.secondary,
   )
+  const hasSystemUsers = (companyInfo.systemUsers ?? []).some((user) => user?.id && (user.password || user.passwordHash))
+  const hasLoginAccount = hasSecurityPassword || hasSystemUsers
   window.__retailCurrencyView = {
     baseCurrency,
     businessCurrencyFilter,
@@ -569,7 +652,9 @@ function App() {
           ? `/customers/${nextPage.split(':')[1] || ''}`
         : nextPage === 'profile'
         ? '/profile'
-        : nextPage === 'settings'
+          : nextPage === 'userManagement'
+            ? '/settings/users'
+          : nextPage === 'settings'
           ? '/settings'
           : nextPage === 'terms'
             ? '/terms'
@@ -679,7 +764,7 @@ function App() {
     setStaffMembers(Array.isArray(data.staffMembers) ? data.staffMembers : [])
     setSalesBills(Array.isArray(data.salesBills) ? data.salesBills : [])
     setGodownEntries(Array.isArray(data.godownEntries) ? data.godownEntries : [])
-    setCashWallet(Number(data.cashWallet ?? 120))
+    setCashWallet(normalizeCashWalletBalance(data.cashWallet, data.cashWalletEntries ?? []))
     setCashWalletEntries(Array.isArray(data.cashWalletEntries) ? data.cashWalletEntries : [])
     setDeletedItems(Array.isArray(data.deletedItems) ? data.deletedItems : [])
     setCategories(mergeCategories(data.categories))
@@ -703,11 +788,21 @@ function App() {
     setStaffMembers([])
     setSalesBills([])
     setGodownEntries([])
-    setCashWallet(120)
+    setCashWallet(0)
     setCashWalletEntries([])
     setDeletedItems([])
+    setCategories(mergeCategories([]))
+    setExpenseCategories(defaultExpenseCategories)
+    setBusinessCurrencyFilter('all')
+    setExchangeCurrency('original')
+    setEditingSale(null)
     showToast(t.dataCleared ?? 'Data cleared')
   }
+
+  useEffect(() => {
+    const splashTimer = window.setTimeout(() => setSplashReady(true), 1300)
+    return () => window.clearTimeout(splashTimer)
+  }, [])
 
   const startEditBill = (sale) => {
     setEditingSale(sale)
@@ -745,11 +840,6 @@ function App() {
   }
 
   useEffect(() => {
-    const splashTimer = window.setTimeout(() => setSplashReady(true), 1300)
-    return () => window.clearTimeout(splashTimer)
-  }, [])
-
-  useEffect(() => {
     const syncPageFromPath = () => {
       setPage(getPageFromPath())
     }
@@ -773,7 +863,7 @@ function App() {
       setStaffMembers(normalizedData.staffMembers ?? [])
       setSalesBills(normalizedData.salesBills ?? [])
       setGodownEntries(normalizedData.godownEntries ?? [])
-      setCashWallet(Number(normalizedData.cashWallet ?? 120))
+      setCashWallet(normalizeCashWalletBalance(normalizedData.cashWallet, normalizedData.cashWalletEntries ?? []))
       setCashWalletEntries(normalizedData.cashWalletEntries ?? [])
       setDeletedItems(normalizedData.deletedItems ?? [])
       setCategories(mergeCategories(normalizedData.categories))
@@ -800,7 +890,7 @@ function App() {
         staffMembers: readStorage('retail-staff-members', []),
         salesBills: readStorage('retail-sales-bills', []),
         godownEntries: readStorage('retail-godown-entries', []),
-        cashWallet: readStorage('retail-cash-wallet', 120),
+        cashWallet: readStorage('retail-cash-wallet', 0),
         cashWalletEntries: readStorage('retail-cash-wallet-entries', []),
         deletedItems: readStorage('retail-recycle-bin', []),
         categories: mergeCategories(readStorage('retail-product-categories', [])),
@@ -962,12 +1052,12 @@ function App() {
   useEffect(() => {
     if (!storageLoaded || initialLockAppliedRef.current) return
     initialLockAppliedRef.current = true
-    if (hasSecurityPassword && securitySettings.lockOnStart) setIsLocked(true)
-  }, [hasSecurityPassword, securitySettings.lockOnStart, storageLoaded])
+    if (hasLoginAccount && securitySettings.lockOnStart) setIsLocked(true)
+  }, [hasLoginAccount, securitySettings.lockOnStart, storageLoaded])
 
   useEffect(() => {
-    if (!hasSecurityPassword && isLocked) setIsLocked(false)
-  }, [hasSecurityPassword, isLocked])
+    if (!hasLoginAccount && isLocked) setIsLocked(false)
+  }, [hasLoginAccount, isLocked])
 
   const notifications = useMemo(() => {
     const items = []
@@ -1108,17 +1198,18 @@ function App() {
   }
 
   return (
-    <div className={`retail-shell theme-${theme} ${sidebarOpen ? 'sidebar-open' : ''}`.trim()} dir={isRtl ? 'rtl' : 'ltr'} style={themeStyle}>
-      <div className="workspace">
+    <div className={`retail-shell theme-${theme} ${theme === 'dark' ? 'dark' : ''} ${sidebarOpen ? 'sidebar-open' : ''}`.trim()} dir={isRtl ? 'rtl' : 'ltr'} style={themeStyle}>
+      <div className="workspace min-h-screen min-w-0 lg:block">
         <button className="mobile-sidebar-toggle" type="button" aria-label={t.menu ?? 'Menu'} onClick={() => setSidebarOpen(true)}>
           <span />
           <span />
           <span />
         </button>
         <button className="mobile-sidebar-scrim" type="button" aria-label={t.close ?? 'Close'} onClick={() => setSidebarOpen(false)} />
-        <Sidebar activePage={page.startsWith('dashboardMetric:') ? 'dashboard' : page.startsWith('customerProfile:') ? 'customers' : page} companyInfo={companyInfo} onNavigate={navigate} onToggle={() => setSidebarOpen((current) => !current)} t={t} />
-        <main className="main-area">
+        <Sidebar activePage={page.startsWith('dashboardMetric:') ? 'dashboard' : page.startsWith('customerProfile:') ? 'customers' : page === 'userManagement' ? 'settings' : page} companyInfo={companyInfo} onNavigate={navigate} onToggle={() => setSidebarOpen((current) => !current)} t={t} />
+        <main className="main-area min-w-0 bg-slate-50 dark:bg-slate-950">
           <Header
+            activePage={page.startsWith('dashboardMetric:') ? 'dashboard' : page}
             baseCurrency={baseCurrency}
             businessCurrencyFilter={businessCurrencyFilter}
             cashWallet={cashWallet}
@@ -1145,7 +1236,7 @@ function App() {
             onWalletEntriesChange={setCashWalletEntries}
             onLanguageChange={setLanguage}
             onLockScreen={() => {
-              if (hasSecurityPassword) {
+              if (hasLoginAccount) {
                 setIsLocked(true)
               } else {
                 navigate('settings')
@@ -1169,6 +1260,7 @@ function App() {
             theme={theme}
           />
 
+          <Suspense fallback={<div className="page-loading"><span /><p>{t.loading ?? 'Loading…'}</p></div>}>
           {page === 'terms' ? (
   <TermsPrivacy companyInfo={companyInfo} t={t} />
 ) : page === 'userGuide' ? (
@@ -1181,7 +1273,7 @@ function App() {
   <FAQ t={t} />
 ) : page === 'workflows' ? (
   <Workflows t={t} />
-) : page === 'settings' ? (
+) : page === 'settings' || page === 'userManagement' ? (
   
             <SettingsPage
   activeColorTheme={activeColorTheme}
@@ -1200,21 +1292,27 @@ function App() {
   onImportBackupData={importBackupData}
   onLanguageChange={setLanguage}
   onNotify={showToast}
+  onNavigate={navigate}
   onPrintSettingsChange={setPrintSettings}
   printSettings={printSettings}
+  initialTab={page === 'userManagement' ? 'users' : 'general'}
+  standaloneUserManagement={page === 'userManagement'}
   t={t}
 />
           ) : page === 'profile' ? (
             <Profile companyInfo={companyInfo} onCompanyInfoChange={setCompanyInfo} onNotify={showToast} t={t} />
           ) : page === 'products' ? (
             <ProductsPage
+              cashWallet={cashWallet}
               categories={categories}
               companyInfo={companyInfo}
+              onCashWalletChange={setCashWallet}
               onCategoryAdd={addCategory}
               onMoveToRecycle={moveToRecycle}
               onNotify={showToast}
               onProductsChange={setProducts}
               onSuppliersChange={setSuppliers}
+              onWalletEntriesChange={setCashWalletEntries}
               printSettings={printSettings}
               products={products}
               suppliers={suppliers}
@@ -1233,18 +1331,8 @@ function App() {
               suppliers={suppliers}
               t={t}
             />
-          ) : page === 'bundles' ? (
-            <BundlesPage
-              bundles={bundles}
-              companyInfo={companyInfo}
-              onBundlesChange={setBundles}
-              onMoveToRecycle={moveToRecycle}
-              onSuppliersChange={setSuppliers}
-              printSettings={printSettings}
-              suppliers={suppliers}
-              t={t}
-            />
-          ) : page === 'customers' || page.startsWith('customerProfile:') ? (
+          )
+: page === 'customers' || page.startsWith('customerProfile:') ? (
             <CustomersPage
               companyInfo={companyInfo}
               customers={customers}
@@ -1260,12 +1348,15 @@ function App() {
           ) : page === 'staff' ? (
             <StaffPage
               companyInfo={companyInfo}
+              onCashWalletChange={setCashWallet}
               onMoveToRecycle={moveToRecycle}
               onNotify={showToast}
               onStaffChange={setStaffMembers}
+              onWalletEntriesChange={setCashWalletEntries}
               printSettings={printSettings}
               staffMembers={staffMembers}
               t={t}
+              walletEntries={cashWalletEntries}
             />
           ) : page === 'expenses' ? (
             <ExpensesPage
@@ -1316,6 +1407,7 @@ function App() {
               onProductsChange={setProducts}
               printSettings={printSettings}
               products={products}
+              sales={salesBills}
               suppliers={suppliers}
               t={t}
               onNavigate={navigate}
@@ -1353,21 +1445,8 @@ function App() {
               staffMembers={staffMembers}
               t={t}
             />
-          ) : page === 'agent' ? (
-            <AgentPage
-              cashWallet={cashWallet}
-              cashWalletEntries={cashWalletEntries}
-              companyInfo={companyInfo}
-              customers={customers}
-              expenses={expenses}
-              godownEntries={godownEntries}
-              products={products}
-              sales={salesBills}
-              staffMembers={staffMembers}
-              suppliers={suppliers}
-              t={t}
-            />
-          ) : page.startsWith('dashboardMetric:') ? (
+          )
+: page.startsWith('dashboardMetric:') ? (
             (page.split(':')[1] || 'totalRevenue') === 'currentCashWallet' ? (
               <CashWalletPage
                 cashWallet={cashWallet}
@@ -1413,6 +1492,7 @@ function App() {
               baseCurrency={baseCurrency}
               businessCurrencyFilter={businessCurrencyFilter}
               cashWallet={cashWallet}
+              cashWalletEntries={cashWalletEntries}
               customers={customers}
               exchangeCurrency={exchangeCurrency}
               exchangeRates={exchangeRates}
@@ -1426,6 +1506,7 @@ function App() {
               t={t}
             />
           )}
+          </Suspense>
         </main>
       </div>
       {pendingConfirmation && (

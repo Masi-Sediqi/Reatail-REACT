@@ -640,4 +640,481 @@ svg {
     width: 100% !important;
     padding-inline: 10px !important;
   }
+}/* =====================================================
+   EXPENSE HEADER BUTTONS — STANDARD SIZE
+===================================================== */
+
+#root .retail-shell .expenses-content .expense-header-actions {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  flex-wrap: nowrap !important;
+  gap: 7px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* هر دو دکمه */
+#root
+.retail-shell
+.expenses-content
+.expense-header-actions
+> button,
+#root
+.retail-shell
+.expenses-content
+.expense-header-actions
+> button:hover,
+#root
+.retail-shell
+.expenses-content
+.expense-header-actions
+> button:focus,
+#root
+.retail-shell
+.expenses-content
+.expense-header-actions
+> button:active {
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: max-content !important;
+
+  inline-size: max-content !important;
+  min-inline-size: 0 !important;
+  max-inline-size: max-content !important;
+
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+
+  flex: 0 0 auto !important;
+
+  margin: 0 !important;
+  padding: 0 11px !important;
+
+  border-radius: 8px !important;
+
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+
+  white-space: nowrap !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* آیکن‌ها */
+#root
+.retail-shell
+.expenses-content
+.expense-header-actions
+> button
+> svg {
+  position: static !important;
+
+  width: 15px !important;
+  min-width: 15px !important;
+  max-width: 15px !important;
+
+  height: 15px !important;
+  min-height: 15px !important;
+  max-height: 15px !important;
+
+  display: block !important;
+  flex: 0 0 15px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: currentColor !important;
+  stroke: currentColor !important;
+  stroke-width: 1.9 !important;
+
+  transform: none !important;
+
+  pointer-events: none !important;
+}
+
+/* متن */
+#root
+.retail-shell
+.expenses-content
+.expense-header-actions
+> button
+> span {
+  display: inline-flex !important;
+  align-items: center !important;
+
+  width: auto !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: inherit !important;
+
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  line-height: 1 !important;
+
+  white-space: nowrap !important;
+}
+
+/* Print Report */
+#root
+.retail-shell
+.expenses-content
+.expense-header-actions
+.expense-print-report-btn {
+  border: 1px solid var(--border) !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+}
+
+#root
+.retail-shell
+.expenses-content
+.expense-header-actions
+.expense-print-report-btn:hover {
+  border-color: var(--accent) !important;
+
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
+}
+
+/* Add Expense */
+#root
+.retail-shell
+.expenses-content
+.expense-header-actions
+.expense-add-btn {
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: max-content !important;
+
+  padding-inline: 12px !important;
+
+  border: 1px solid var(--accent) !important;
+
+  background: var(--accent) !important;
+  color: var(--accent-contrast) !important;
+}
+
+#root
+.retail-shell
+.expenses-content
+.expense-header-actions
+.expense-add-btn:hover {
+  filter: brightness(0.96);
+}
+
+/* جلوگیری از استایل عمومی primary-btn */
+#root
+.retail-shell
+.expenses-content
+.entity-heading
+.entity-actions
+.primary-btn.expense-add-btn {
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: max-content !important;
+
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+
+  padding-inline: 12px !important;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  #root .retail-shell .expenses-content .expense-header-actions {
+    width: 100% !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  #root
+  .retail-shell
+  .expenses-content
+  .expense-header-actions
+  > button {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    inline-size: auto !important;
+    max-inline-size: none !important;
+
+    padding-inline: 9px !important;
+  }
+}
+/* =====================================================
+   EXPENSE MODAL CLOSE BUTTON
+===================================================== */
+
+#root .retail-shell .expense-modal {
+  position: relative !important;
+}
+
+#root .retail-shell .expense-modal-close,
+#root .retail-shell .expense-modal-close:hover,
+#root .retail-shell .expense-modal-close:focus,
+#root .retail-shell .expense-modal-close:active {
+  position: absolute !important;
+  inset-block-start: 12px !important;
+  inset-inline-end: 12px !important;
+  z-index: 20 !important;
+
+  width: 30px !important;
+  min-width: 30px !important;
+  max-width: 30px !important;
+
+  height: 30px !important;
+  min-height: 30px !important;
+  max-height: 30px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+
+  background: transparent !important;
+  color: var(--muted) !important;
+
+  box-shadow: none !important;
+  outline: none !important;
+  transform: none !important;
+
+  cursor: pointer !important;
+
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease,
+    color 140ms ease !important;
+}
+
+#root .retail-shell .expense-modal-close:hover {
+  border-color:
+    color-mix(
+      in srgb,
+      #ef4444 25%,
+      var(--border)
+    ) !important;
+
+  background:
+    color-mix(
+      in srgb,
+      #ef4444 7%,
+      var(--panel-bg)
+    ) !important;
+
+  color: #ef4444 !important;
+}
+
+#root .retail-shell .expense-modal-close svg {
+  width: 16px !important;
+  height: 16px !important;
+
+  display: block !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  stroke: currentColor !important;
+  stroke-width: 2 !important;
+
+  pointer-events: none !important;
+}
+
+/* Give title enough space beside close button */
+#root .retail-shell .expense-modal > h2 {
+  padding-inline-end: 38px !important;
+}
+
+/* =====================================================
+   CUSTOM CATEGORY INLINE EDITOR
+===================================================== */
+
+#root
+.retail-shell
+.expense-modal
+.expense-category-editor {
+  width: 100% !important;
+
+  display: grid !important;
+  grid-template-columns:
+    minmax(0, 1fr)
+    max-content
+    max-content !important;
+
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+#root
+.retail-shell
+.expense-modal
+.expense-category-editor
+input {
+  width: 100% !important;
+  min-width: 0 !important;
+
+  height: 36px !important;
+  min-height: 36px !important;
+}
+
+/* Common exact-fit buttons */
+#root
+.retail-shell
+.expense-modal
+.expense-category-editor
+> button,
+#root
+.retail-shell
+.expense-modal
+.expense-category-editor
+> button:hover,
+#root
+.retail-shell
+.expense-modal
+.expense-category-editor
+> button:focus,
+#root
+.retail-shell
+.expense-modal
+.expense-category-editor
+> button:active {
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: max-content !important;
+
+  height: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  flex: 0 0 auto !important;
+
+  margin: 0 !important;
+  padding: 0 10px !important;
+
+  border-radius: 7px !important;
+
+  font-family: inherit !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+
+  white-space: nowrap !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+
+  cursor: pointer !important;
+}
+
+/* Add */
+#root
+.retail-shell
+.expense-modal
+.expense-category-add-btn {
+  border: 1px solid var(--accent) !important;
+
+  background: var(--accent) !important;
+  color: var(--accent-contrast) !important;
+}
+
+#root
+.retail-shell
+.expense-modal
+.expense-category-add-btn:hover {
+  filter: brightness(0.96);
+}
+
+/* Cancel */
+#root
+.retail-shell
+.expense-modal
+.expense-category-cancel-btn {
+  border: 1px solid var(--border) !important;
+
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+}
+
+#root
+.retail-shell
+.expense-modal
+.expense-category-cancel-btn:hover {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--accent) 35%,
+      var(--border)
+    ) !important;
+
+  background: var(--panel-soft) !important;
+}
+
+/* =====================================================
+   RTL
+===================================================== */
+
+[dir="rtl"]
+#root
+.retail-shell
+.expense-modal
+.expense-category-editor {
+  direction: rtl;
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 520px) {
+  #root
+  .retail-shell
+  .expense-modal
+  .expense-category-editor {
+    grid-template-columns:
+      minmax(0, 1fr)
+      max-content
+      max-content !important;
+
+    gap: 5px !important;
+  }
+
+  #root
+  .retail-shell
+  .expense-modal
+  .expense-category-editor
+  > button {
+    width: max-content !important;
+    min-width: 0 !important;
+
+    padding-inline: 8px !important;
+  }
 }

@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react'
 import CustomSelect from '../components/CustomSelect.jsx'
 import DateRangePicker from '../components/DateRangePicker.jsx'
-import { CalendarDays, ChevronLeft, DollarSign, Download, Plus, Printer, Search, SquareMenu, Trash2, Upload, WalletCards, X } from '../components/Icons.jsx'
+import { AlertTriangle, BarChart3, ChevronLeft, Download, Plus, Printer, Search, SquareMenu, Trash2, Upload, WalletCards, X } from '../components/Icons.jsx'
 import { currencies } from '../data/dashboardData.js'
-import { calculateBusinessMetrics, dateOptionsFor, filterByDate, formatMoney, getExpenseCategory, parseNumber } from '../utils/businessMetrics.js'
+import { dateOptionsFor, filterByDate, parseNumber } from '../utils/businessMetrics.js'
+import { formatBusinessCurrencyAmount } from '../utils/currencyExchange.js'
 import './CashWalletPage.css'
 
 const currencyOptions = currencies.map((currency) => ({
@@ -21,6 +22,31 @@ const shamsiLabel = (value) => {
   const date = new Date(String(value || '').includes('T') ? value : `${value || new Date().toISOString().slice(0, 10)}T12:00:00`)
   if (Number.isNaN(date.getTime())) return ''
   return new Intl.DateTimeFormat('fa-AF-u-ca-persian', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(date)
+}
+
+const totalsByCurrency = (records, filter, amountFor = (record) => record.amount) => {
+  const totals = new Map()
+  records.filter(filter).forEach((record) => {
+    const currency = record.currency || 'AFN'
+    totals.set(currency, (totals.get(currency) || 0) + parseNumber(amountFor(record)))
+  })
+  return [...totals.entries()]
+    .filter(([, amount]) => Math.abs(amount) > 0.000001)
+    .sort(([currencyA], [currencyB]) => currencyA.localeCompare(currencyB))
+}
+
+const formatCurrencyLines = (totals, fallbackCurrency = 'AFN') => {
+  if (!totals.length) return [formatBusinessCurrencyAmount(0, fallbackCurrency)]
+  return totals.map(([currency, amount]) => formatBusinessCurrencyAmount(amount, currency))
+}
+
+const normalizeAmountInput = (value) => {
+  const normalizedDigits = String(value)
+    .replace(/[۰-۹]/g, (digit) => String(digit.charCodeAt(0) - 1776))
+    .replace(/[٠-٩]/g, (digit) => String(digit.charCodeAt(0) - 1632))
+    .replace(/,/g, '.')
+  const numericParts = normalizedDigits.replace(/[^\d.]/g, '').split('.')
+  return numericParts.length === 1 ? numericParts[0] : `${numericParts[0]}.${numericParts.slice(1).join('')}`
 }
 
 function CashWalletModal({ baseCurrency, initialEntry, onClose, onSave, t }) {
@@ -44,9 +70,25 @@ function CashWalletModal({ baseCurrency, initialEntry, onClose, onSave, t }) {
     })
   }
 
+  const stopModalEvent = (event) => event.stopPropagation()
+  const handleAmountChange = (event) => {
+    setAmount(normalizeAmountInput(event.target.value))
+  }
+  const blockAmountKeys = (event) => {
+    if (['e', 'E', '+', '-'].includes(event.key)) {
+      event.preventDefault()
+    }
+  }
+
   return (
     <div className="modal-backdrop cash-wallet-backdrop" onClick={onClose}>
-      <section className="cash-wallet-modal cash-wallet-header-modal" onClick={(event) => event.stopPropagation()}>
+      <section
+        className="cash-wallet-modal cash-wallet-header-modal"
+        onClick={stopModalEvent}
+        onFocus={stopModalEvent}
+        onKeyDown={stopModalEvent}
+        onPointerDown={stopModalEvent}
+      >
         <button className="modal-close" type="button" onClick={onClose}><X size={17} /></button>
         <header className="cash-wallet-modal-head header-shared-modal-head">
           <span className="header-shared-modal-icon"><WalletCards size={18} /></span>
@@ -62,7 +104,22 @@ function CashWalletModal({ baseCurrency, initialEntry, onClose, onSave, t }) {
         <div className="cash-wallet-form-grid wallet-form-grid">
           <label>
             <span>{t.amount ?? 'Amount'} *</span>
-            <input autoFocus min="0" step="0.01" type="number" placeholder="0.00" value={amount} onChange={(event) => setAmount(event.target.value)} />
+            <input
+              autoFocus
+              inputMode="decimal"
+              min="0"
+              pattern="[0-9]*[.]?[0-9]*"
+              placeholder="0.00"
+              step="0.01"
+              type="text"
+              value={amount}
+              onChange={handleAmountChange}
+              onKeyDown={blockAmountKeys}
+              onPaste={(event) => {
+                event.preventDefault()
+                setAmount(normalizeAmountInput(event.clipboardData.getData('text')))
+              }}
+            />
           </label>
           <label>
             <span>{t.currency ?? 'Currency'}</span>
@@ -85,14 +142,19 @@ function CashWalletModal({ baseCurrency, initialEntry, onClose, onSave, t }) {
 function CashWalletPrintModal({ companyInfo, filterLabel, onClose, records, t }) {
   const [rowsPerPage, setRowsPerPage] = useState('25')
   const pageRows = records.slice(0, Number(rowsPerPage))
-  let balance = 0
+  const balances = new Map()
   const rows = pageRows.map((record, index) => {
-    balance += record.direction === 'in' ? record.amount : -record.amount
+    const currency = record.currency || 'AFN'
+    const balance = (balances.get(currency) || 0) + (record.direction === 'in' ? record.amount : -record.amount)
+    balances.set(currency, balance)
     return { ...record, balance, number: index + 1 }
   })
-  const deposits = records.filter((record) => record.direction === 'in').reduce((sum, record) => sum + record.amount, 0)
-  const withdrawals = records.filter((record) => record.direction === 'out').reduce((sum, record) => sum + record.amount, 0)
-  const currentBalance = deposits - withdrawals
+  const deposits = totalsByCurrency(records, (record) => record.direction === 'in')
+  const withdrawals = totalsByCurrency(records, (record) => record.direction === 'out')
+  const currentBalances = totalsByCurrency(records, () => true, (record) => record.direction === 'in' ? record.amount : -record.amount)
+  const currentBalanceLines = formatCurrencyLines(currentBalances)
+  const depositLines = formatCurrencyLines(deposits)
+  const withdrawalLines = formatCurrencyLines(withdrawals)
 
   const print = () => {
     const paper = document.querySelector('.cash-statement-paper')?.outerHTML
@@ -133,9 +195,9 @@ function CashWalletPrintModal({ companyInfo, filterLabel, onClose, records, t })
               </div>
             </header>
             <section className="cash-print-balance">
-              <strong>{filterLabel} - AFN</strong>
-              <div><span>{t.currentBalance ?? 'Current Balance'}</span><b className={currentBalance >= 0 ? 'success' : 'danger'}>{formatMoney(currentBalance)}</b></div>
-              <div><span>{t.previousBalance ?? 'Previous Balance'}</span><b>{formatMoney(0)}</b></div>
+              <strong>{filterLabel}</strong>
+              <div><span>{t.currentBalance ?? 'Current Balance'}</span><b>{currentBalanceLines.join(' / ')}</b></div>
+              <div><span>{t.previousBalance ?? 'Previous Balance'}</span><b>{formatBusinessCurrencyAmount(0, 'AFN')}</b></div>
             </section>
             <table className="cash-print-table">
               <thead><tr><th>#</th><th>{t.date ?? 'Date'}</th><th>{t.description ?? 'Description'}</th><th>{t.deposit ?? 'Deposit'}</th><th>{t.withdraw ?? 'Withdraw'}</th><th>{t.balance ?? 'Balance'}</th><th>{t.currency ?? 'Currency'}</th></tr></thead>
@@ -145,13 +207,13 @@ function CashWalletPrintModal({ companyInfo, filterLabel, onClose, records, t })
                     <td>{record.number}</td>
                     <td>{dateLabel(record.date)}<br /><small>{shamsiLabel(record.date)}</small></td>
                     <td>{record.note}</td>
-                    <td className="success">{record.direction === 'in' ? formatMoney(record.amount, record.currency) : '-'}</td>
-                    <td className="danger">{record.direction === 'out' ? formatMoney(record.amount, record.currency) : '-'}</td>
-                    <td className={record.balance >= 0 ? 'success' : 'danger'}>{formatMoney(record.balance, record.currency)}</td>
+                    <td className="success">{record.direction === 'in' ? formatBusinessCurrencyAmount(record.amount, record.currency) : '-'}</td>
+                    <td className="danger">{record.direction === 'out' ? formatBusinessCurrencyAmount(record.amount, record.currency) : '-'}</td>
+                    <td className={record.balance >= 0 ? 'success' : 'danger'}>{formatBusinessCurrencyAmount(record.balance, record.currency)}</td>
                     <td>{record.currency || 'AFN'}</td>
                   </tr>
                 ))}
-                <tr className="cash-print-total"><td colSpan="3">{t.total ?? 'Total'}</td><td>{formatMoney(deposits)}</td><td>{formatMoney(withdrawals)}</td><td>{formatMoney(currentBalance)}</td><td>AFN</td></tr>
+                <tr className="cash-print-total"><td colSpan="3">{t.total ?? 'Total'}</td><td>{depositLines.join(' / ')}</td><td>{withdrawalLines.join(' / ')}</td><td>{currentBalanceLines.join(' / ')}</td><td>{t.all ?? 'All'}</td></tr>
               </tbody>
             </table>
             <footer className="cash-print-footer">{t.totalEntries ?? 'Total Entries'}: {records.length} | {t.generated ?? 'Generated'}: {dateLabel(new Date().toISOString())}</footer>
@@ -162,7 +224,25 @@ function CashWalletPrintModal({ companyInfo, filterLabel, onClose, records, t })
   )
 }
 
-function CashWalletPage({ cashWallet, companyInfo, expenses = [], onBack, onCashWalletChange, onWalletEntriesChange, products = [], sales = [], staffMembers = [], suppliers = [], t, walletEntries = [] }) {
+function CashWalletDeleteModal({ entry, onCancel, onConfirm, t }) {
+  if (!entry) return null
+
+  return (
+    <div className="modal-backdrop app-confirm-backdrop cash-wallet-delete-backdrop" onClick={onCancel}>
+      <div className="app-confirm-modal" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
+        <span className="app-confirm-icon danger"><AlertTriangle size={20} /></span>
+        <h2>{t.confirmDeletion ?? 'Confirm Deletion'}</h2>
+        <p>{t.confirmDeleteWalletEntry ?? t.confirmDeleteItem?.replace('{name}', entry.note || t.cashWallet || 'Cash Wallet') ?? 'Are you sure you want to delete this wallet entry?'}</p>
+        <footer className="modal-actions">
+          <button type="button" onClick={onCancel}>{t.cancel ?? 'Cancel'}</button>
+          <button className="danger-btn" type="button" onClick={onConfirm}>{t.delete ?? 'Delete'}</button>
+        </footer>
+      </div>
+    </div>
+  )
+}
+
+function CashWalletPage({ companyInfo, expenses = [], onBack, onCashWalletChange, onWalletEntriesChange, products = [], sales = [], t, walletEntries = [] }) {
   const [activeType, setActiveType] = useState('all')
   const [dateFilter, setDateFilter] = useState('all')
   const [customRange, setCustomRange] = useState({ start: '', end: '' })
@@ -170,34 +250,56 @@ function CashWalletPage({ cashWallet, companyInfo, expenses = [], onBack, onCash
   const [supplierFilter] = useState('all')
   const [categoryFilter] = useState('all')
   const [editingEntry, setEditingEntry] = useState(null)
+  const [deletingEntry, setDeletingEntry] = useState(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [printOpen, setPrintOpen] = useState(false)
 
-  const metrics = useMemo(() => calculateBusinessMetrics({ cashWallet, expenses, products, sales, staffMembers }), [cashWallet, expenses, products, sales, staffMembers])
-  const supplierMap = useMemo(() => new Map(suppliers.map((supplier) => [supplier.id, supplier.name])), [suppliers])
   const records = useMemo(() => {
-    const paidRows = sales.filter((sale) => parseNumber(sale.paidAmount) > 0).map((sale) => ({
-      amount: parseNumber(sale.paidAmount),
-      category: 'sales',
-      currency: sale.currency || 'AFN',
-      date: sale.date || sale.createdAt,
-      direction: 'in',
-      group: 'paid',
-      id: `sale-${sale.id}`,
-      note: sale.invoiceNumber || t.sales,
-      supplier: '',
-      typeLabel: t.totalPaidFromSales ?? 'Total Paid (from sales)',
-    }))
+    const productPurchaseById = new Map(products.map((product) => [product.id, parseNumber(product.purchase)]))
+    const salesRows = sales
+      .map((sale) => {
+        const paidAmount = parseNumber(sale.paidAmount)
+        if (paidAmount <= 0) return null
+
+        const total = parseNumber(sale.total)
+        const paidRatio = total > 0 ? Math.min(1, paidAmount / total) : 1
+        const grossProfit = (sale.items || []).reduce((sum, item) => {
+          const quantity = parseNumber(item.quantity)
+          const lineTotal = parseNumber(item.lineTotal || (parseNumber(item.price) * quantity))
+          const purchase = parseNumber(item.purchase ?? productPurchaseById.get(item.productId))
+          return sum + Math.max(0, lineTotal - purchase * quantity)
+        }, 0)
+        const invoice = sale.invoiceNumber || sale.id || t.invoice || 'Invoice'
+        const customer = sale.customerName || t.walkInCustomer || ''
+
+        return {
+          amount: paidAmount,
+          category: 'sales',
+          currency: sale.currency || 'AFN',
+          date: sale.date || sale.createdAt,
+          direction: 'in',
+          group: 'dash_totalPaid',
+          id: `sale-paid-${sale.id || invoice}`,
+          note: `#${invoice} — ${customer}`.trim(),
+          profitAmount: grossProfit * paidRatio,
+          sale,
+          source: null,
+          supplier: '',
+          typeLabel: 'dash_totalPaid',
+        }
+      })
+      .filter(Boolean)
     const expenseRows = expenses.map((expense) => ({
       amount: parseNumber(expense.amount),
-      category: getExpenseCategory(expense),
+      category: 'expense',
       currency: expense.currency || 'AFN',
       date: expense.date || expense.createdAt,
       direction: 'out',
-      group: 'expenses',
+      group: 'withdraw',
       id: `expense-${expense.id}`,
-      note: expense.description || getExpenseCategory(expense),
-      supplier: supplierMap.get(expense.supplierId) || expense.supplier || expense.supplierName || '',
+      note: expense.description || expense.category || t.expenses || 'Expense',
+      source: null,
+      supplier: '',
       typeLabel: t.expenses ?? 'Expenses',
     }))
     const walletRows = walletEntries.map((entry) => ({
@@ -213,22 +315,28 @@ function CashWalletPage({ cashWallet, companyInfo, expenses = [], onBack, onCash
       supplier: '',
       typeLabel: entry.type === 'deposit' ? (t.deposit ?? 'Deposit') : (t.withdraw ?? 'Withdraw'),
     }))
-    return [...paidRows, ...walletRows, ...expenseRows].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
-  }, [expenses, sales, supplierMap, t, walletEntries])
+    return [...salesRows, ...expenseRows, ...walletRows].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+  }, [expenses, products, sales, t, walletEntries])
+
+  const totalPaidFromSales = totalsByCurrency(records, (record) => record.group === 'dash_totalPaid')
+  const pureProfit = totalsByCurrency(records, (record) => record.group === 'dash_totalPaid', (record) => record.profitAmount)
+  const totalDeposits = totalsByCurrency(records, (record) => record.group === 'deposit')
+  const totalWithdrawals = totalsByCurrency(records, (record) => record.group === 'withdraw')
 
   const cards = [
-    { key: 'paid', label: t.totalPaidFromSales ?? 'Total Paid (from sales)', value: sales.reduce((sum, sale) => sum + parseNumber(sale.paidAmount), 0), icon: WalletCards, tone: 'green' },
-    { key: 'profit', label: t.pureProfit ?? 'Pure Profit', value: metrics.pureProfit, icon: DollarSign, tone: 'blue' },
-    { key: 'deposit', label: t.totalDeposits ?? 'Total Deposits', value: records.filter((record) => record.group === 'deposit').reduce((sum, record) => sum + record.amount, 0), icon: Download, tone: 'blue' },
-    { key: 'withdraw', label: t.totalWithdrawals ?? 'Total Withdrawals', value: records.filter((record) => record.group === 'withdraw').reduce((sum, record) => sum + record.amount, 0), icon: CalendarDays, tone: 'orange' },
+    { key: 'dash_totalPaid', label: t.totalPaidFromSales ?? 'Total Paid (from sales)', value: formatCurrencyLines(totalPaidFromSales), icon: WalletCards, tone: 'green' },
+    { key: 'pureProfit', filterKey: 'dash_totalPaid', label: t.pureProfit ?? 'Pure Profit', value: formatCurrencyLines(pureProfit), icon: BarChart3, tone: 'blue' },
+    { key: 'deposit', label: t.totalDeposits ?? 'Total Deposits', value: formatCurrencyLines(totalDeposits), icon: Download, tone: 'blue' },
+    { key: 'withdraw', label: t.totalWithdrawals ?? 'Total Withdrawals', value: formatCurrencyLines(totalWithdrawals), icon: Upload, tone: 'orange' },
   ]
   const typeOptions = [
     { value: 'all', label: t.filterAll ?? 'filter_all' },
-    ...cards.map((card) => ({ value: card.key, label: card.label })),
-    { value: 'expenses', label: t.expenses ?? 'Expenses' },
+    { value: 'dash_totalPaid', label: t.totalPaidFromSales ?? 'Total Paid (from sales)' },
+    { value: 'deposit', label: t.totalDeposits ?? 'Total Deposits' },
+    { value: 'withdraw', label: t.totalWithdrawals ?? 'Total Withdrawals' },
   ]
   const visibleRecords = filterByDate(records, dateFilter, customRange.start, customRange.end).filter((record) => {
-    const byType = activeType === 'all' || (activeType === 'profit' ? ['paid', 'expenses'].includes(record.group) : record.group === activeType)
+    const byType = activeType === 'all' || record.group === activeType
     const bySupplier = supplierFilter === 'all' || record.supplier === supplierFilter
     const byCategory = categoryFilter === 'all' || record.category === categoryFilter
     const query = search.trim().toLowerCase()
@@ -257,10 +365,9 @@ function CashWalletPage({ cashWallet, companyInfo, expenses = [], onBack, onCash
   }
 
   const deleteWalletEntry = (entry) => {
-    const ok = window.confirm(t.confirmDeleteWalletEntry ?? t.confirmDelete ?? 'Delete this wallet entry?')
-    if (!ok) return
     onWalletEntriesChange((current) => current.filter((item) => item.id !== entry.id))
     onCashWalletChange((current) => Number(current || 0) - signedWalletAmount(entry))
+    setDeletingEntry(null)
   }
 
   const closeWalletModal = () => {
@@ -305,9 +412,9 @@ function CashWalletPage({ cashWallet, companyInfo, expenses = [], onBack, onCash
         {cards.map((card) => {
           const Icon = card.icon
           return (
-            <button className={`cash-wallet-card tone-${card.tone} ${activeType === card.key ? 'active' : ''}`} key={card.key} type="button" onClick={() => setActiveType(card.key)}>
+            <button className={`cash-wallet-card tone-${card.tone} ${activeType === (card.filterKey ?? card.key) ? 'active' : ''}`} key={card.key} type="button" onClick={() => setActiveType(card.filterKey ?? card.key)}>
               <span>{card.label}</span>
-              <strong>{formatMoney(card.value)}</strong>
+              <strong className="cash-wallet-card-values">{card.value.map((line) => <b key={`${card.key}-${line}`}>{line}</b>)}</strong>
               <i><Icon size={20} /></i>
             </button>
           )
@@ -325,14 +432,14 @@ function CashWalletPage({ cashWallet, companyInfo, expenses = [], onBack, onCash
         ) : (
           <div className="metric-detail-table-wrap">
             <table className="data-table cash-wallet-table">
-              <thead><tr><th>{t.date ?? 'Date'}</th><th>{t.type ?? 'Type'}</th><th>{t.amount ?? 'Amount'}</th><th>{t.reasonNote ?? 'Reason / Note'}</th><th>{t.actions ?? 'Actions'}</th></tr></thead>
+              <thead><tr><th>{t.date ?? 'Date'}</th><th>{t.type ?? 'Type'}</th><th>{t.description ?? t.reasonNote ?? 'Description'}</th><th>{t.amount ?? 'Amount'}</th><th>{t.actions ?? 'Actions'}</th></tr></thead>
               <tbody>
                 {visibleRecords.map((record) => (
                   <tr key={record.id}>
                     <td>{dateLabel(record.date)}<br /><small>{shamsiLabel(record.date)}</small></td>
-                    <td><span className={`cash-type-pill ${record.direction === 'in' ? 'deposit' : 'withdraw'}`}>{record.typeLabel}</span></td>
-                    <td className={record.direction === 'in' ? 'success-text' : 'danger-text'}>{record.direction === 'in' ? '+ ' : '- '}{formatMoney(record.amount, record.currency)}</td>
+                    <td><span className={`cash-type-pill ${record.group === 'dash_totalPaid' ? 'sales' : record.direction === 'in' ? 'deposit' : 'withdraw'}`}>{record.typeLabel}</span></td>
                     <td>{record.note}</td>
+                    <td className={record.direction === 'in' ? 'success-text' : 'danger-text'}>{record.direction === 'in' ? '+ ' : '- '}{formatBusinessCurrencyAmount(record.amount, record.currency)}</td>
                     <td className="cash-wallet-actions-cell">
   {record.source ? (
     <div className="cash-wallet-row-actions">
@@ -349,7 +456,7 @@ function CashWalletPage({ cashWallet, companyInfo, expenses = [], onBack, onCash
       <button
         className="cash-wallet-delete-action"
         type="button"
-        onClick={() => deleteWalletEntry(record.source)}
+        onClick={() => setDeletingEntry(record.source)}
         aria-label={t.delete ?? 'Delete'}
         title={t.delete ?? 'Delete'}
       >
@@ -369,6 +476,7 @@ function CashWalletPage({ cashWallet, companyInfo, expenses = [], onBack, onCash
       </div>
 
       {modalOpen && <CashWalletModal baseCurrency="AFN" initialEntry={editingEntry} onClose={closeWalletModal} onSave={saveWalletEntry} t={t} />}
+      {deletingEntry && <CashWalletDeleteModal entry={deletingEntry} onCancel={() => setDeletingEntry(null)} onConfirm={() => deleteWalletEntry(deletingEntry)} t={t} />}
       {printOpen && <CashWalletPrintModal companyInfo={companyInfo} filterLabel={filterLabel} onClose={() => setPrintOpen(false)} records={visibleRecords} t={t} />}
     </section>
   )

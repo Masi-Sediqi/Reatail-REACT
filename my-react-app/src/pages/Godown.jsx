@@ -13,8 +13,10 @@ import {
   Download,
   Eye,
   Plus,
+  Printer,
   ReceiptText,
   Search,
+  ShoppingCart,
   SquareMenu,
   Trash2,
   Upload,
@@ -29,6 +31,7 @@ const formatMoney = (value) => formatBusinessCurrencyAmount(value, 'AFN')
 const formatCurrencyMoney = (value, currency = 'AFN') => formatBusinessCurrencyAmount(value, currency)
 const todayInput = () => new Date().toISOString().slice(0, 10)
 const parseDateInput = (value) => (value ? new Date(`${value}T12:00:00`) : null)
+const normalizeText = (value) => String(value || '').trim().toLowerCase()
 
 const getDateMatches = (dateValue, filter, start, end) => {
   if (filter === 'all' || !dateValue) return true
@@ -590,6 +593,7 @@ function PurchaseModal({ categories, onClose, onSave, products, suppliers, t }) 
   const [rows, setRows] = useState([newLine()])
   const [submitted, setSubmitted] = useState(false)
   const [closing, setClosing] = useState(false)
+  const requiredMessage = t.requiredFieldMessage ?? 'This field is required.'
 
   const productOptions = useMemo(() => [
     { value: '', label: t.newProduct },
@@ -745,14 +749,21 @@ function PurchaseModal({ categories, onClose, onSave, products, suppliers, t }) 
             <span>{t.date}</span>
             <span>{t.action}</span>
           </div>
-          {rows.map((row) => (
+          {rows.map((row) => {
+            const missingName = submitted && !row.name.trim()
+            const missingQuantity = submitted && parseNumber(row.quantity) <= 0
+            return (
             <div className="purchase-line" key={row.id}>
               <div className="product-pick">
                 <CustomSelect ariaLabel={t.product} options={productOptions} value={row.productId} onChange={(value) => updateRow(row.id, { productId: value })} />
                 <input className={submitted && !row.name.trim() ? 'field-invalid' : ''} placeholder={t.newProductName} value={row.name} onChange={(event) => updateRow(row.id, { name: event.target.value })} />
+                {missingName && <small className="validation-error purchase-line-error">{requiredMessage}</small>}
               </div>
               <input placeholder={t.code} value={row.code} onChange={(event) => updateRow(row.id, { code: event.target.value })} />
-              <input type="number" min="0" placeholder="0" value={row.quantity} onChange={(event) => updateRow(row.id, { quantity: event.target.value })} />
+              <div className="purchase-quantity-field">
+                <input className={missingQuantity ? 'field-invalid' : ''} type="number" min="0" placeholder="0" value={row.quantity} onChange={(event) => updateRow(row.id, { quantity: event.target.value })} />
+                {missingQuantity && <small className="validation-error purchase-line-error">{requiredMessage}</small>}
+              </div>
               <CustomSelect ariaLabel={t.unit} options={unitOptions} value={row.unit} onChange={(value) => updateRow(row.id, { unit: value })} />
               <input type="number" min="0" placeholder="0.00" value={row.purchase} onChange={(event) => updateRow(row.id, { purchase: event.target.value })} />
               <input type="number" min="0" placeholder="0.00" value={row.selling} onChange={(event) => updateRow(row.id, { selling: event.target.value })} />
@@ -774,7 +785,7 @@ function PurchaseModal({ categories, onClose, onSave, products, suppliers, t }) 
               <input className="line-alert-date" type="date" value={row.expiryDate || ''} onChange={(event) => updateRow(row.id, { expiryDate: event.target.value })} />
               <input className="line-alert-days" type="number" min="0" placeholder={t.daysBefore ?? 'Days before'} value={row.alertDaysBefore || ''} onChange={(event) => updateRow(row.id, { alertDaysBefore: event.target.value })} />
             </div>
-          ))}
+          )})}
           <button className="add-line-btn" type="button" onClick={addRow}><Plus size={15} /> {t.addRow}</button>
         </section>
 
@@ -853,7 +864,7 @@ function EditEntryModal({ categories, entry, onClose, onSave, suppliers, t }) {
   )
 }
 
-function GodownPage({ categories, companyInfo, godownEntries, onGodownChange, onNotify, onProductsChange, printSettings, products, suppliers, t }) {
+function GodownPage({ categories, companyInfo, godownEntries, onGodownChange, onNotify, onProductsChange, printSettings, products, sales = [], suppliers, t }) {
   const [search, setSearch] = useState('')
   const [productFilter, setProductFilter] = useState('all')
   const [supplierFilter, setSupplierFilter] = useState('all')
@@ -863,6 +874,7 @@ function GodownPage({ categories, companyInfo, godownEntries, onGodownChange, on
   const [purchaseOpen, setPurchaseOpen] = useState(false)
   const [printOpen, setPrintOpen] = useState(false)
   const [expandedProduct, setExpandedProduct] = useState('')
+  const [expandedStockEntry, setExpandedStockEntry] = useState('')
   const [detailEntry, setDetailEntry] = useState(null)
   const [detailTab, setDetailTab] = useState('product')
   const [supplierPortal, setSupplierPortal] = useState(null)
@@ -883,46 +895,81 @@ function GodownPage({ categories, companyInfo, godownEntries, onGodownChange, on
     const billTotal = parseNumber(entry.total) || rows.reduce((sum, row) => sum + parseNumber(row.quantity) * parseNumber(row.purchase), 0)
     const billPaid = Math.min(parseNumber(entry.paid), billTotal)
     const billRemaining = Math.max(0, billTotal - billPaid)
-    return rows.filter((row) => !row.expired).map((row, index) => ({
-      ...row,
-      billNumber: entry.billNumber || `#${String(entry.id).slice(0, 6).toUpperCase()}`,
-      currency: entry.currency || 'AFN',
-      entryDate: entry.date,
-      entryId: entry.id,
-      paid: billPaid,
-      paymentHistory: entry.paymentHistory || [],
-      remaining: billRemaining,
-      rowIndex: index,
-      rowTotal: parseNumber(row.quantity) * parseNumber(row.purchase),
-      total: billTotal,
-    }))
+    return rows.filter((row) => !row.expired).map((row, index) => {
+      const rowTotal = parseNumber(row.quantity) * parseNumber(row.purchase)
+      const rowPaid = billTotal > 0 ? Math.min(rowTotal, (billPaid * rowTotal) / billTotal) : 0
+      return {
+        ...row,
+        billNumber: entry.billNumber || `#${String(entry.id).slice(0, 6).toUpperCase()}`,
+        billPaid,
+        billRemaining,
+        billTotal,
+        currency: entry.currency || 'AFN',
+        entryDate: entry.date,
+        entryId: entry.id,
+        paid: rowPaid,
+        paymentHistory: entry.paymentHistory || [],
+        remaining: Math.max(0, rowTotal - rowPaid),
+        rowIndex: index,
+        rowTotal,
+        total: rowTotal,
+      }
+    })
   }), [godownEntries])
+
+  const soldQuantityByProduct = useMemo(() => {
+    const totals = new Map()
+    const add = (productId, amount) => {
+      if (!productId) return
+      const value = parseNumber(amount)
+      if (!value) return
+      totals.set(productId, (totals.get(productId) || 0) + value)
+    }
+
+    sales.forEach((sale) => {
+      ;(sale.items || []).forEach((item) => add(item.productId, item.quantity))
+      ;(sale.refundHistory || []).forEach((refund) => {
+        ;(refund.items || []).forEach((item) => add(item.productId, -parseNumber(item.refundQty || item.quantity)))
+      })
+    })
+
+    return totals
+  }, [sales])
 
   const productRows = useMemo(() => products.map((product) => {
     const productEntries = entries.filter((entry) => entry.productId === product.id || (!entry.productId && entry.name === product.name))
-    const imported = productEntries.reduce((sum, entry) => sum + parseNumber(entry.quantity), 0)
+    const importedFromEntries = productEntries.reduce((sum, entry) => sum + parseNumber(entry.quantity), 0)
     const quantity = parseNumber(product.quantity)
+    const sold = Math.max(0, parseNumber(soldQuantityByProduct.get(product.id)))
+    const imported = Math.max(importedFromEntries, quantity + sold)
     const purchase = parseNumber(product.purchase)
     const selling = parseNumber(product.selling)
+    const currency = product.currency || productEntries[0]?.currency || 'AFN'
+    const paid = productEntries.reduce((sum, entry) => sum + parseNumber(entry.paid), 0)
+    const remaining = productEntries.reduce((sum, entry) => sum + parseNumber(entry.remaining), 0)
     return {
       ...product,
       imported,
       quantity,
       purchase,
       selling,
+      currency,
+      sold,
       entries: productEntries,
-      totalValue: quantity * purchase,
+      totalValue: imported * purchase,
       expectedProfit: Math.max(0, selling - purchase) * quantity,
-      remaining: productEntries.reduce((sum, entry) => sum + parseNumber(entry.total), 0) - productEntries.reduce((sum, entry) => sum + parseNumber(entry.paid), 0),
+      paid,
+      remaining,
     }
-  }), [entries, products])
+  }), [entries, products, soldQuantityByProduct])
 
   const filteredProducts = productRows.filter((product) => {
     const needle = search.trim().toLowerCase()
-    const supplierId = product.supplierId || ''
-    const matchesSearch = !needle || `${product.name} ${product.code}`.toLowerCase().includes(needle)
+    const supplierIds = new Set([product.supplierId, ...product.entries.map((entry) => entry.supplierId)].filter(Boolean))
+    const supplierNames = [...supplierIds].map((id) => suppliers.find((supplier) => supplier.id === id)?.name || '').join(' ')
+    const matchesSearch = !needle || `${product.name} ${product.code} ${supplierNames}`.toLowerCase().includes(needle)
     const matchesProduct = productFilter === 'all' || product.id === productFilter
-    const matchesSupplier = supplierFilter === 'all' || supplierId === supplierFilter
+    const matchesSupplier = supplierFilter === 'all' || supplierIds.has(supplierFilter)
     const threshold = parseNumber(product.lowStockThreshold || product.lowStock || 0)
     const expiryDate = parseDateInput(product.expiryDate)
     const today = new Date()
@@ -941,32 +988,103 @@ function GodownPage({ categories, companyInfo, godownEntries, onGodownChange, on
     return matchesSearch && matchesProduct && matchesSupplier && matchesStock && matchesDate && matchesSoldOut
   })
 
-  const filteredEntries = entries.filter((entry) => {
+  const stockEntryRows = useMemo(() => {
+    const purchaseRows = godownEntries
+      .map((purchase) => {
+        const rows = entries.filter((entry) => entry.entryId === purchase.id)
+        if (!rows.length) return null
+        const quantity = rows.reduce((sum, row) => sum + parseNumber(row.quantity), 0)
+        const total = rows.reduce((sum, row) => sum + parseNumber(row.total), 0)
+        const paid = rows.reduce((sum, row) => sum + parseNumber(row.paid), 0)
+        const remaining = rows.reduce((sum, row) => sum + parseNumber(row.remaining), 0)
+        return {
+          id: `purchase-${purchase.id}`,
+          actionEntry: rows[0],
+          billNumber: purchase.billNumber || rows[0]?.billNumber || `#${String(purchase.id).slice(0, 6).toUpperCase()}`,
+          code: '',
+          currency: purchase.currency || rows[0]?.currency || 'AFN',
+          date: purchase.date || purchase.createdAt?.slice(0, 10) || rows[0]?.date,
+          isExpandable: rows.length > 1,
+          kind: 'purchase',
+          name: rows.length > 1 ? `${t.purchaseBill ?? 'Purchase Bill'} (${rows.length} ${t.items ?? 'items'})` : rows[0].name,
+          paid,
+          remaining,
+          rows,
+          supplierId: purchase.supplierId || rows[0]?.supplierId || '',
+          total,
+          unit: rows[0]?.unit || 'pcs',
+          quantity,
+        }
+      })
+      .filter(Boolean)
+
+    const autoRows = productRows
+      .map((product) => {
+        const importedFromPurchases = product.entries.reduce((sum, entry) => sum + parseNumber(entry.quantity), 0)
+        const quantity = Math.max(0, parseNumber(product.imported) - importedFromPurchases)
+        if (quantity <= 0) return null
+        const purchase = parseNumber(product.purchase)
+        const total = quantity * purchase
+        const paid = Math.min(total, parseNumber(product.cashWalletPaid) + parseNumber(product.supplierAdvanceUsed))
+        return {
+          id: `auto-${product.id}`,
+          actionEntry: {
+            ...product,
+            date: product.createdAt?.slice(0, 10) || todayInput(),
+            entryId: `auto-${product.id}`,
+            id: `auto-${product.id}`,
+            productId: product.id,
+            quantity,
+            total,
+          },
+          code: product.code || '',
+          currency: product.currency || 'AFN',
+          date: product.createdAt?.slice(0, 10) || todayInput(),
+          isExpandable: false,
+          kind: 'auto',
+          name: product.name,
+          paid,
+          remaining: Math.max(0, total - paid),
+          rows: [],
+          supplierId: product.supplierId || '',
+          total,
+          unit: product.unit || 'pcs',
+          quantity,
+        }
+      })
+      .filter(Boolean)
+
+    return [...purchaseRows, ...autoRows].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+  }, [entries, godownEntries, productRows, t.items, t.purchaseBill])
+
+  const filteredStockEntries = stockEntryRows.filter((row) => {
     const needle = search.trim().toLowerCase()
-    const matchesSearch = !needle || `${entry.name} ${entry.code}`.toLowerCase().includes(needle)
-    const matchesProduct = productFilter === 'all' || entry.productId === productFilter
-    const matchesSupplier = supplierFilter === 'all' || entry.supplierId === supplierFilter
-    const product = productRows.find((item) => item.id === entry.productId)
-    const threshold = parseNumber(product?.lowStockThreshold || product?.lowStock || 0)
-    const expiryDate = parseDateInput(product?.expiryDate)
+    const supplierName = suppliers.find((supplier) => supplier.id === row.supplierId)?.name || ''
+    const rowText = `${row.name} ${row.code} ${supplierName} ${row.rows.map((item) => `${item.name} ${item.code}`).join(' ')}`.toLowerCase()
+    const matchesSearch = !needle || rowText.includes(needle)
+    const matchesProduct = productFilter === 'all' || row.actionEntry?.productId === productFilter || row.rows.some((item) => item.productId === productFilter)
+    const matchesSupplier = supplierFilter === 'all' || row.supplierId === supplierFilter || row.rows.some((item) => item.supplierId === supplierFilter)
+    const relatedProduct = productRows.find((product) => product.id === row.actionEntry?.productId || row.rows.some((item) => item.productId === product.id))
+    const threshold = parseNumber(relatedProduct?.lowStockThreshold || relatedProduct?.lowStock || 0)
+    const expiryDate = parseDateInput(relatedProduct?.expiryDate)
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     const daysToExpire = expiryDate ? Math.ceil((expiryDate - today) / 86400000) : null
-    const quantity = parseNumber(product?.quantity ?? entry.quantity)
+    const currentQuantity = parseNumber(relatedProduct?.quantity ?? row.quantity)
     const matchesStock =
       stockFilter === 'all' ||
-      (stockFilter === 'in' && quantity > 0) ||
-      (stockFilter === 'out' && quantity <= 0) ||
-      (stockFilter === 'low' && quantity > 0 && threshold > 0 && quantity <= threshold) ||
+      (stockFilter === 'in' && currentQuantity > 0) ||
+      (stockFilter === 'out' && currentQuantity <= 0) ||
+      (stockFilter === 'low' && currentQuantity > 0 && threshold > 0 && currentQuantity <= threshold) ||
       (stockFilter === 'expiring' && daysToExpire !== null && daysToExpire >= 0 && daysToExpire <= 30) ||
       (stockFilter === 'expired' && daysToExpire !== null && daysToExpire < 0)
-    const matchesDate = getDateMatches(entry.date || entry.entryDate, dateFilter, customStartDate, customEndDate)
-    const matchesSoldOut = !hideSoldOut || quantity > 0
+    const matchesDate = getDateMatches(row.date, dateFilter, customStartDate, customEndDate)
+    const matchesSoldOut = !hideSoldOut || currentQuantity > 0
     return matchesSearch && matchesProduct && matchesSupplier && matchesStock && matchesDate && matchesSoldOut
   })
 
   const summary = {
-    imports: godownEntries.length,
+    imports: stockEntryRows.length,
     exports: 0,
     stockValue: productRows.reduce((sum, product) => sum + product.totalValue, 0),
     profit: productRows.reduce((sum, product) => sum + product.expectedProfit, 0),
@@ -997,27 +1115,48 @@ function GodownPage({ categories, companyInfo, godownEntries, onGodownChange, on
       id: product.id,
       product: product.name,
       supplier: suppliers.find((supplier) => supplier.id === product.supplierId)?.name || '-',
-      quantity: `${product.quantity} ${product.unit || 'pcs'}`,
-      purchase: formatMoney(product.purchase),
-      selling: formatMoney(product.selling),
-      total: formatMoney(product.totalValue),
+      imported: `${product.imported} ${product.unit || 'pcs'}`,
+      inStock: `${product.quantity} ${product.unit || 'pcs'}`,
+      purchase: formatCurrencyMoney(product.purchase, product.currency || 'AFN'),
+      sold: `${product.sold} ${product.unit || 'pcs'}`,
+      selling: formatCurrencyMoney(product.selling, product.currency || 'AFN'),
+      total: formatCurrencyMoney(product.totalValue, product.currency || 'AFN'),
     }))
-    : filteredEntries.map((entry) => ({
-      id: entry.id,
-      type: t.import,
-      product: entry.name,
-      supplier: suppliers.find((supplier) => supplier.id === entry.supplierId)?.name || '-',
-      quantity: `${entry.quantity} ${entry.unit || 'pcs'}`,
-      purchase: formatMoney(entry.purchase),
-      selling: formatMoney(entry.selling),
+    : filteredStockEntries.map((entry) => ({
       date: getGregorianLabel(entry.date),
+      id: entry.id,
+      paid: formatCurrencyMoney(entry.paid, entry.currency),
+      product: entry.name,
+      quantity: `${entry.quantity} ${entry.unit || 'pcs'}`,
+      remaining: formatCurrencyMoney(entry.remaining, entry.currency),
+      supplier: suppliers.find((supplier) => supplier.id === entry.supplierId)?.name || '-',
+      total: formatCurrencyMoney(entry.total, entry.currency),
+      type: t.product ?? 'Product',
     }))
 
   const savePurchase = (purchase) => {
     let nextProducts = [...products]
-    const rowsWithIds = purchase.rows.map((row) => {
-      const existingIndex = nextProducts.findIndex((product) => product.id === row.productId)
-      const productId = existingIndex >= 0 ? row.productId : crypto.randomUUID()
+    const rowsWithIds = purchase.rows.map((row, rowIndex) => {
+      const selectedIndex = nextProducts.findIndex((product) => product.id === row.productId)
+      const selectedProduct = selectedIndex >= 0 ? nextProducts[selectedIndex] : null
+      const rowCode = normalizeText(row.code)
+      const rowName = normalizeText(row.name)
+      const selectedCode = normalizeText(selectedProduct?.code || selectedProduct?.barcode)
+      const selectedName = normalizeText(selectedProduct?.name)
+      const editedSelectedProduct = selectedProduct && (
+        (rowName && rowName !== selectedName) ||
+        (rowCode && rowCode !== selectedCode)
+      )
+      const codeIndex = rowCode
+        ? nextProducts.findIndex((product) => [product.code, product.barcode].some((value) => normalizeText(value) === rowCode))
+        : -1
+      const existingIndex = codeIndex >= 0
+        ? codeIndex
+        : selectedIndex >= 0 && !editedSelectedProduct
+          ? selectedIndex
+          : -1
+      const productId = existingIndex >= 0 ? nextProducts[existingIndex].id : crypto.randomUUID()
+      const fallbackCode = `PRD-${Date.now().toString().slice(-5)}${String(rowIndex + 1).padStart(2, '0')}`
       if (existingIndex >= 0) {
         const existing = nextProducts[existingIndex]
         nextProducts[existingIndex] = {
@@ -1029,6 +1168,7 @@ function GodownPage({ categories, companyInfo, godownEntries, onGodownChange, on
           selling: row.selling,
           quantity: String(parseNumber(existing.quantity) + parseNumber(row.quantity)),
           unit: row.unit || existing.unit,
+          currency: purchase.currency || existing.currency || 'AFN',
           supplierId: row.supplierId || existing.supplierId,
           status: 'In Stock',
         }
@@ -1036,8 +1176,10 @@ function GodownPage({ categories, companyInfo, godownEntries, onGodownChange, on
         nextProducts = [{
           id: productId,
           barcode: '',
-          code: row.code || `PRD-${Date.now().toString().slice(-6)}`,
+          code: row.code || fallbackCode,
           category: row.category,
+          createdAt: purchase.createdAt || new Date().toISOString(),
+          currency: purchase.currency || 'AFN',
           name: row.name,
           purchase: row.purchase,
           selling: row.selling,
@@ -1163,7 +1305,9 @@ function GodownPage({ categories, companyInfo, godownEntries, onGodownChange, on
       {printOpen && <PrintPreviewModal companyInfo={companyInfo} onClose={() => setPrintOpen(false)} printSettings={printSettings} rows={printRows} title={t.godownStockReport} columns={viewMode === 'product' ? [
         { key: 'product', label: t.product },
         { key: 'supplier', label: t.supplier },
-        { key: 'quantity', label: t.quantity },
+        { key: 'imported', label: t.imported ?? 'Imported' },
+        { key: 'inStock', label: t.inStock },
+        { key: 'sold', label: t.sold },
         { key: 'purchase', label: t.purchase },
         { key: 'selling', label: t.selling },
         { key: 'total', label: t.total },
@@ -1172,8 +1316,9 @@ function GodownPage({ categories, companyInfo, godownEntries, onGodownChange, on
         { key: 'product', label: t.product },
         { key: 'supplier', label: t.supplier },
         { key: 'quantity', label: t.quantity },
-        { key: 'purchase', label: t.purchase },
-        { key: 'selling', label: t.selling },
+        { key: 'total', label: t.total },
+        { key: 'paid', label: t.paid },
+        { key: 'remaining', label: t.remaining },
         { key: 'date', label: t.date },
       ]} t={t} />}
     </>
@@ -1497,10 +1642,27 @@ function GodownPage({ categories, companyInfo, godownEntries, onGodownChange, on
     <section className="entity-content godown-content">
       <div className="entity-heading">
         <div><h1>{t.godownInventory}</h1><p>{t.trackStockImportsExports}</p></div>
-        <div className="entity-actions">
-          <button className="primary-btn" type="button" onClick={() => setPurchaseOpen(true)}><Archive size={16} /> {t.multiPurchase}</button>
-          <button type="button" onClick={() => setPrintOpen(true)}><ReceiptText size={16} /> {t.printReport}</button>
-        </div>
+       <div className="entity-actions godown-header-actions">
+  <button
+    className="godown-purchase-btn"
+    type="button"
+    onClick={() => setPurchaseOpen(true)}
+  >
+    <ShoppingCart size={16} />
+
+    <span>{t.multiPurchase}</span>
+  </button>
+
+  <button
+    className="godown-print-btn"
+    type="button"
+    onClick={() => setPrintOpen(true)}
+  >
+    <Printer size={16} />
+
+    <span>{t.printReport}</span>
+  </button>
+</div>
       </div>
 
       <div className="godown-summary-grid">
@@ -1557,25 +1719,25 @@ function GodownPage({ categories, companyInfo, godownEntries, onGodownChange, on
       </div>
 
       <div className="data-panel godown-panel">
-        <h2><SquareMenu size={20} /> {viewMode === 'product' ? `${t.productsInStock} (${filteredProducts.length})` : `${t.stockEntries} (${filteredEntries.length})`}</h2>
+        <h2><SquareMenu size={20} /> {viewMode === 'product' ? `${t.productsInStock} (${filteredProducts.length})` : `${t.stockEntries} (${filteredStockEntries.length})`}</h2>
         {viewMode === 'product' ? (
           <div className="godown-table-wrap">
-            <table className="data-table godown-table">
-              <thead><tr><th></th><th>{t.product}</th><th>{t.inStock}</th><th>{t.imported}</th><th>{t.sold}</th><th>{t.unitCost}</th><th>{t.sellingPrice}</th><th>{t.totalValue}</th><th>{t.paid}</th><th>{t.remaining}</th></tr></thead>
+            <table className="data-table godown-table godown-stock-table">
+              <thead><tr><th></th><th>{t.product}</th><th>{t.imported ?? 'Imported'}</th><th>{t.inStock}</th><th>{t.sold}</th><th>{t.unitCost}</th><th>{t.sellingPrice}</th><th>{t.totalValue}</th><th>{t.paid}</th><th>{t.remaining}</th></tr></thead>
               <tbody>
                 {filteredProducts.length === 0 ? <tr><td colSpan="10" className="empty-cell">{t.noProductsFound}</td></tr> : filteredProducts.map((product) => (
                   <Fragment key={product.id}>
-                    <tr>
+                    <tr className="godown-product-row">
                       <td><button className="expand-row-btn" type="button" onClick={() => setExpandedProduct((current) => current === product.id ? '' : product.id)}><ChevronDown className={expandedProduct === product.id ? 'open' : ''} size={16} /></button></td>
-                      <td><strong>{product.name}</strong><small>{product.code || '-'} · {product.entries.length} {t.purchase}</small></td>
-                      <td><strong>{product.quantity} {product.unit || 'pcs'}</strong></td>
-                      <td><span className="success-text">{product.imported}</span> / {product.imported || product.quantity} {product.unit || 'pcs'}</td>
-                      <td>0 {product.unit || 'pcs'}</td>
-                      <td>{formatMoney(product.purchase)}</td>
-                      <td className="info-text">{formatMoney(product.selling)}</td>
-                      <td><strong>{formatMoney(product.totalValue)}</strong></td>
-                      <td className="success-text">{formatMoney(0)}</td>
-                      <td className="danger-text">{formatMoney(Math.max(0, product.remaining))}</td>
+                      <td><strong>{product.name}</strong><small>{product.code || '-'} &middot; {product.entries.length} {product.entries.length === 1 ? (t.purchase ?? 'Purchase') : (t.purchases ?? 'Purchases')}</small></td>
+                      <td><span className="stock-count stock-count-imported">{product.imported}</span> <small>{product.unit || 'pcs'}</small></td>
+                      <td><strong className="stock-count stock-count-current">{product.quantity}</strong> <small>{product.unit || 'pcs'}</small></td>
+                      <td><span className="stock-count stock-count-sold">{product.sold}</span> <small>{product.unit || 'pcs'}</small></td>
+                      <td>{formatCurrencyMoney(product.purchase, product.currency)}</td>
+                      <td className="info-text">{formatCurrencyMoney(product.selling, product.currency)}</td>
+                      <td><strong>{formatCurrencyMoney(product.totalValue, product.currency)}</strong></td>
+                      <td className="success-text">{formatCurrencyMoney(product.paid, product.currency)}</td>
+                      <td className="danger-text">{formatCurrencyMoney(Math.max(0, product.remaining), product.currency)}</td>
                     </tr>
                     {expandedProduct === product.id && (
                       <tr className="history-row">
@@ -1583,10 +1745,10 @@ function GodownPage({ categories, companyInfo, godownEntries, onGodownChange, on
                           <div className="purchase-history">
                             <div><span>{t.allPurchasesForProduct}</span><span className="soft-pill">{t.immutableHistory}</span></div>
                             <table>
-                              <thead><tr><th>{t.date}</th><th>{t.supplier}</th><th>{t.source}</th><th>{t.qty}</th><th>{t.unitCost}</th><th>{t.sellingPrice}</th><th>{t.total}</th></tr></thead>
+                              <thead><tr><th>{t.date}</th><th>{t.supplier}</th><th>{t.source}</th><th>{t.qty}</th><th>{t.unitCost}</th><th>{t.sellingPrice}</th><th>{t.rate ?? 'Rate'}</th><th>{t.total}</th></tr></thead>
                               <tbody>
                                 {product.entries.map((entry) => (
-                                  <tr key={entry.id}><td>{getGregorianLabel(entry.date)}<small>{getShamsiShortLabel(entry.date)}</small></td><td>{suppliers.find((supplier) => supplier.id === entry.supplierId)?.name || '-'}</td><td><span className="soft-pill">{t.import}</span></td><td>{entry.quantity} {entry.unit}</td><td>{formatMoney(entry.purchase)}</td><td>{formatMoney(entry.selling)}</td><td><strong>{formatMoney(entry.total)}</strong></td></tr>
+                                  <tr key={entry.id}><td>{getGregorianLabel(entry.date)}<small>{getShamsiShortLabel(entry.date)}</small></td><td>{suppliers.find((supplier) => supplier.id === entry.supplierId)?.name || '-'}</td><td><span className="soft-pill">{entry.billNumber ? `${t.bill ?? 'Bill'} ${entry.billNumber}` : t.import}</span></td><td>{entry.quantity} {entry.unit}</td><td>{formatCurrencyMoney(entry.purchase, entry.currency)}</td><td className="info-text">{formatCurrencyMoney(entry.selling, entry.currency)}<small>{t.net ?? 'net'}: {formatCurrencyMoney(Math.max(0, parseNumber(entry.selling) - parseNumber(entry.purchase)) * parseNumber(entry.quantity), entry.currency)}</small></td><td>{entry.currency === 'AFN' ? '-' : entry.currency}</td><td><strong>{formatCurrencyMoney(entry.total, entry.currency)}</strong></td></tr>
                                 ))}
                               </tbody>
                             </table>
@@ -1601,32 +1763,66 @@ function GodownPage({ categories, companyInfo, godownEntries, onGodownChange, on
           </div>
         ) : (
           <div className="godown-table-wrap">
-            <table className="data-table godown-table">
-              <thead><tr><th>{t.type}</th><th>{t.product}</th><th>{t.supplier}</th><th>{t.quantity}</th><th>{t.total}</th><th>{t.paid}</th><th>{t.remaining}</th><th>{t.date}</th><th>{t.actions}</th></tr></thead>
+            <table className="data-table godown-table godown-entry-table">
+              <thead><tr><th></th><th>{t.type}</th><th>{t.product}</th><th>{t.supplier}</th><th>{t.vehicle ?? 'Vehicle'}</th><th>{t.quantity}</th><th>{t.total}</th><th>{t.paid}</th><th>{t.remaining}</th><th>{t.date}</th><th>{t.actions}</th></tr></thead>
               <tbody>
-                {filteredEntries.length === 0 ? <tr><td colSpan="9" className="empty-cell">{t.noRecordsFound ?? 'No records found'}</td></tr> : filteredEntries.map((entry) => (
-                  <tr key={entry.id}>
-                    <td><span className="status-pill active">{t.import}</span></td>
-                    <td><strong>{entry.name}</strong><small>{entry.code || '-'}</small></td>
-                    <td>{suppliers.find((supplier) => supplier.id === entry.supplierId)?.name || '-'}</td>
-                    <td>{entry.quantity} {entry.unit}</td>
-                    <td><strong>{formatMoney(entry.total)}</strong></td>
-                    <td className="success-text">{formatMoney(entry.paid)}</td>
-                    <td className="danger-text">{formatMoney(entry.remaining)}</td>
-                    <td>{getGregorianLabel(entry.date)}<small>{getShamsiShortLabel(entry.date)}</small></td>
-                    <td>
-                      <FloatingActionMenu
-                        ariaLabel={t.actions}
-                        actions={[
-                          { icon: <Eye size={15} />, label: t.view, onClick: () => { setDetailEntry(entry); setDetailTab('product') } },
-                          { icon: <Eye size={15} />, label: t.supplierPortal ?? t.view, onClick: () => { setSupplierPortal(entry); setSupplierTab('ledger') } },
-                          { icon: <SquareMenu size={15} />, label: t.edit, onClick: () => setEditEntry(entry) },
-                          { icon: <CalendarDays size={15} />, label: t.moveToExpired ?? 'Move to expired', onClick: () => moveToExpired(entry) },
-                          { danger: true, icon: <Trash2 size={15} />, label: t.delete, onClick: () => setDeleteEntry(entry) },
-                        ]}
-                      />
-                    </td>
-                  </tr>
+                {filteredStockEntries.length === 0 ? <tr><td colSpan="11" className="empty-cell">{t.noRecordsFound ?? 'No records found'}</td></tr> : filteredStockEntries.map((entry) => (
+                  <Fragment key={entry.id}>
+                    <tr className="godown-stock-entry-row">
+                      <td>
+                        {entry.isExpandable ? (
+                          <button className="expand-row-btn" type="button" onClick={() => setExpandedStockEntry((current) => current === entry.id ? '' : entry.id)}>
+                            <ChevronDown className={expandedStockEntry === entry.id ? 'open' : ''} size={16} />
+                          </button>
+                        ) : null}
+                      </td>
+                      <td><span className="status-pill active">{t.import}</span></td>
+                      <td>
+                        <strong>{entry.name}</strong>
+                        <small>
+                          {entry.kind === 'auto' ? <>{entry.code || '-'} &middot; Auto</> : `${entry.rows.length} ${t.items ?? 'item(s)'}`}
+                        </small>
+                      </td>
+                      <td>{suppliers.find((supplier) => supplier.id === entry.supplierId)?.name || '-'}</td>
+                      <td>-</td>
+                      <td>{entry.quantity} {entry.unit}</td>
+                      <td><strong>{formatCurrencyMoney(entry.total, entry.currency)}</strong></td>
+                      <td className="success-text">{formatCurrencyMoney(entry.paid, entry.currency)}</td>
+                      <td className="danger-text">{formatCurrencyMoney(entry.remaining, entry.currency)}</td>
+                      <td>{getGregorianLabel(entry.date)}<small>{getShamsiShortLabel(entry.date)}</small></td>
+                      <td>
+                        <FloatingActionMenu
+                          ariaLabel={t.actions}
+                          actions={[
+                            { icon: <Eye size={15} />, label: t.view, onClick: () => { setDetailEntry(entry.actionEntry); setDetailTab('product') } },
+                            ...(entry.supplierId ? [{ icon: <Eye size={15} />, label: t.supplierPortal ?? t.view, onClick: () => { setSupplierPortal(entry.actionEntry); setSupplierTab('ledger') } }] : []),
+                            ...(entry.kind === 'purchase' ? [
+                              { icon: <SquareMenu size={15} />, label: t.edit, onClick: () => setEditEntry(entry.actionEntry) },
+                              { icon: <CalendarDays size={15} />, label: t.moveToExpired ?? 'Move to expired', onClick: () => moveToExpired(entry.actionEntry) },
+                              { danger: true, icon: <Trash2 size={15} />, label: t.delete, onClick: () => setDeleteEntry(entry.actionEntry) },
+                            ] : []),
+                          ]}
+                        />
+                      </td>
+                    </tr>
+                    {entry.isExpandable && expandedStockEntry === entry.id && (
+                      <tr className="history-row stock-entry-lines-row">
+                        <td colSpan="11">
+                          <div className="purchase-history">
+                            <div><span>{t.lineItemsInBill ?? 'Line Items in this bill'}</span></div>
+                            <table>
+                              <thead><tr><th>{t.product}</th><th>{t.code}</th><th>{t.qty}</th><th>{t.unitCost}</th><th>{t.sellingPrice}</th><th>{t.total}</th></tr></thead>
+                              <tbody>
+                                {entry.rows.map((row) => (
+                                  <tr key={row.id}><td><strong>{row.name}</strong></td><td>{row.code || '-'}</td><td>{row.quantity} {row.unit}</td><td>{formatCurrencyMoney(row.purchase, row.currency)}</td><td className="info-text">{formatCurrencyMoney(row.selling, row.currency)}</td><td><strong>{formatCurrencyMoney(row.total, row.currency)}</strong></td></tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
                 ))}
               </tbody>
             </table>
