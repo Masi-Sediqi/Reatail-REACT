@@ -1654,7 +1654,7 @@ function GodownPage({ categories, companyInfo, godownEntries, onGodownChange, on
   </button>
 
   <button
-    className="godown-print-btn"
+    className="app-print-action-btn godown-print-btn"
     type="button"
     onClick={() => setPrintOpen(true)}
   >

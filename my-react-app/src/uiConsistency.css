@@ -1086,6 +1086,131 @@
   cursor: not-allowed;
 }
 
+/* Shared page-level print action: Expenses is the canonical design. */
+#root#root#root .retail-shell .main-area button.app-print-action-btn,
+#root#root#root .retail-shell .main-area button.app-print-action-btn:hover,
+#root#root#root .retail-shell .main-area button.app-print-action-btn:focus,
+#root#root#root .retail-shell .main-area button.app-print-action-btn:active {
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: max-content !important;
+  inline-size: max-content !important;
+  min-inline-size: 0 !important;
+  max-inline-size: max-content !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+  padding: 0 11px !important;
+  border: 1px solid var(--app-primary-button-bg) !important;
+  border-radius: 8px !important;
+  background: var(--app-primary-button-bg) !important;
+  background-color: var(--app-primary-button-bg) !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root .retail-shell .main-area button.app-print-action-btn:hover {
+  border-color: var(--app-primary-button-bg-hover) !important;
+  background: var(--app-primary-button-bg-hover) !important;
+  background-color: var(--app-primary-button-bg-hover) !important;
+}
+
+#root#root#root .retail-shell .main-area button.app-print-action-btn > svg {
+  position: static !important;
+  width: 15px !important;
+  min-width: 15px !important;
+  max-width: 15px !important;
+  height: 15px !important;
+  min-height: 15px !important;
+  max-height: 15px !important;
+  display: block !important;
+  flex: 0 0 15px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: currentColor !important;
+  stroke: currentColor !important;
+  stroke-width: 1.9 !important;
+  transform: none !important;
+  pointer-events: none !important;
+}
+
+#root#root#root .retail-shell .main-area button.app-print-action-btn > span {
+  display: inline-flex !important;
+  align-items: center !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: inherit !important;
+  font: inherit !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+@media (max-width: 640px) {
+  #root#root#root .retail-shell .main-area button.app-print-action-btn {
+    width: 100% !important;
+    max-width: none !important;
+    inline-size: 100% !important;
+    max-inline-size: none !important;
+  }
+}
+
+/* Keep Settings save actions aligned with the shared 36px page-action design. */
+#root#root#root .retail-shell .main-area .settings-content button.save-btn,
+#root#root#root .retail-shell .main-area .settings-content button.save-btn:hover,
+#root#root#root .retail-shell .main-area .settings-content button.save-btn:focus,
+#root#root#root .retail-shell .main-area .settings-content button.save-btn:active {
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: max-content !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  gap: 6px !important;
+  margin: 0 !important;
+  padding: 0 11px !important;
+  border: 1px solid var(--app-primary-button-bg) !important;
+  border-radius: 8px !important;
+  background: var(--app-primary-button-bg) !important;
+  background-color: var(--app-primary-button-bg) !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root#root#root .retail-shell .main-area .settings-content button.save-btn:hover {
+  border-color: var(--app-primary-button-bg-hover) !important;
+  background: var(--app-primary-button-bg-hover) !important;
+  background-color: var(--app-primary-button-bg-hover) !important;
+}
+
+#root#root#root .retail-shell .main-area .settings-content button.save-btn > svg {
+  width: 15px !important;
+  min-width: 15px !important;
+  height: 15px !important;
+  min-height: 15px !important;
+  flex: 0 0 15px !important;
+  color: currentColor !important;
+  stroke: currentColor !important;
+}
+
 /* Final modal backdrop: keep forms light by using a simple veil without backdrop blur. */
 body:has(.modal-backdrop) {
   overflow: hidden;

@@ -11,6 +11,7 @@ import {
   ReceiptText,
   Search,
   Trash2,
+  Printer,
   WalletCards,
   X,
 } from '../components/Icons.jsx'
@@ -581,10 +582,61 @@ function LoansPage({ companyInfo, onCustomersChange, onEditBill, onNotify, onSal
 
   return (
     <section className="entity-content loans-content">
-      <div className="entity-heading loans-heading">
-        <div><h1>{t.loanManagement}</h1><p>{t.trackManageCustomerLoans}</p></div>
-        <div className="entity-actions"><button type="button" onClick={() => setPrintOpen(true)}><ReceiptText size={16} /> {t.printReport}</button></div>
-      </div>
+<div className="entity-heading loans-heading">
+  <div className="min-w-0">
+    <h1>{t.loanManagement}</h1>
+
+    <p>
+      {t.trackManageCustomerLoans}
+    </p>
+  </div>
+
+  <div className="entity-actions !m-0 !w-auto !min-w-0">
+    <button
+      className="
+        app-print-action-btn
+        loans-print-btn
+        !inline-flex
+        !h-8
+        !min-h-8
+        !max-h-8
+        !w-fit
+        !min-w-0
+        !max-w-max
+        shrink-0
+        items-center
+        justify-center
+        gap-1.5
+        !rounded-lg
+        !border
+        !border-slate-200
+        !bg-white
+        !px-2.5
+        !py-0
+        !text-[11px]
+        !font-bold
+        !leading-none
+        !text-slate-700
+        !shadow-none
+        hover:!border-slate-300
+        hover:!bg-slate-50
+        dark:!border-slate-700
+        dark:!bg-slate-900
+        dark:!text-slate-200
+        dark:hover:!border-slate-600
+        dark:hover:!bg-slate-800
+      "
+      type="button"
+      onClick={() => setPrintOpen(true)}
+    >
+      <Printer size={14} />
+
+      <span className="whitespace-nowrap">
+        {t.printReport ?? 'Print Report'}
+      </span>
+    </button>
+  </div>
+</div>
 
       <div className="summary-grid four loans-summary">
         <article className="tone-blue"><span>{t.activeLoans}</span><strong>{formatMoney(activeTotal)}</strong><CreditCard size={22} /></article>

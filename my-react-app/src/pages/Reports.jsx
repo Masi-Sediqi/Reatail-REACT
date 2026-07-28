@@ -98,12 +98,12 @@ function ReportsPage({ cashWallet, companyInfo, expenses = [], printSettings, pr
   </div>
 
   <button
-    className="report-print-btn"
+    className="app-print-action-btn report-print-btn"
     type="button"
     onClick={() => setPrintOpen(true)}
   >
     <ReceiptText size={15} />
-    <span>{t.print}</span>
+    <span>{t.printReport ?? 'Print Report'}</span>
   </button>
 </div>
       </div>

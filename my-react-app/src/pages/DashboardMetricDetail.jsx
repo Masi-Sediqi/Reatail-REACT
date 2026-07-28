@@ -262,7 +262,7 @@ function DashboardMetricDetail({ cashWallet, companyInfo, customers = [], expens
             <button className="back-icon-btn" type="button" onClick={onBack}><ChevronLeft size={18} /></button>
             <div><h1>{t.customersView ?? 'Customers View'}</h1><p>{t.allCustomers ?? 'All customers'}</p></div>
           </div>
-          <div className="entity-actions"><button type="button" onClick={() => setPrintOpen(true)}><ReceiptText size={16} /> {t.printReport}</button></div>
+          <div className="entity-actions"><button className="app-print-action-btn" type="button" onClick={() => setPrintOpen(true)}><ReceiptText size={16} /> {t.printReport}</button></div>
         </div>
 
         <div className="summary-grid three metric-detail-summary">
@@ -448,7 +448,7 @@ function DashboardMetricDetail({ cashWallet, companyInfo, customers = [], expens
           </div>
           <div className="entity-actions">
   <button
-    className="revenue-print-btn"
+    className="app-print-action-btn revenue-print-btn"
     type="button"
     onClick={() => setPrintOpen(true)}
   >
@@ -568,7 +568,7 @@ function DashboardMetricDetail({ cashWallet, companyInfo, customers = [], expens
             <button className="back-icon-btn" type="button" onClick={onBack}><ChevronLeft size={18} /></button>
             <div><h1>{t.pureProfitBreakdown ?? 'Pure Profit Breakdown'}</h1><p>{t.pureProfitBreakdownSubtitle ?? 'Raw goods margin without expenses or refunds deducted'}</p></div>
           </div>
-          <div className="entity-actions"><button type="button" onClick={() => setPrintOpen(true)}><Printer size={16} /> {t.print ?? 'Print'}</button></div>
+          <div className="entity-actions"><button className="app-print-action-btn" type="button" onClick={() => setPrintOpen(true)}><Printer size={16} /> {t.printReport ?? 'Print Report'}</button></div>
         </div>
 
         <div className="summary-grid four metric-detail-summary pure-profit-summary">
@@ -688,7 +688,7 @@ function DashboardMetricDetail({ cashWallet, companyInfo, customers = [], expens
             <button className="back-icon-btn" type="button" onClick={onBack}><ChevronLeft size={18} /></button>
             <div><h1>{t.netProfit ?? 'Net Profit'}</h1><p>{t.netProfitSubtitle ?? 'Pure profit after all costs and expenses'}</p></div>
           </div>
-          <div className="entity-actions"><button type="button" onClick={() => setPrintOpen(true)}><ReceiptText size={16} /> {t.print ?? 'Print'}</button></div>
+          <div className="entity-actions"><button className="app-print-action-btn" type="button" onClick={() => setPrintOpen(true)}><ReceiptText size={16} /> {t.printReport ?? 'Print Report'}</button></div>
         </div>
 
         <div className="summary-grid three metric-detail-summary">
@@ -743,7 +743,7 @@ function DashboardMetricDetail({ cashWallet, companyInfo, customers = [], expens
           <div><h1>{title}</h1><p>{subtitle}</p></div>
         </div>
         <div className="entity-actions">
-          <button className={isRevenueView ? 'revenue-print-btn' : ''} type="button" onClick={() => setPrintOpen(true)}>
+          <button className={isRevenueView ? 'app-print-action-btn revenue-print-btn' : 'app-print-action-btn'} type="button" onClick={() => setPrintOpen(true)}>
             {isRevenueView ? <Printer size={16} /> : <ReceiptText size={16} />}
             <span>{t.printReport ?? 'Print Report'}</span>
           </button>

@@ -285,7 +285,7 @@ function ExpensesPage({ companyInfo, expenseCategories = defaultExpenseCategorie
         <div><h1>{t.expensesManagement}</h1><p>{t.trackBusinessExpenses}</p></div>
         <div className="entity-actions expense-header-actions">
   <button
-    className="expense-print-report-btn"
+    className="app-print-action-btn expense-print-report-btn"
     type="button"
     onClick={() => setPrintOpen(true)}
   >

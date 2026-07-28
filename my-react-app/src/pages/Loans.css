@@ -1418,3 +1418,64 @@
 .loan-modal-v2-title p {
   line-height: 1.2 !important;
 }
+
+
+
+#root .retail-shell .loans-heading .loans-print-btn {
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: max-content !important;
+
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+
+  padding: 0 10px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+
+  flex: 0 0 auto !important;
+
+  border-radius: 8px !important;
+
+  font-size: 11px !important;
+  line-height: 1 !important;
+
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#root .retail-shell .loans-heading .loans-print-btn > svg {
+  position: static !important;
+
+  width: 14px !important;
+  min-width: 14px !important;
+  height: 14px !important;
+  min-height: 14px !important;
+
+  display: block !important;
+  flex: 0 0 14px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: currentColor !important;
+  stroke: currentColor !important;
+
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+#root .retail-shell .loans-heading .loans-print-btn > span {
+  display: inline-flex !important;
+  align-items: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}

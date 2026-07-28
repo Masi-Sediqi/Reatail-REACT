@@ -404,7 +404,7 @@ function CashWalletPage({ companyInfo, expenses = [], onBack, onCashWalletChange
             </>
           )}
           <button className="cash-wallet-add-btn" title={t.cashWallet ?? 'Cash Wallet'} type="button" onClick={() => setModalOpen(true)}><Plus size={20} /></button>
-          <button className="cash-wallet-print-btn" type="button" onClick={() => setPrintOpen(true)}><Printer size={16} /> {t.printStatement ?? 'Print Statement'}</button>
+          <button className="app-print-action-btn cash-wallet-print-btn" type="button" onClick={() => setPrintOpen(true)}><Printer size={16} /> {t.printStatement ?? 'Print Statement'}</button>
         </div>
       </div>
 

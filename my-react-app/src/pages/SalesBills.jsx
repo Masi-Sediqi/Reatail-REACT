@@ -925,7 +925,7 @@ function SalesBillsPage({ companyInfo, onEditBill, onNotify, onProductsChange, o
         <div><h1>{t.salesManagement}</h1><p>{t.salesSubtitle}</p></div>
         <div className="entity-actions sales-page-actions">
   <button
-    className="sales-print-report-btn"
+    className="app-print-action-btn sales-print-report-btn"
     type="button"
     onClick={() => setReportPreviewOpen(true)}
   >

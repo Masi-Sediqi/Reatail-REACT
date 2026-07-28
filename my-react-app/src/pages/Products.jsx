@@ -1257,7 +1257,7 @@ function ProductsPage({ cashWallet = 0, categories, companyInfo, onCashWalletCha
         <div><h1>{t.products}</h1><p>{t.manageProductInventory}</p></div>
         <div className="entity-actions products-header-actions">
  <button
-  className="products-print-btn"
+  className="app-print-action-btn products-print-btn"
   type="button"
   onClick={() => setPrintOpen(true)}
 >

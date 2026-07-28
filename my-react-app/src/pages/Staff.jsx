@@ -521,7 +521,7 @@ function StaffPage({ companyInfo, onCashWalletChange, onMoveToRecycle, onNotify,
         <div><h1>{t.staff}</h1><p>{t.staffOverview}</p></div>
        <div className="entity-actions staff-header-actions">
   <button
-    className="staff-action-btn staff-print-btn"
+    className="app-print-action-btn staff-action-btn staff-print-btn"
     type="button"
     onClick={() => setPrintOpen(true)}
   >

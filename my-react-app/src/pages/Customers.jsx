@@ -633,7 +633,7 @@ function CustomersPage({ companyInfo, customers, initialProfileCustomerId = '', 
         <div><h1>{t.customerManagement}</h1><p>{t.manageCustomerRelationships}</p></div>
         <div className="entity-actions customer-header-actions">
           <button
-            className="customer-print-btn"
+            className="app-print-action-btn customer-print-btn"
             type="button"
             onClick={() => setPrintOpen(true)}
           >

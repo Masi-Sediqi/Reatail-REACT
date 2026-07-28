@@ -969,12 +969,12 @@ function SuppliersPage({
         <div><h1>{t.suppliers}</h1><p>{t.manageSupplierLedgers}</p></div>
        <div className="entity-actions supplier-page-actions">
   <button
-    className="supplier-print-btn"
+    className="app-print-action-btn supplier-print-btn"
     type="button"
     onClick={() => setPrintOpen(true)}
   >
     <Printer size={16} />
-    <span>{t.print}</span>
+    <span>{t.printReport ?? 'Print Report'}</span>
   </button>
 
   <button
